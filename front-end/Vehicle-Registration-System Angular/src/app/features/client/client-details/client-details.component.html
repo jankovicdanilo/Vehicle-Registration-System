@@ -1,0 +1,10 @@
+<div style="display: flex; justify-content: center; margin: 40px 0">
+  <mat-card class="card">
+    <mat-card-header class="card-header">
+      <mat-card-title class="card-header-title">{{ client?.ime }} {{ client?.prezime }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="card-body">
+      <app-client-form (clientChanged)="editClient($event)" [clientId]="clientId" [client]="client"></app-client-form>
+    </mat-card-content>
+  </mat-card>
+</div>

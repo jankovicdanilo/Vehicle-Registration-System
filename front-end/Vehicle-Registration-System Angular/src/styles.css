@@ -1,0 +1,47 @@
+@import './app/styles/form.css';
+@import './app/styles/table.css';
+@import './app/styles/card.css';
+@import './app/styles/toastr.css';
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f0f0f0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.register-link {
+  margin-top: 6rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.register-link a {
+  margin-left: 0.3rem;
+  text-decoration: none;
+  color: #3f51b5;
+  font-weight: 500;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+button[mat-flat-button] {
+  border-radius: 4px !important;
+}

@@ -1,0 +1,37 @@
+<form class="form" [formGroup]="userForm">
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Ime</mat-label>
+        <input matInput formControlName="username" type="text" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Mejl adresa</mat-label>
+        <input matInput formControlName="email" type="email" required autocomplete="off" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Lozinka</mat-label>
+        <input matInput formControlName="password" type="password" required [autocomplete]="userId ? 'off' : 'new-password'" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Uloga</mat-label>
+        <mat-select formControlName="role">
+            <mat-option value="Admin">Admin</mat-option>
+            <mat-option value="SefOdsjeka">Šef odsjeka</mat-option>
+            <mat-option value="">Zaposleni</mat-option>
+        </mat-select>
+    </mat-form-field>
+</form>
+
+<div style="display: flex; justify-content: center; margin-bottom: 40px">
+    <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="onSave()"
+            [disabled]="userForm.invalid"
+    >
+        Potvrdite
+    </button>
+</div>

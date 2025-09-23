@@ -1,0 +1,26 @@
+<mat-toolbar color="primary" class="header-toolbar header">
+  <span class="pointer" [routerLink]="['/registration/list']">eRegistracija</span>
+  <div class="header-links">
+    <button mat-button [routerLink]="['/vehicle/list']" routerLinkActive="router-link-active" >Vozila</button>
+    <button mat-button [routerLink]="['/client/list']" routerLinkActive="router-link-active">Klijenti</button>
+    <button mat-button [routerLink]="['/insurance/list']" routerLinkActive="router-link-active">Osiguranja</button>
+    <button mat-button [routerLink]="['/registration/list']" routerLinkActive="router-link-active">Registracije</button>
+  </div>
+  <button style="margin-left: auto;" mat-icon-button aria-label="Profil" [matMenuTriggerFor]="profileMenu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #profileMenu="matMenu">
+    <button mat-menu-item [routerLink]="'/user/profile'">
+      <mat-icon>person</mat-icon>
+      <span>Moj profil</span>
+    </button>
+    <button mat-menu-item *ngIf="userService.isAdmin() || userService.isSefOdsjeka()" [routerLink]="'/user/list'">
+      <mat-icon>people</mat-icon>
+      <span>Lista korisnika</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Odjavite se</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>

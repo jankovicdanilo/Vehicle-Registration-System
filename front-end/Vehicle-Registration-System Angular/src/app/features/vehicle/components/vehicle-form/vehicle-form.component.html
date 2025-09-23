@@ -1,0 +1,64 @@
+<form [formGroup]="vehicleForm" class="form">
+  <mat-form-field appearance="outline" class="field">
+    <mat-label>Broj šasije</mat-label>
+    <input matInput formControlName="brojSasije" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Tip</mat-label>
+    <mat-select formControlName="tipVozilaId">
+      <mat-option *ngFor="let tip of vehicleTypes" [value]="tip.id">{{ tip.naziv }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Marka</mat-label>
+    <mat-select formControlName="markaVozilaId">
+      <mat-option *ngFor="let marka of vehicleBrands" [value]="marka.id">{{ marka.naziv }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Model</mat-label>
+    <mat-select formControlName="modelVozilaId">
+      <mat-option *ngFor="let model of vehicleBrandModels" [value]="model.id">{{ model.naziv }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Vrsta goriva</mat-label>
+    <mat-select formControlName="vrstaGoriva">
+      <mat-option *ngFor="let vrsta of vehicleFuelTypes" [value]="vrsta">{{ vrsta }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Godina proizvodnje</mat-label>
+    <input matInput type="number" formControlName="godinaProizvodnje" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Masa (kg)</mat-label>
+    <input matInput type="number" formControlName="masa" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Snaga motora (kW)</mat-label>
+    <input matInput type="number" formControlName="snagaMotora" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Zapremina motora (cm³)</mat-label>
+    <input matInput type="number" formControlName="zapreminaMotora" />
+  </mat-form-field>
+
+  <mat-form-field class="field" appearance="outline">
+    <mat-label>Datum prve registracije</mat-label>
+    <input matInput [matDatepicker]="prva" formControlName="datumPrveRegistracije" />
+    <mat-datepicker-toggle matSuffix [for]="prva"></mat-datepicker-toggle>
+    <mat-datepicker #prva></mat-datepicker>
+  </mat-form-field>
+</form>
+<div style="display: flex; justify-content: center; margin-bottom: 40px">
+  <button mat-flat-button color="primary" type="button" [disabled]="vehicleForm.invalid" (click)="onSave()">Sačuvajte</button>
+</div>

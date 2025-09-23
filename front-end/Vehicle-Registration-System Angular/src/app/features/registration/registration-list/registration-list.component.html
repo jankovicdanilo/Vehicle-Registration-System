@@ -1,0 +1,117 @@
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 40px 0">
+  <mat-card class="card">
+    <mat-card-header class="card-header">
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 16px; flex-wrap: wrap;">
+        <mat-card-title class="card-header-title" style="margin: 0; flex: 0 0 auto;">Lista registracija</mat-card-title>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <app-search
+            [placeholder]="'Unesite vozilo, registarsku oznaku, vlasnika...'"
+            (searchChange)="onSearchChange($event)"
+          ></app-search>
+          <button
+            mat-flat-button
+            matButton="filled"
+            (click)="navigateToRegistrationCreatePage()"
+            style="height: 56px; white-space: nowrap;"
+          >
+            <mat-icon aria-hidden="false" fontIcon="add">add</mat-icon>
+            Dodajte registraciju
+          </button>
+        </div>
+      </div>
+    </mat-card-header>
+    <mat-card-content class="card-body">
+      <div class="table-wrapper">
+        <ng-container *ngIf="registrations.length > 0; else noRegistrations">
+          <table
+            mat-table
+            [dataSource]="registrations"
+            class="mat-elevation-z8 table"
+          >
+            <ng-container matColumnDef="voziloMarkaModel">
+              <th mat-header-cell *matHeaderCellDef>Vozilo</th>
+              <td mat-cell *matCellDef="let registration">
+                {{ registration.vozilo.markaVozilaNaziv }}
+                {{ registration.vozilo.modelVozilaNaziv }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="registarskaOznaka">
+              <th mat-header-cell *matHeaderCellDef>Registarska oznaka</th>
+              <td mat-cell *matCellDef="let registration">
+                {{ registration.registarskaOznaka }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="vlasnik">
+              <th mat-header-cell *matHeaderCellDef>Vlasnik</th>
+              <td mat-cell *matCellDef="let registration">
+                {{ registration.vlasnik.ime }}
+                {{ registration.vlasnik.prezime }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="datumRegistracije">
+              <th mat-header-cell *matHeaderCellDef>Datum registracije</th>
+              <td mat-cell *matCellDef="let registration">
+                {{ registration.datumRegistracije | date : "dd.MM.yyyy." }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="datumIstekaRegistracije">
+              <th mat-header-cell *matHeaderCellDef>
+                Datum isteka registracije
+              </th>
+              <td mat-cell *matCellDef="let registration">
+                {{
+                  registration.datumIstekaRegistracije | date : "dd.MM.yyyy."
+                }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="cijenaRegistracije">
+              <th mat-header-cell *matHeaderCellDef>
+                Cijena registracije (RSD)
+              </th>
+              <td mat-cell *matCellDef="let registration">
+                {{ registration.cijenaRegistracije | number : "1.2-2" }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let registration">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                  "
+                >
+                  <mat-icon
+                    class="pointer"
+                    style="margin-right: 10px"
+                    aria-hidden="false"
+                    fontIcon="edit"
+                    (click)="onEditRegistration(registration)"
+                    >edit</mat-icon
+                  >
+                  <mat-icon
+                    class="pointer"
+                    aria-hidden="false"
+                    fontIcon="delete"
+                    *ngIf="userService.isAdmin() || userService.isSefOdsjeka()"
+                    (click)="onDeleteRegistration(registration)"
+                    >delete</mat-icon
+                  >
+                </div>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </ng-container>
+        <ng-template #noRegistrations>
+          <app-empty-list></app-empty-list>
+        </ng-template>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="currentPageSize"
+                  (paginationChange)="onPaginationChange($event)"></app-pagination>
+</div>

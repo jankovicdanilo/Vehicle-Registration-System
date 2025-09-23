@@ -1,0 +1,87 @@
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 40px 0">
+  <mat-card class="card">
+    <mat-card-header class="card-header">
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 16px; flex-wrap: wrap;">
+        <mat-card-title class="card-header-title" style="margin: 0; flex: 0 0 auto;">Lista korisnika</mat-card-title>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="navigateToUserCreatePage()"
+            style="height: 56px; white-space: nowrap;"
+          >
+            <mat-icon>person_add</mat-icon>
+            Dodajte korisnnika
+          </button>
+        </div>
+      </div>
+    </mat-card-header>
+    <mat-card-content class="card-body">
+      <div class="table-wrapper">
+        <ng-container *ngIf="users.length > 0; else noUsers">
+          <table
+            mat-table
+            [dataSource]="users"
+            class="mat-elevation-z8 table"
+          >
+            <ng-container matColumnDef="Korisničko ime">
+              <th mat-header-cell *matHeaderCellDef>Korisničko ime</th>
+              <td mat-cell *matCellDef="let user">
+                {{ user.username }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef>Mejl adresa</th>
+              <td mat-cell *matCellDef="let user">
+                {{ user.email }}
+              </td>
+            </ng-container>
+              <ng-container matColumnDef="role">
+                  <th mat-header-cell *matHeaderCellDef>Uloga</th>
+                  <td mat-cell *matCellDef="let user">
+                      {{ formatRole(user.mainRole) }}
+                  </td>
+              </ng-container>
+
+
+              <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td  mat-cell *matCellDef="let user">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                  "
+                >
+                  <mat-icon
+                    class="pointer"
+                    style="margin-right: 10px"
+                    aria-hidden="false"
+                    fontIcon="edit"
+                    *ngIf="userService.isAdmin()"
+                    (click)="onEditUser(user)"
+                    >edit</mat-icon
+                  >
+                  <mat-icon
+                    class="pointer"
+                    aria-hidden="false"
+                    fontIcon="delete"
+                    *ngIf="userService.isAdmin()"
+                    (click)="onDeleteUser(user)"
+                    >delete</mat-icon
+                  >
+                </div>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </ng-container>
+        <ng-template #noUsers>
+          <app-empty-list></app-empty-list>
+        </ng-template>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,75 @@
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 40px 0">
+  <mat-card class="card">
+    <mat-card-header class="card-header">
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 16px; flex-wrap: wrap;">
+        <mat-card-title class="card-header-title" style="margin: 0; flex: 0 0 auto;">
+          Lista vozila
+        </mat-card-title>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <app-search [placeholder]="'Unesite registarsku oznaku, marku, model...'" 
+                      [label]="'Pretražite vozila'"
+                      (searchChange)="onSearchChange($event)"></app-search>
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="navigateToVehicleCreatePage()"
+            style="height: 56px; white-space: nowrap;"
+          >
+            <mat-icon>add</mat-icon>
+            Dodajte vozilo
+          </button>
+        </div>
+      </div>
+    </mat-card-header>    
+    <mat-card-content class="card-body">
+      <div class="table-wrapper">
+        <ng-container *ngIf="vehicles.length > 0; else noVehicles">
+          <table mat-table [dataSource]="vehicles" class="mat-elevation-z8 table">
+            <ng-container matColumnDef="tip">
+              <th mat-header-cell *matHeaderCellDef>Tip</th>
+              <td mat-cell *matCellDef="let vehicle">{{ vehicle.tipVozilaNaziv }}</td>
+            </ng-container>
+            <ng-container matColumnDef="marka">
+              <th mat-header-cell *matHeaderCellDef>Marka</th>
+              <td mat-cell *matCellDef="let vehicle">{{ vehicle.markaVozilaNaziv }}</td>
+            </ng-container>
+            <ng-container matColumnDef="model">
+              <th mat-header-cell *matHeaderCellDef>Model</th>
+              <td mat-cell *matCellDef="let vehicle">{{ vehicle.modelVozilaNaziv }}</td>
+            </ng-container>
+            <ng-container matColumnDef="godinaProizvodnje">
+              <th mat-header-cell *matHeaderCellDef>Godina</th>
+              <td mat-cell *matCellDef="let vehicle">
+                {{ vehicle.godinaProizvodnje }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="vrstaGoriva">
+              <th mat-header-cell *matHeaderCellDef>Gorivo</th>
+              <td mat-cell *matCellDef="let vehicle">
+                {{ vehicle.vrstaGoriva }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let vehicle">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <mat-icon class="pointer" style="margin-right: 10px" aria-hidden="false" fontIcon="edit" (click)="onEditVehicle(vehicle)">edit</mat-icon>
+                  <mat-icon class="pointer" aria-hidden="false" fontIcon="delete" *ngIf="userService.isAdmin() || userService.isSefOdsjeka()" (click)="onDeleteVehicle(vehicle)">delete</mat-icon>
+                </div>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </ng-container>
+        <ng-template #noVehicles>
+          <app-empty-list></app-empty-list>
+        </ng-template>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="currentPageSize"
+                  (paginationChange)="onPaginationChange($event)"></app-pagination>
+  
+</div>

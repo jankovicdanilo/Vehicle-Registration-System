@@ -1,0 +1,27 @@
+
+<div class="container">
+  <mat-card class="auth-card">
+    <h2>Prijava</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline" floatLabel="always" class="full-width">
+        <mat-label>Ime</mat-label>
+        <input matInput formControlName="username" type="text" placeholder="Ime" required />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Mejl adresa</mat-label>
+        <input matInput formControlName="email" type="email" required />
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Lozinka</mat-label>
+        <input matInput formControlName="password" type="password" required />
+      </mat-form-field>
+      <div class="button-wrapper">
+        <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid">
+          Prijavite se
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>

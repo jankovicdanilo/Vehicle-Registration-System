@@ -1,0 +1,10 @@
+<div style="display: flex; justify-content: center; margin: 40px 0">
+  <mat-card class="card">
+    <mat-card-header class="card-header">
+      <mat-card-title class="card-header-title">{{ registration?.registarskaOznaka }} - {{ registration?.vlasnik.ime }} {{ registration?.vlasnik.prezime }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="card-body">
+      <app-registration-form (registrationChanged)="editRegistration($event)" [registrationId]="registrationId" [registration]="registration"></app-registration-form>
+    </mat-card-content>
+  </mat-card>
+</div>

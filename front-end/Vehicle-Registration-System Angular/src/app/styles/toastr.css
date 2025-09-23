@@ -1,0 +1,78 @@
+.toast-container {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+
+  &.toast-top-right {
+    top: 1rem;
+    right: 1rem;
+  }
+}
+
+.toast-container .ngx-toastr {
+  background-color: #fff;
+  color: #333;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 15px;
+  min-width: 350px;
+  max-width: 400px;
+  min-height: 50px;
+  background-repeat: no-repeat;
+  background-position: 16px center;
+  padding-left: 48px;
+  position: relative;
+  pointer-events: auto;
+}
+
+.toast-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #aaa;
+  font-size: 24px;
+  opacity: 0.7;
+  background: none;
+  border: none;
+
+  &:hover {
+    opacity: 1;
+    color: #000;
+  }
+}
+
+.toast-success {
+  border-left: 5px solid #28a745;
+  background-color: #fff;
+  background-image: url("../../assets/img/toast/success.svg");
+  color: #28a745 !important;
+}
+
+.toast-error {
+  border-left: 5px solid #dc3545;
+  background-color: #fff;
+  background-image: url("../../assets/img/toast/error.svg");
+  color: #dc3545 !important;
+}
+
+.toast-warning {
+  border-left: 5px solid #ffc107;
+  background-color: #fff;
+  background-image: url("../../assets/img/toast/warning.svg");
+  color: #ffc107 !important;
+}
+
+.toast-info {
+  border-left: 5px solid #17a2b8;
+  background-color: #fff;
+  background-image: url("../../assets/img/toast/info.svg");
+  color: #17a2b8 !important;
+}
+
+.toast-message {
+  margin-left: 10px;
+}

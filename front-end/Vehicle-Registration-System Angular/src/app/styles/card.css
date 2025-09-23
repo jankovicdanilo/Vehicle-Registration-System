@@ -1,0 +1,70 @@
+mat-card.auth-card {
+  width: 100%;
+  min-height: 600px;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 30px;
+  background-color: #f7f7f7;
+}
+
+.button-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button-wrapper button {
+  width: 100%;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+mat-card.card {
+  width: 80%; 
+  box-shadow: none;
+  margin-bottom: 20px;
+}
+
+mat-card-header.card-header {
+  min-height: 80px;
+  padding: 0 20px;
+  background-color: #fff;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+}
+
+mat-card-content.card-body {
+  margin: 20px 0 0 0;
+  padding: 0 0;
+  background-color: #fff;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgb(234, 234, 234);
+  border-radius: 4px;
+}
+
+mat-card-content.card-body:last-child {
+  padding-bottom: 0;
+}
+
+mat-card-actions.card-footer {
+  min-height: 60px;
+  padding: 0 20px;
+  background-color: #fff;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  border-radius: 4px;
+}
+
+.card-header-title {
+  color: #494949;
+}

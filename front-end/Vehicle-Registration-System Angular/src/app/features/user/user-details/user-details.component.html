@@ -1,0 +1,23 @@
+<div style="display: flex">
+  <app-user-sidebar></app-user-sidebar>
+  <div style="margin: 35px 30px; width: 100%;">
+    <mat-card class="card">
+      <mat-card-header class="card-header">
+        <mat-card-title class="card-header-title">Moj profil</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="card-body">
+        <form [formGroup]="userForm" style="display: flex; flex-direction: column; gap: 10px; max-width: 400px; padding: 20px;">
+          <mat-form-field appearance="outline">
+            <mat-label>Korisničko ime</mat-label>
+            <input matInput placeholder="Unesite korisničko ime" formControlName="username" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" placeholder="Unesite email adresu" formControlName="email" />
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

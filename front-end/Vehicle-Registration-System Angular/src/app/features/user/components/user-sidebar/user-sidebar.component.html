@@ -1,0 +1,8 @@
+<mat-drawer-container class="drawer-container" autosize>
+  <mat-drawer class="navbar" mode="side" opened>
+    <mat-nav-list>
+      <a style="margin-bottom: 15px;" mat-list-item routerLink="/user/profile" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Detalji profila</a>
+      <a style="margin-bottom: 15px;" mat-list-item routerLink="/user/change-password" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Lozinka</a>
+    </mat-nav-list>
+  </mat-drawer>
+</mat-drawer-container>

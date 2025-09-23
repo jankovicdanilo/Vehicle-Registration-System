@@ -1,0 +1,73 @@
+<form [formGroup]="clientForm" class="form">
+  <mat-form-field appearance="outline" class="field">
+    <mat-label>Ime</mat-label>
+    <input matInput formControlName="ime" />
+    <mat-error *ngIf="clientForm.get('ime')?.touched && clientForm.get('ime')?.errors?.['required']">
+      Ime je obavezno.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Prezime</mat-label>
+    <input matInput formControlName="prezime" />
+    <mat-error *ngIf="clientForm.get('prezime')?.touched && clientForm.get('prezime')?.errors?.['required']">
+      Prezime je obavezno.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>JMBG</mat-label>
+    <input matInput formControlName="jmbg" />
+    <mat-error *ngIf="clientForm.get('jmbg')?.touched && clientForm.get('jmbg')?.errors?.['required']">
+      JMBG je obavezan.
+    </mat-error>
+    <mat-error *ngIf="clientForm.get('jmbg')?.touched && clientForm.get('jmbg')?.errors?.['pattern']">
+      JMBG mora imati tačno 13 cifara.
+    </mat-error>
+  </mat-form-field>
+  
+  <mat-form-field appearance="outline">
+    <mat-label>Datum rodjenja</mat-label>
+    <input matInput [matDatepicker]="reg" formControlName="datumRodjenja" />
+    <mat-datepicker-toggle matSuffix [for]="reg"></mat-datepicker-toggle>
+    <mat-datepicker #reg></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Adresa</mat-label>
+    <input matInput formControlName="adresa" />
+    <mat-error *ngIf="clientForm.get('adresa')?.touched && clientForm.get('adresa')?.errors?.['required']">
+      Adresa je obavezna.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Broj lične karte</mat-label>
+    <input matInput formControlName="brojLicneKarte" />
+    <mat-error *ngIf="clientForm.get('brojLicneKarte')?.touched && clientForm.get('brojLicneKarte')?.errors?.['required']">
+      Broj lične karte je obavezan.
+    </mat-error>
+    <mat-error *ngIf="clientForm.get('brojLicneKarte')?.touched && clientForm.get('brojLicneKarte')?.errors?.['pattern']">
+      Broj lične karte mora imati 9 cifara.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Mejl adresa</mat-label>
+    <input matInput formControlName="email" />
+    <mat-error *ngIf="clientForm.get('email')?.touched && clientForm.get('email')?.errors?.['required']">
+      Mejl adresa je obavezna.
+    </mat-error>
+    <mat-error *ngIf="clientForm.get('email')?.touched && clientForm.get('email')?.errors?.['email']">
+      Unesite ispravnu mejl adresu (npr. korisnikuser&#64;example.com).
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Broj telefona</mat-label>
+    <input matInput formControlName="brojTelefona" />
+  </mat-form-field>
+</form>
+<div style="display: flex; justify-content: center; margin-bottom: 40px">
+  <button mat-flat-button color="primary" type="button" [disabled]="clientForm.invalid" (click)="onSave()">Sačuvajte</button>
+</div>

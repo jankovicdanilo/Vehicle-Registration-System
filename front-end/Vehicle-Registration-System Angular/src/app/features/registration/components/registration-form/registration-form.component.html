@@ -1,0 +1,46 @@
+<form [formGroup]="registrationForm" class="form">
+  <mat-form-field appearance="outline" class="field">
+    <mat-label>Klijent</mat-label>
+    <mat-select formControlName="klijentId">
+      <mat-option *ngFor="let client of clients" [value]="client.id">{{ client.ime }} {{ client.prezime }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Vozilo</mat-label>
+    <mat-select formControlName="voziloId">
+      <mat-option *ngFor="let vehicle of vehicles" [value]="vehicle.id">{{ vehicle.markaVozilaNaziv }} {{ vehicle.modelVozilaNaziv }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Datum registracije</mat-label>
+    <input matInput [matDatepicker]="reg" formControlName="datumRegistracije" />
+    <mat-datepicker-toggle matSuffix [for]="reg"></mat-datepicker-toggle>
+    <mat-datepicker #reg></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Registarska oznaka</mat-label>
+    <input type="text" matInput formControlName="registarskaOznaka" />
+    <mat-error *ngIf="registrationForm.get('registarskaOznaka')?.hasError('registarskaOznakaInvalid')">
+      Oznaka mora biti u formatu 'DE8976OP'.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Odaberi osiguranje</mat-label>
+    <mat-select formControlName="osiguranjeId">
+      <mat-option *ngFor="let insurance of insurances" [value]="insurance.id">
+        {{ insurance.naziv }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-slide-toggle formControlName="privremenaRegistracija">
+    Privremena registracija
+  </mat-slide-toggle>
+</form>
+<div style="display: flex; justify-content: center; margin-bottom: 40px;">
+  <button mat-flat-button color="primary" type="button" [disabled]="registrationForm.invalid" (click)="onSave()">Sačuvajte</button>
+</div>

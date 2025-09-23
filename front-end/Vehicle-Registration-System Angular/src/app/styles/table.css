@@ -1,0 +1,23 @@
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  background-color: white !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgb(234, 234, 234);
+}
+
+.table th {
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: start;
+  border: 1px solid rgb(234, 234, 234);
+}
+
+.table td {
+  font-size: 16px;
+  border: 1px solid rgb(234, 234, 234);
+}

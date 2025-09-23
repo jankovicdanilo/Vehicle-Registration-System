@@ -1,0 +1,17 @@
+<mat-form-field appearance="outline" style="width: 350px; margin-top: 20px">
+  <mat-label>{{ label || "Pretraga" }}</mat-label>
+  <input
+    matInput
+    [(ngModel)]="searchTerm"
+    (ngModelChange)="onChange($event)"
+    [placeholder]="placeholder"/>
+  <mat-icon
+    *ngIf="searchTerm"
+    matSuffix
+    (click)="clear()"
+    style="cursor: pointer; margin-right: 4px"
+  >
+    close
+  </mat-icon>
+  <mat-icon matSuffix>search</mat-icon>
+</mat-form-field>
