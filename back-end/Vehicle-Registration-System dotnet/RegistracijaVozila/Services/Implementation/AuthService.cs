@@ -284,7 +284,6 @@ namespace RegistracijaVozila.Services.Implementation
             {
                 var roles = await userManager.GetRolesAsync(user);
 
-                // Determine main role based on priority
                 string mainRole;
                 if (roles.Contains("Admin"))
                     mainRole = "Admin";
@@ -298,12 +297,11 @@ namespace RegistracijaVozila.Services.Implementation
                     Id = user.Id,
                     Email = user.Email,
                     Username = user.UserName,
-                    Roles = roles,        // keep full roles list
-                    MainRole = mainRole   // add main role for easy display
+                    Roles = roles,     
+                    MainRole = mainRole
                 });
             }
 
-            // Restrict results if caller is SefOdsjeka
             if (callerRole == "SefOdsjeka")
             {
                 results = results
