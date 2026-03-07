@@ -12,8 +12,8 @@ using VehicleRegistrationSystem.Data;
 namespace VehicleRegistrationSystem.Migrations
 {
     [DbContext(typeof(VehicleRegistrationDbContext))]
-    [Migration("20260306203549_FixVehicleForeignKeyNames")]
-    partial class FixVehicleForeignKeyNames
+    [Migration("20260307195502_InitialCreateWithSeedData")]
+    partial class InitialCreateWithSeedData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace VehicleRegistrationSystem.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Client", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Client", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,6 +65,32 @@ namespace VehicleRegistrationSystem.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Clients");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("10101010-1010-1010-1010-101010101010"),
+                            Address = "Main Street 12",
+                            DateOfBirth = new DateTime(1990, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "John@test.com",
+                            FirstName = "John",
+                            IdCardNumber = "123456",
+                            LastName = "Smith",
+                            NationalId = "1234567890123",
+                            PhoneNumber = "987654"
+                        },
+                        new
+                        {
+                            Id = new Guid("20202020-2020-2020-2020-202020202020"),
+                            Address = "Second Street 5",
+                            DateOfBirth = new DateTime(2002, 4, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "Alice@test.com",
+                            FirstName = "Alice",
+                            IdCardNumber = "987321",
+                            LastName = "Brown",
+                            NationalId = "9876543210123",
+                            PhoneNumber = "123789"
+                        });
                 });
 
             modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Insurance", b =>
@@ -80,6 +106,18 @@ namespace VehicleRegistrationSystem.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Insurances");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("50505050-5050-5050-5050-505050505050"),
+                            Name = "Allianz"
+                        },
+                        new
+                        {
+                            Id = new Guid("60606060-6060-6060-6060-606060606060"),
+                            Name = "Generali"
+                        });
                 });
 
             modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.InsurancePrice", b =>
@@ -106,6 +144,24 @@ namespace VehicleRegistrationSystem.Migrations
                     b.HasIndex("InsuranceId");
 
                     b.ToTable("InsurancePrices");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("70707070-7070-7070-7070-707070707070"),
+                            InsuranceId = new Guid("50505050-5050-5050-5050-505050505050"),
+                            MaxKw = 50,
+                            MinKw = 0,
+                            PricePerKw = 220m
+                        },
+                        new
+                        {
+                            Id = new Guid("80808080-8080-8080-8080-808080808080"),
+                            InsuranceId = new Guid("50505050-5050-5050-5050-505050505050"),
+                            MaxKw = 100,
+                            MinKw = 51,
+                            PricePerKw = 270m
+                        });
                 });
 
             modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Registration", b =>
@@ -150,6 +206,20 @@ namespace VehicleRegistrationSystem.Migrations
                         .IsUnique();
 
                     b.ToTable("Registrations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("90909090-9090-9090-9090-909090909090"),
+                            ClientId = new Guid("10101010-1010-1010-1010-101010101010"),
+                            ExpirationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            InsuranceId = new Guid("50505050-5050-5050-5050-505050505050"),
+                            IsTemporary = false,
+                            LicensePlate = "PG123AB",
+                            RegistrationDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RegistrationPrice = 55000m,
+                            VehicleId = new Guid("30303030-3030-3030-3030-303030303030")
+                        });
                 });
 
             modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Vehicle", b =>
@@ -199,6 +269,50 @@ namespace VehicleRegistrationSystem.Migrations
                     b.HasIndex("VehicleTypeId");
 
                     b.ToTable("Vehicles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("30303030-3030-3030-3030-303030303030"),
+                            ChassisNumber = "WBAXX12345678901",
+                            EngineCapacity = 1000f,
+                            EnginePowerKw = 250,
+                            FirstRegistrationDate = new DateTime(2023, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FuelType = "Petrol",
+                            ProductionYear = 2022,
+                            VehicleBrandId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            VehicleModelId = new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
+                            VehicleTypeId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Weight = 300f
+                        },
+                        new
+                        {
+                            Id = new Guid("40404040-4040-4040-4040-404040404040"),
+                            ChassisNumber = "JTDBR32E720123456",
+                            EngineCapacity = 1800f,
+                            EnginePowerKw = 103,
+                            FirstRegistrationDate = new DateTime(2022, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FuelType = "Diesel",
+                            ProductionYear = 2020,
+                            VehicleBrandId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            VehicleModelId = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                            VehicleTypeId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Weight = 1400f
+                        },
+                        new
+                        {
+                            Id = new Guid("50505050-5050-5050-5050-505050505050"),
+                            ChassisNumber = "ACAEBF12345678902",
+                            EngineCapacity = 4000f,
+                            EnginePowerKw = 300,
+                            FirstRegistrationDate = new DateTime(2023, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FuelType = "Diesel",
+                            ProductionYear = 2020,
+                            VehicleBrandId = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                            VehicleModelId = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
+                            VehicleTypeId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Weight = 4200f
+                        });
                 });
 
             modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.VehicleBrand", b =>
@@ -219,6 +333,26 @@ namespace VehicleRegistrationSystem.Migrations
                     b.HasIndex("VehicleTypeId");
 
                     b.ToTable("VehicleBrands");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            Name = "Yamaha",
+                            VehicleTypeId = new Guid("33333333-3333-3333-3333-333333333333")
+                        },
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            Name = "Toyota",
+                            VehicleTypeId = new Guid("11111111-1111-1111-1111-111111111111")
+                        },
+                        new
+                        {
+                            Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                            Name = "Mercedes",
+                            VehicleTypeId = new Guid("22222222-2222-2222-2222-222222222222")
+                        });
                 });
 
             modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.VehicleModel", b =>
@@ -239,6 +373,26 @@ namespace VehicleRegistrationSystem.Migrations
                     b.HasIndex("VehicleBrandId");
 
                     b.ToTable("VehicleModels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                            Name = "Corolla",
+                            VehicleBrandId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+                        },
+                        new
+                        {
+                            Id = new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
+                            Name = "R1",
+                            VehicleBrandId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                        },
+                        new
+                        {
+                            Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
+                            Name = "Actros",
+                            VehicleBrandId = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc")
+                        });
                 });
 
             modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.VehicleType", b =>
@@ -258,6 +412,26 @@ namespace VehicleRegistrationSystem.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("VehicleTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Category = "A",
+                            Name = "Motorcycle"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Category = "B",
+                            Name = "Car"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Category = "C",
+                            Name = "Truck"
+                        });
                 });
 
             modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.InsurancePrice", b =>
@@ -273,7 +447,7 @@ namespace VehicleRegistrationSystem.Migrations
 
             modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Registration", b =>
                 {
-                    b.HasOne("RegistracijaVozila.Models.Domain.Client", "Client")
+                    b.HasOne("VehicleRegistrationSystem.Models.Domain.Client", "Client")
                         .WithMany("Registrations")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -347,7 +521,7 @@ namespace VehicleRegistrationSystem.Migrations
                     b.Navigation("VehicleBrand");
                 });
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Client", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Client", b =>
                 {
                     b.Navigation("Registrations");
                 });

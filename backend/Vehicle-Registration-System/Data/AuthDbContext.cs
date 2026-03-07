@@ -30,37 +30,65 @@ namespace VehicleRegistrationSystem.Data
                 },
                 new IdentityRole
                 {
-                    Id = employeeRoleId,
-                    Name = "Employee",
-                    NormalizedName = "EMPLOYEE",
-                    ConcurrencyStamp = employeeRoleId
-                },
-                new IdentityRole
-                {
                     Id = managerRoleId,
                     Name = "Manager",
                     NormalizedName = "MANAGER",
                     ConcurrencyStamp = managerRoleId
+                },
+                new IdentityRole
+                {
+                    Id = employeeRoleId,
+                    Name = "Employee",
+                    NormalizedName = "EMPLOYEE",
+                    ConcurrencyStamp = employeeRoleId
                 }
             };
 
             builder.Entity<IdentityRole>().HasData(roles);
 
             var adminUserId = "93e88597-7567-4e0a-af32-d3c79597ab97";
+            var managerUserId = "704519ee-9221-42a4-bc6e-b09e9b7dc72e";
+            var employeeUserId = "5debe77c-d7dc-4321-b09d-e8e3fe2d92eb";
+            var hasher = new PasswordHasher<IdentityUser>();
+
 
             var admin = new IdentityUser
             {
                 Id = adminUserId,
-                UserName = "Danilo",
-                Email = "jankovic.danilo23@gmail.com",
-                NormalizedEmail = "JANKOVIC.DANILO23@GMAIL.COM",
-                NormalizedUserName = "DANILO"
+                UserName = "admin",
+                Email = "admin@test.com",
+                NormalizedEmail = "ADMIN@TEST.COM",
+                NormalizedUserName = "ADMIN",
+                SecurityStamp = Guid.NewGuid().ToString()
             };
 
-            admin.PasswordHash = new PasswordHasher<IdentityUser>()
-                .HashPassword(admin, "Admin123!");
+            admin.PasswordHash = hasher.HashPassword(admin, "Admin123!");
 
-            builder.Entity<IdentityUser>().HasData(admin);
+            var manager = new IdentityUser
+            {
+                Id = managerUserId,
+                UserName = "manager",
+                Email = "manager@test.com",
+                NormalizedEmail = "MANAGER@TEST.COM",
+                NormalizedUserName = "MANAGER",
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            manager.PasswordHash = hasher.HashPassword(manager, "Manager123!");
+
+            var employee = new IdentityUser
+            {
+                Id = employeeUserId,
+                UserName = "employee",
+                Email = "employee@test.com",
+                NormalizedEmail = "EMPLOYEE@TEST.COM",
+                NormalizedUserName = "EMPLOYEE",
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            employee.PasswordHash = hasher.HashPassword(employee, "Employee123!");
+
+            builder.Entity<IdentityUser>().HasData(admin, manager, employee);
 
             var adminRoles = new List<IdentityUserRole<string>>
             {

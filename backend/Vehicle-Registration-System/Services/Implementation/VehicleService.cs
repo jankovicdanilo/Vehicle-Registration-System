@@ -146,10 +146,10 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 return RepositoryResult<bool>.Fail("INVALID_COMBINATION: " +
                     "Model doesn't match brand and vehicle type");
 
-            
+
 
             if (await appDbContext.Vehicles.AnyAsync(x => x.ChassisNumber == request.ChassisNumber &&
-            x.Id!=request.Id))
+            x.Id != request.Id))
                 return RepositoryResult<bool>.Fail("CHASSIS_NUMBER_EXISTS: Chassis number already used");
 
             if (request.ProductionYear < 1900 || request.ProductionYear > DateTime.Now.Year)

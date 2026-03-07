@@ -1,5 +1,4 @@
-﻿using VehicleRegistrationSystem.Models.Domain;
-
+﻿
 namespace VehicleRegistrationSystem.Models.Domain
 {
     public class Registration

@@ -58,17 +58,17 @@ namespace VehicleRegistrationSystem.Migrations.AuthDb
                         },
                         new
                         {
-                            Id = "49b719cf-9ebf-4151-af09-835f9c03f6b6",
-                            ConcurrencyStamp = "49b719cf-9ebf-4151-af09-835f9c03f6b6",
-                            Name = "Employee",
-                            NormalizedName = "EMPLOYEE"
-                        },
-                        new
-                        {
                             Id = "f2f2ca54-7b0e-4d50-9b8a-7a5f9d6e3a11",
                             ConcurrencyStamp = "f2f2ca54-7b0e-4d50-9b8a-7a5f9d6e3a11",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
+                        },
+                        new
+                        {
+                            Id = "49b719cf-9ebf-4151-af09-835f9c03f6b6",
+                            ConcurrencyStamp = "49b719cf-9ebf-4151-af09-835f9c03f6b6",
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
                         });
                 });
 
@@ -166,17 +166,49 @@ namespace VehicleRegistrationSystem.Migrations.AuthDb
                         {
                             Id = "93e88597-7567-4e0a-af32-d3c79597ab97",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e234f8a5-9f09-4fe2-8a72-843a6e9e2e3a",
-                            Email = "jankovic.danilo23@gmail.com",
+                            ConcurrencyStamp = "375968fd-f0fe-406d-97ee-0f7ca303a2d8",
+                            Email = "admin@test.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            NormalizedEmail = "JANKOVIC.DANILO23@GMAIL.COM",
-                            NormalizedUserName = "DANILO",
-                            PasswordHash = "AQAAAAIAAYagAAAAENUlx+tPk9PoXImr/4I1wKq8FoedcLgs/JZp6T/ecKZE7PLfH/q5tGah/U79ohTYEg==",
+                            NormalizedEmail = "ADMIN@TEST.COM",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJzPvIorgRzTbz5hKdAYdrYFxtaigPusJ/ikLCfH4WUqjU53c0f/nZa9mTzEUxAIPA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b156b53a-c5ac-40ac-8a52-9af07b768682",
+                            SecurityStamp = "8dee4b72-57b2-4fef-9288-d9da741b751b",
                             TwoFactorEnabled = false,
-                            UserName = "Danilo"
+                            UserName = "admin"
+                        },
+                        new
+                        {
+                            Id = "704519ee-9221-42a4-bc6e-b09e9b7dc72e",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "4da56735-98d6-4838-a3c5-b2d612f5de58",
+                            Email = "manager@test.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "MANAGER@TEST.COM",
+                            NormalizedUserName = "MANAGER",
+                            PasswordHash = "AQAAAAIAAYagAAAAELSAPRBLOojdOoU5bOWAPBmc6gMlId8WrONeSm3yrzvJCNiKzEXYdy1AeczRsOEaDw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "72eb38ae-4bf0-414f-a61d-15ac88a894c2",
+                            TwoFactorEnabled = false,
+                            UserName = "manager"
+                        },
+                        new
+                        {
+                            Id = "5debe77c-d7dc-4321-b09d-e8e3fe2d92eb",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "bb0beed9-18dc-49fd-b7ff-07bc851c9356",
+                            Email = "employee@test.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "EMPLOYEE@TEST.COM",
+                            NormalizedUserName = "EMPLOYEE",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAzktpMv3F8+SR0DtgFwatYS6Ywd0nm5NTmwihULChPkbPb7ky/JfAGxh/ar5YuMYA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "66b8e944-0939-4fea-b939-62f71ea27b75",
+                            TwoFactorEnabled = false,
+                            UserName = "employee"
                         });
                 });
 

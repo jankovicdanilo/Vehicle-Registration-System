@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VehicleRegistrationSystem.Migrations.AuthDb
 {
     /// <inheritdoc />
-    public partial class addauthdb : Migration
+    public partial class InitialIdentitySetup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -163,14 +163,20 @@ namespace VehicleRegistrationSystem.Migrations.AuthDb
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "49b719cf-9ebf-4151-af09-835f9c03f6b6", "49b719cf-9ebf-4151-af09-835f9c03f6b6", "Zaposleni", "ZAPOSLENI" },
-                    { "80e38d55-3872-4320-9f5b-54d5b2e50d38", "80e38d55-3872-4320-9f5b-54d5b2e50d38", "Admin", "ADMIN" }
+                    { "49b719cf-9ebf-4151-af09-835f9c03f6b6", "49b719cf-9ebf-4151-af09-835f9c03f6b6", "Employee", "EMPLOYEE" },
+                    { "80e38d55-3872-4320-9f5b-54d5b2e50d38", "80e38d55-3872-4320-9f5b-54d5b2e50d38", "Admin", "ADMIN" },
+                    { "f2f2ca54-7b0e-4d50-9b8a-7a5f9d6e3a11", "f2f2ca54-7b0e-4d50-9b8a-7a5f9d6e3a11", "Manager", "MANAGER" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "93e88597-7567-4e0a-af32-d3c79597ab97", 0, "e4acecdf-bdd9-445d-8428-1f6d2a3a16f8", "jankovic.danilo23@gmail.com", false, false, null, "JANKOVIC.DANILO23@GMAIL.COM", "DANILO", "AQAAAAIAAYagAAAAEBn1wo8BQmhwZYZYTtCXleQgPpW6QtmyOOdTvemWEJPXhoAezytTqJHO/smQjDNYmg==", null, false, "3ab76896-5de7-4e19-a9ab-16c398157e3f", false, "Danilo" });
+                values: new object[,]
+                {
+                    { "5debe77c-d7dc-4321-b09d-e8e3fe2d92eb", 0, "bb0beed9-18dc-49fd-b7ff-07bc851c9356", "employee@test.com", false, false, null, "EMPLOYEE@TEST.COM", "EMPLOYEE", "AQAAAAIAAYagAAAAEAzktpMv3F8+SR0DtgFwatYS6Ywd0nm5NTmwihULChPkbPb7ky/JfAGxh/ar5YuMYA==", null, false, "66b8e944-0939-4fea-b939-62f71ea27b75", false, "employee" },
+                    { "704519ee-9221-42a4-bc6e-b09e9b7dc72e", 0, "4da56735-98d6-4838-a3c5-b2d612f5de58", "manager@test.com", false, false, null, "MANAGER@TEST.COM", "MANAGER", "AQAAAAIAAYagAAAAELSAPRBLOojdOoU5bOWAPBmc6gMlId8WrONeSm3yrzvJCNiKzEXYdy1AeczRsOEaDw==", null, false, "72eb38ae-4bf0-414f-a61d-15ac88a894c2", false, "manager" },
+                    { "93e88597-7567-4e0a-af32-d3c79597ab97", 0, "375968fd-f0fe-406d-97ee-0f7ca303a2d8", "admin@test.com", false, false, null, "ADMIN@TEST.COM", "ADMIN", "AQAAAAIAAYagAAAAEJzPvIorgRzTbz5hKdAYdrYFxtaigPusJ/ikLCfH4WUqjU53c0f/nZa9mTzEUxAIPA==", null, false, "8dee4b72-57b2-4fef-9288-d9da741b751b", false, "admin" }
+                });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -178,7 +184,8 @@ namespace VehicleRegistrationSystem.Migrations.AuthDb
                 values: new object[,]
                 {
                     { "49b719cf-9ebf-4151-af09-835f9c03f6b6", "93e88597-7567-4e0a-af32-d3c79597ab97" },
-                    { "80e38d55-3872-4320-9f5b-54d5b2e50d38", "93e88597-7567-4e0a-af32-d3c79597ab97" }
+                    { "80e38d55-3872-4320-9f5b-54d5b2e50d38", "93e88597-7567-4e0a-af32-d3c79597ab97" },
+                    { "f2f2ca54-7b0e-4d50-9b8a-7a5f9d6e3a11", "93e88597-7567-4e0a-af32-d3c79597ab97" }
                 });
 
             migrationBuilder.CreateIndex(
