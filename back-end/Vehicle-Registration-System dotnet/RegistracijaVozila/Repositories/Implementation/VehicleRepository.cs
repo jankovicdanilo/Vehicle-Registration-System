@@ -1,66 +1,66 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Repositories.Interface;
+using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Data;
 
-namespace RegistracijaVozila.Repositories.Implementation
+namespace VehicleRegistrationSystem.Repositories.Implementation
 {
     public class VehicleRepository : IVehicleRepository
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
 
-        public VehicleRepository(RegistracijaVozilaDbContext appDbContext)
+        public VehicleRepository(VehicleRegistrationDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
         }
 
-        public async Task<Vozilo> AddAsync(Vozilo vozilo)
+        public async Task<Vehicle> AddAsync(Vehicle vehicle)
         {
-            await appDbContext.Vozila.AddAsync(vozilo);
+            await appDbContext.Vehicles.AddAsync(vehicle);
             await appDbContext.SaveChangesAsync();
 
-            return await appDbContext.Vozila.
-                Include(v => v.TipVozila).
-                Include(v => v.MarkaVozila).
-                Include(v => v.ModelVozila).
-                FirstOrDefaultAsync(v => v.Id == vozilo.Id);
+            return await appDbContext.Vehicles.
+                Include(v => v.VehicleType).
+                Include(v => v.VehicleBrand).
+                Include(v => v.VehicleModel).
+                FirstOrDefaultAsync(v => v.Id == vehicle.Id);
         }
 
-        public async Task<Vozilo?> DeleteVehicleAsync(Guid id)
+        public async Task<Vehicle?> DeleteVehicleAsync(Guid id)
         {
-            var existingVehicle = await appDbContext.Vozila.
-                Include(v=>v.TipVozila).
-                Include(v=>v.MarkaVozila).
-                Include(v=>v.ModelVozila).FirstOrDefaultAsync(x => x.Id == id);
+            var existingVehicle = await appDbContext.Vehicles.
+                Include(v=>v.VehicleType).
+                Include(v=>v.VehicleBrand).
+                Include(v=>v.VehicleModel).FirstOrDefaultAsync(x => x.Id == id);
 
             if(existingVehicle ==  null)
             {
                 return null;
             }
 
-            appDbContext.Vozila.Remove(existingVehicle);
+            appDbContext.Vehicles.Remove(existingVehicle);
             await appDbContext.SaveChangesAsync();
 
             return existingVehicle;
             
         }
 
-        public async Task<(List<Vozilo> Items, int TotalCount)> GetAllAsync(string? searchQuery = null,
+        public async Task<(List<Vehicle> Items, int TotalCount)> GetAllAsync(string? searchQuery = null,
             int pageSize = 1000, int pageNumber = 1)
         {
-            var query = appDbContext.Vozila
-                .Include(x => x.TipVozila)
-                .Include(x => x.MarkaVozila)
-                .Include(x => x.ModelVozila)
+            var query = appDbContext.Vehicles
+                .Include(x => x.VehicleType)
+                .Include(x => x.VehicleBrand)
+                .Include(x => x.VehicleModel)
                 .AsQueryable();
 
 
             if (string.IsNullOrWhiteSpace(searchQuery) == false)
             {
-                query = query.Where(x => x.TipVozila.Naziv.Contains(searchQuery) ||
-                x.MarkaVozila.Naziv.Contains(searchQuery) ||
-                x.ModelVozila.Naziv.Contains(searchQuery) ||
-                x.TipVozila.Naziv.Contains(searchQuery));
+                query = query.Where(x => x.VehicleType.Name.Contains(searchQuery) ||
+                x.VehicleBrand.Name.Contains(searchQuery) ||
+                x.VehicleModel.Name.Contains(searchQuery) ||
+                x.VehicleType.Name.Contains(searchQuery));
             }
 
             
@@ -70,35 +70,35 @@ namespace RegistracijaVozila.Repositories.Implementation
             return (items, totalCount); 
         }
 
-        public async Task<Vozilo?> GetVehicleByIdAsync(Guid id)
+        public async Task<Vehicle?> GetVehicleByIdAsync(Guid id)
         {
-            return await appDbContext.Vozila.Include(x => x.TipVozila).Include(x => x.MarkaVozila).
-                Include(x => x.ModelVozila).FirstOrDefaultAsync(x => x.Id == id);
+            return await appDbContext.Vehicles.Include(x => x.VehicleType).Include(x => x.VehicleBrand).
+                Include(x => x.VehicleModel).FirstOrDefaultAsync(x => x.Id == id);
 
             
         }
 
-        public async Task<Vozilo?> UpdateVehicleAsync(Vozilo vozilo)
+        public async Task<Vehicle?> UpdateVehicleAsync(Vehicle vehicle)
         {
-            var existingVozilo = await appDbContext.Vozila.
-                Include(x=>x.TipVozila).
-                Include(x=>x.MarkaVozila).
-                Include(x=>x.ModelVozila).FirstOrDefaultAsync(x => x.Id == vozilo.Id);
+            var existingVehicle = await appDbContext.Vehicles.
+                Include(x=>x.VehicleType).
+                Include(x=>x.VehicleBrand).
+                Include(x=>x.VehicleModel).FirstOrDefaultAsync(x => x.Id == vehicle.Id);
 
-            existingVozilo.TipVozilaId = vozilo.TipVozilaId;
-            existingVozilo.ModelVozilaId = vozilo.ModelVozilaId;
-            existingVozilo.MarkaVozilaId = vozilo.MarkaVozilaId;
-            existingVozilo.GodinaProizvodnje = vozilo.GodinaProizvodnje;
-            existingVozilo.ZapreminaMotora = vozilo.ZapreminaMotora;
-            existingVozilo.SnagaMotora = vozilo.SnagaMotora;
-            existingVozilo.Masa = vozilo.Masa;
-            existingVozilo.VrstaGoriva = vozilo.VrstaGoriva;
-            existingVozilo.BrojSasije = vozilo.BrojSasije;
-            existingVozilo.DatumPrveRegistracije = vozilo.DatumPrveRegistracije;
+            existingVehicle.VehicleTypeId = vehicle.VehicleTypeId;
+            existingVehicle.VehicleBrandId = vehicle.VehicleBrandId;
+            existingVehicle.VehicleModelId = vehicle.VehicleModelId;
+            existingVehicle.ProductionYear = vehicle.ProductionYear;
+            existingVehicle.EngineCapacity = vehicle.EngineCapacity;
+            existingVehicle.EnginePowerKw = vehicle.EnginePowerKw;
+            existingVehicle.Weight = vehicle.Weight;
+            existingVehicle.FuelType = vehicle.FuelType;
+            existingVehicle.ChassisNumber = vehicle.ChassisNumber;
+            existingVehicle.FirstRegistrationDate = vehicle.FirstRegistrationDate;
 
             await appDbContext.SaveChangesAsync();
 
-            return existingVozilo;
+            return existingVehicle;
 
         }
     }

@@ -1,24 +1,24 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Repositories.Interface;
-using RegistracijaVozila.Results;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Results;
+using VehicleRegistrationSystem.Services.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Services.Implementation
+namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class RegistrationVehicleService : IRegistrationVehicleService
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
         private readonly IMapper mapper;
         private readonly IRegistrationVehicleRepository registrationVehicleRepository;
         private readonly IRegistrationCalculatorService registrationCalculatorService;
         private readonly IVehicleRepository vehicleRepository;
         private readonly IInsurancePricingRepository insurancePricingRepository;
 
-        public RegistrationVehicleService(RegistracijaVozilaDbContext appDbContext,
+        public RegistrationVehicleService(VehicleRegistrationDbContext appDbContext,
             IMapper mapper, IRegistrationVehicleRepository registrationVehicleRepository, 
             IRegistrationCalculatorService registrationCalculatorService,
             IVehicleRepository vehicleRepository,
@@ -37,34 +37,34 @@ namespace RegistracijaVozila.Services.Implementation
         {
 
 
-            if (await appDbContext.Registracije.AnyAsync(x => x.VoziloId == request.VoziloId))
+            if (await appDbContext.Registrations.AnyAsync(x => x.VehicleId == request.VehicleId))
             {
                 return RepositoryResult<bool>.Fail("VEHICLE_ALREADY_REGISTERED: " +
                     "Registration cannot be done because vehicle is already registered");
             }
 
-            if(await appDbContext.Registracije.AnyAsync(x=>x.RegistarskaOznaka == request.RegistarskaOznaka))
+            if(await appDbContext.Registrations.AnyAsync(x=>x.LicensePlate == request.LicensePlate))
             {
                 return RepositoryResult<bool>.Fail("PLATE_NUMBER_EXISTS: " +
                     "Registration cannot be done because vehicle plate already exists");
             }
 
-            if (request.DatumRegistracije > DateTime.Now)
+            if (request.RegistrationDate > DateTime.Now)
             {
                 return RepositoryResult<bool>.Fail("REGISTRATION_INVALID_DATE: " +
                     "Date of registration cannot be in the future");
             }
 
-            if (!await appDbContext.Vozila.AnyAsync(x => x.Id == request.VoziloId))
+            if (!await appDbContext.Vehicles.AnyAsync(x => x.Id == request.VehicleId))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_VEHICLE_INVALID_ID: " +
-                    $"Vehicle with the id {request.VoziloId} doesnt exist");
+                    $"Vehicle with the id {request.VehicleId} doesnt exist");
             }
 
-            if(!await appDbContext.Klijenti.AnyAsync(x=> x.Id == request.KlijentId))
+            if(!await appDbContext.Clients.AnyAsync(x=> x.Id == request.ClientId))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_CLIENT_INVALID_ID: " +
-                    $"Client with the id {request.KlijentId} doesnt exist");
+                    $"Client with the id {request.ClientId} doesnt exist");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -80,20 +80,20 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<RegistrationVehicleDto>.Fail(validationResult.Message);
             }
 
-            var domainRegistration = mapper.Map<Registracija>(request);
+            var domainRegistration = mapper.Map<Registration>(request);
 
-            var vehicle = await vehicleRepository.GetVehicleByIdAsync(request.VoziloId);
-            int vehicleAge = DateTime.Now.Year - vehicle.GodinaProizvodnje;
+            var vehicle = await vehicleRepository.GetVehicleByIdAsync(request.VehicleId);
+            int vehicleAge = DateTime.Now.Year - vehicle.ProductionYear;
             var insurancePrice = 
-                await insurancePricingRepository.GetByInsuranceIdAsync(request.OsiguranjeId, vehicle.SnagaMotora);
+                await insurancePricingRepository.GetByInsuranceIdAsync(request.InsuranceId, vehicle.EnginePowerKw);
 
-            domainRegistration.DatumIstekaRegistracije = domainRegistration.DatumRegistracije.AddMonths(12);
+            domainRegistration.ExpirationDate = domainRegistration.RegistrationDate.AddMonths(12);
 
-            domainRegistration.CijenaRegistracije = registrationCalculatorService.CalculateRegistrationPrice(
-                 vehicle.SnagaMotora,insurancePrice.PricePerKw,
-                 Convert.ToDecimal(vehicle.ZapreminaMotora),
+            domainRegistration.RegistrationPrice = registrationCalculatorService.CalculateRegistrationPrice(
+                 vehicle.EnginePowerKw, insurancePrice.PricePerKw,
+                 Convert.ToDecimal(vehicle.EngineCapacity),
                  vehicleAge,
-                 vehicle.VrstaGoriva);
+                 vehicle.FuelType);
 
             domainRegistration = await registrationVehicleRepository.AddRegistrationAsync(domainRegistration);
 
@@ -101,14 +101,16 @@ namespace RegistracijaVozila.Services.Implementation
 
             var response = mapper.Map<RegistrationVehicleDto>(registration);
 
-            return RepositoryResult<RegistrationVehicleDto>.Ok(response, "New vehicle registration has successfully been created!");
+            return RepositoryResult<RegistrationVehicleDto>.Ok
+                (response, "New vehicle registration has successfully been created!");
         }
 
         public async Task<RepositoryResult<bool>?> ValidateRegistrationDeleteRequestAsync(Guid id)
         {
-            if (!await appDbContext.Registracije.AnyAsync(x => x.Id == id))
+            if (!await appDbContext.Registrations.AnyAsync(x => x.Id == id))
             {
-                return RepositoryResult<bool>.Fail($"REGISTRATION_INVALID_ID: Registration with the id {id} doesnt exist");
+                return RepositoryResult<bool>.Fail
+                    ($"REGISTRATION_INVALID_ID: Registration with the id {id} doesnt exist");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -127,46 +129,42 @@ namespace RegistracijaVozila.Services.Implementation
 
             var response = mapper.Map<RegistrationVehicleDto>(deletedRegistrationDomain);
 
-            return RepositoryResult<RegistrationVehicleDto>.Ok(response, "Registration of the vehicle has been successfully deleted!");
+            return RepositoryResult<RegistrationVehicleDto>.Ok
+                (response, "Registration of the vehicle has been successfully deleted!");
         }
 
         public async Task<RepositoryResult<bool>?>
             ValidateRegistrationUpdateRequestAsync(UpdateRegistrationVehicleRequestDto request)
         {
 
-            if (!await appDbContext.Registracije.AnyAsync(x => x.Id == request.Id))
+            if (!await appDbContext.Registrations.AnyAsync(x => x.Id == request.Id))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_INVALID_ID: " +
                     $"Registration with the id {request.Id} not found");
             }
 
-            if (await appDbContext.Registracije.AnyAsync(x => x.VoziloId == request.VoziloId && x.Id!=request.Id))
+            if (await appDbContext.Registrations.AnyAsync
+                (x => x.VehicleId == request.VehicleId && x.Id!=request.Id))
             {
                 return RepositoryResult<bool>.Fail("VEHICLE_ALREADY_REGISTERED: " +
                     "Registration cannot be done because vehicle is already registered");
             }
 
-            if (request.DatumRegistracije > DateTime.Now)
+            if (request.RegistrationDate > DateTime.Now)
             {
                 return RepositoryResult<bool>.Fail("REGISTRATION_INVALID_DATE: Date of registration cannot be in the future");
             }
 
-            //if (request.CijenaRegistracije <= 0)
-            //{
-            //    return RepositoryResult<bool>.Fail("REGISTRATION_INVALID_PRICE: " +
-            //        "Price of registration cannot be lower then 0");
-            //}
-
-            if (!await appDbContext.Vozila.AnyAsync(x => x.Id == request.VoziloId))
+            if (!await appDbContext.Vehicles.AnyAsync(x => x.Id == request.VehicleId))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_VEHICLE_INVALID_ID: " +
-                    $"Vehicle with the id {request.VoziloId} doesnt exist");
+                    $"Vehicle with the id {request.VehicleId} doesnt exist");
             }
 
-            if (!await appDbContext.Klijenti.AnyAsync(x => x.Id == request.KlijentId))
+            if (!await appDbContext.Clients.AnyAsync(x => x.Id == request.ClientId))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_CLIENT_INVALID_ID: " +
-                    $"Client with the id {request.KlijentId} doesnt exist");
+                    $"Client with the id {request.ClientId} doesnt exist");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -182,19 +180,21 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<RegistrationVehicleDto>.Fail(validationResult.Message);
             }
 
-            var registrationDomain = mapper.Map<Registracija>(request);
+            var registrationDomain = mapper.Map<Registration>(request);
 
             var result = await registrationVehicleRepository.UpdateAsync(registrationDomain);
 
             var response = mapper.Map<RegistrationVehicleDto>(result);
 
-            return RepositoryResult<RegistrationVehicleDto>.Ok(response, "Registration of the vehicle has been successfully updated!");
+            return RepositoryResult<RegistrationVehicleDto>.Ok
+                (response, "Registration of the vehicle has been successfully updated!");
         }
 
         public async Task<RepositoryResult<PagedResult<RegistrationVehicleDto>>> GetAllAsync
             (string? searchQuery = null, int pageNumber = 1, int pageSize = 1000)
         {
-            var (registrations, totalCount) = await registrationVehicleRepository.GetAllAsync(searchQuery, pageNumber, pageSize);
+            var (registrations, totalCount) = await registrationVehicleRepository.GetAllAsync
+                (searchQuery, pageNumber, pageSize);
 
             var response = new PagedResult<RegistrationVehicleDto>
             {
@@ -207,7 +207,7 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>?> ValidateGetByIdAsync(Guid id)
         {
-            if(!await appDbContext.Registracije.AnyAsync(x=>x.Id == id))
+            if(!await appDbContext.Registrations.AnyAsync(x=>x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_INVALID_ID: " +
                     $"Registration with the id {id} not found");

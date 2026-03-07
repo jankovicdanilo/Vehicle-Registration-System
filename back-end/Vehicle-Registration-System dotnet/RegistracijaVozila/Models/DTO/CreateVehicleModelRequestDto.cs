@@ -1,9 +1,9 @@
-﻿namespace RegistracijaVozila.Models.DTO
+﻿namespace VehicleRegistrationSystem.Models.DTO
 {
     public class CreateVehicleModelRequestDto
     {
-        public string Naziv { get; set; }
+        public string Name { get; set; }
 
-        public Guid MarkaVozilaId { get; set; }
+        public Guid VehicleBrandId { get; set; }
     }
 }

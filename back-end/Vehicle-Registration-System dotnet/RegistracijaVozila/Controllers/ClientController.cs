@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Repositories.Interface;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Services.Interface;
 
-namespace RegistracijaVozila.Controllers
+namespace VehicleRegistrationSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -49,7 +49,7 @@ namespace RegistracijaVozila.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetClientById([FromRoute] Guid id)
         {
-            var response = await clientService.GetClijentByIdAsync(id);
+            var response = await clientService.GetClientByIdAsync(id);
 
             return Ok(response);
         }

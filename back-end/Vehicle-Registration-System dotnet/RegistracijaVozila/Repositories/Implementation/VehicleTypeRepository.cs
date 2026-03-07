@@ -1,33 +1,33 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Repositories.Interface;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Repositories.Implementation
+namespace VehicleRegistrationSystem.Repositories.Implementation
 {
     public class VehicleTypeRepository : IVehicleTypeRepository
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
 
-        public VehicleTypeRepository(RegistracijaVozilaDbContext appDbContext)
+        public VehicleTypeRepository(VehicleRegistrationDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
         }
 
-        public async Task<TipVozila> AddAsync(TipVozila tipVozila)
+        public async Task<VehicleType> AddAsync(VehicleType vehicleType)
         {
-            await appDbContext.TipoviVozila.AddAsync(tipVozila);
+            await appDbContext.VehicleTypes.AddAsync(vehicleType);
             await appDbContext.SaveChangesAsync();
-            return tipVozila;
+            return vehicleType;
         }
 
-        public async Task<TipVozila?> DeleteAsync(Guid id)
+        public async Task<VehicleType?> DeleteAsync(Guid id)
         {
-            var existingVehicleType = await appDbContext.TipoviVozila.FirstOrDefaultAsync(x => x.Id==id);
+            var existingVehicleType = await appDbContext.VehicleTypes.FirstOrDefaultAsync(x => x.Id==id);
 
             if (existingVehicleType != null)
             {
-                appDbContext.TipoviVozila.Remove(existingVehicleType);
+                appDbContext.VehicleTypes.Remove(existingVehicleType);
                 await appDbContext.SaveChangesAsync();
                 return existingVehicleType;
             }
@@ -36,27 +36,27 @@ namespace RegistracijaVozila.Repositories.Implementation
 
         }
 
-        public async Task<List<TipVozila>> GetAllAsync()
+        public async Task<List<VehicleType>> GetAllAsync()
         {
-            return await appDbContext.TipoviVozila.ToListAsync();
+            return await appDbContext.VehicleTypes.ToListAsync();
         }
 
-        public async Task<TipVozila?> GetByIdAsync(Guid id)
+        public async Task<VehicleType?> GetByIdAsync(Guid id)
         {
-            return await appDbContext.TipoviVozila.FirstOrDefaultAsync(x => x.Id == id);
+            return await appDbContext.VehicleTypes.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<TipVozila?> UpdateAsync(TipVozila tipVozila)
+        public async Task<VehicleType?> UpdateAsync(VehicleType vehicleType)
         {
-            var existingVehicleType = await appDbContext.TipoviVozila.FirstOrDefaultAsync(x => x.Id == tipVozila.Id);
+            var existingVehicleType = await appDbContext.VehicleTypes.FirstOrDefaultAsync(x => x.Id == vehicleType.Id);
 
             if(existingVehicleType == null)
             {
                 return null;
             }
 
-            existingVehicleType.Naziv = tipVozila.Naziv;
-            existingVehicleType.Kategorija = tipVozila.Kategorija;
+            existingVehicleType.Name = vehicleType.Name;
+            existingVehicleType.Category = vehicleType.Category;
 
             await appDbContext.SaveChangesAsync();
 

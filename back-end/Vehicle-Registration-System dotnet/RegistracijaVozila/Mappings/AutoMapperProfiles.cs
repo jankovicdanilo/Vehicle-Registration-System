@@ -1,69 +1,72 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Models.DTO;
+using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Models.DTO;
 
-namespace RegistracijaVozila.Mappings
+namespace VehicleRegistrationSystem.Mappings
 {
     public class AutoMapperProfiles : Profile
     {
         public AutoMapperProfiles()
         {
-            CreateMap<Vozilo, CreateVehicleRequestDto>().ReverseMap();
+            CreateMap<Vehicle, CreateVehicleRequestDto>().ReverseMap();
 
-            CreateMap<Vozilo, UpdateVehicleDto>().ReverseMap();
+            CreateMap<Vehicle, UpdateVehicleDto>().ReverseMap();
 
-            CreateMap<Vozilo, VehicleDto>().
-                ForMember(dest => dest.TipVozilaNaziv, opt => opt.MapFrom(src => src.TipVozila.Naziv)).
-                ForMember(dest => dest.MarkaVozilaNaziv, opt => opt.MapFrom(src => src.MarkaVozila.Naziv)).
-                ForMember(dest => dest.ModelVozilaNaziv, opt => opt.MapFrom(src => src.ModelVozila.Naziv)).ReverseMap();
+            CreateMap<Vehicle, VehicleDto>().
+                ForMember(dest => dest.VehicleTypeName, opt => opt.MapFrom(src => src.VehicleType.Name)).
+                ForMember(dest => dest.VehicleBrandName, opt => opt.MapFrom(src => src.VehicleBrand.Name)).
+                ForMember(dest => dest.VehicleModelName, opt => 
+                opt.MapFrom(src => src.VehicleModel.Name)).ReverseMap();
 
-            CreateMap<Klijent, CreateClientRequestDto>().ReverseMap();
+            CreateMap<Client, CreateClientRequestDto>().ReverseMap();
 
-            CreateMap<Klijent, ClientDto>().ReverseMap();
+            CreateMap<Client, ClientDto>().ReverseMap();
 
-            CreateMap<Klijent, UpdateClientRequestDto>().ReverseMap();
+            CreateMap<Client, UpdateClientRequestDto>().ReverseMap();
 
-            CreateMap<Osiguranje, CreateInsuranceRequestDto>().ReverseMap();
+            CreateMap<Insurance, CreateInsuranceRequestDto>().ReverseMap();
 
-            CreateMap<Osiguranje, InsuranceDto>().ReverseMap();
+            CreateMap<Insurance, InsuranceDto>().ReverseMap();
 
-            CreateMap<Osiguranje, UpdateInsuranceRequestDto>().ReverseMap();
+            CreateMap<Insurance, UpdateInsuranceRequestDto>().ReverseMap();
 
-            CreateMap<VehicleTypeDto, TipVozila>().ReverseMap();
+            CreateMap<VehicleTypeDto, VehicleType>().ReverseMap();
 
-            CreateMap<CreateVehicleTypeRequestDto, TipVozila>().ReverseMap();
+            CreateMap<CreateVehicleTypeRequestDto, VehicleType>().ReverseMap();
 
-            CreateMap<UpdateVehicleTypeRequestDto, TipVozila>().ReverseMap();
+            CreateMap<UpdateVehicleTypeRequestDto, VehicleType>().ReverseMap();
 
-            CreateMap<MarkaVozila, VehicleBrandDto >()
-                .ForMember(dest => dest.TipVozila, opt => opt.MapFrom(src => src.TipVozila.Naziv))
-                .ForMember(dest => dest.Kategorija, opt => opt.MapFrom(src => src.TipVozila.Kategorija))
+            CreateMap<VehicleBrand, VehicleBrandDto >()
+                .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => src.VehicleType.Name))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.VehicleType.Category))
                 .ReverseMap();
 
-            CreateMap<MarkaVozila, UpdateVehicleBrandRequestDto>().ReverseMap();
+            CreateMap<VehicleBrand, UpdateVehicleBrandRequestDto>().ReverseMap();
 
-            CreateMap<CreateVehicleBrandRequestDto, MarkaVozila>().ReverseMap();
+            CreateMap<CreateVehicleBrandRequestDto, VehicleBrand>().ReverseMap();
 
-            CreateMap<ModelVozila,VehicleModelDto>()
-                .ForMember(dest=>dest.MarkaVozilaNaziv, opt=>opt.MapFrom(src=>src.MarkaVozila.Naziv))
-                .ForMember(dest=>dest.TipVozilaId, opt=>opt.MapFrom(src=>src.MarkaVozila.TipVozila.Id))
-                .ForMember(dest=>dest.TipVozilaNaziv, opt=>opt.MapFrom(src=>src.MarkaVozila.TipVozila.Naziv))
+            CreateMap<VehicleModel,VehicleModelDto>()
+                .ForMember(dest=>dest.VehicleBrandName, opt=>opt.MapFrom(src=>src.VehicleBrand.Name))
+                .ForMember(dest=>dest.VehicleTypeId, opt=>opt.MapFrom(src=>src.VehicleBrand.VehicleType.Id))
+                .ForMember(dest=>dest.VehicleTypeName, opt=>opt.MapFrom(src=>src.VehicleBrand.VehicleType.Name))
                 .ReverseMap();
 
-            CreateMap<CreateVehicleModelRequestDto, ModelVozila>().ReverseMap();
+            CreateMap<CreateVehicleModelRequestDto, VehicleModel>().ReverseMap();
 
-            CreateMap<UpdateVehicleModelRequestDto, ModelVozila>().ReverseMap();
+            CreateMap<UpdateVehicleModelRequestDto, VehicleModel>().ReverseMap();
 
-            CreateMap<Registracija, RegistrationVehicleDto>()
-                .ForMember(dest => dest.Vlasnik, opt => opt.MapFrom(src => src.Vlasnik))
-                .ForMember(dest => dest.Vozilo, opt => opt.MapFrom(src => src.Vozilo))
-                .ForMember(dest => dest.Osiguranje, opt=>opt.MapFrom(src=>src.Osiguranje))
+            CreateMap<Registration, RegistrationVehicleDto>()
+                .ForMember(dest => dest.Client, opt => opt.MapFrom(src => src.Client))
+                .ForMember(dest => dest.Vehicle, opt => opt.MapFrom(src => src.Vehicle))
+                .ForMember(dest => dest.Insurance, opt=>opt.MapFrom(src=>src.Insurance))
                 .ReverseMap();
 
-            CreateMap<Registracija, CreateRegistrationVehicleRequestDto>().ReverseMap();
+            CreateMap<Registration, CreateRegistrationVehicleRequestDto>().ReverseMap();
 
-            CreateMap<Registracija, UpdateRegistrationVehicleRequestDto>().ReverseMap();
+            CreateMap<Registration, UpdateRegistrationVehicleRequestDto>().ReverseMap();
 
             CreateMap<UserDto,IdentityUser>().ReverseMap();
 
@@ -71,9 +74,9 @@ namespace RegistracijaVozila.Mappings
 
             CreateMap<LoginRequestDto, IdentityUser>().ReverseMap();
 
-            CreateMap<OsiguranjeCijene, CreateInsurancePriceRequestDto>().ReverseMap();
+            CreateMap<InsurancePrice, CreateInsurancePriceRequestDto>().ReverseMap();
 
-            CreateMap<OsiguranjeCijene, InsurancePriceDto>().ReverseMap();
+            CreateMap<InsurancePrice, InsurancePriceDto>().ReverseMap();
 
         }
     }

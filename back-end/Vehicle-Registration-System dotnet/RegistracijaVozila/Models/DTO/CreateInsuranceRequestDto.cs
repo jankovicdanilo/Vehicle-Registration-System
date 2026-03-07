@@ -1,7 +1,7 @@
-﻿namespace RegistracijaVozila.Models.DTO
+﻿namespace VehicleRegistrationSystem.Models.DTO
 {
     public class CreateInsuranceRequestDto
     {
-        public string Naziv { get; set; }
+        public string Name { get; set; }
     }
 }

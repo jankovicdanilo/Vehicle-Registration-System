@@ -1,4 +1,4 @@
-﻿namespace RegistracijaVozila.Models.DTO
+﻿namespace VehicleRegistrationSystem.Models.DTO
 {
     public class ApiError
     {

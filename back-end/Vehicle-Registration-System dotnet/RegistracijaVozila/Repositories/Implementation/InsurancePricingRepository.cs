@@ -1,40 +1,41 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Repositories.Interface;
+using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Repositories.Implementation
+namespace VehicleRegistrationSystem.Repositories.Implementation
 {
     public class InsurancePricingRepository : IInsurancePricingRepository
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
 
-        public InsurancePricingRepository(RegistracijaVozilaDbContext appDbContext)
+        public InsurancePricingRepository(VehicleRegistrationDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
         }
 
-        public async Task<OsiguranjeCijene> CreateAsync(OsiguranjeCijene osiguranjeCijene)
+        public async Task<InsurancePrice> CreateAsync(InsurancePrice insurancePrice)
         {
-            await appDbContext.AddAsync(osiguranjeCijene);
+            await appDbContext.AddAsync(insurancePrice);
             await appDbContext.SaveChangesAsync();
-            return osiguranjeCijene;
+            return insurancePrice;
         }
 
-        public async Task<List<OsiguranjeCijene>> GetAllAsync()
+        public async Task<List<InsurancePrice>> GetAllAsync()
         {
-            return await appDbContext.OsiguranjeCijene.ToListAsync();
+            return await appDbContext.InsurancePrices.ToListAsync();
         }
 
-        public async Task<OsiguranjeCijene?> GetByIdAsync(Guid id)
+        public async Task<InsurancePrice?> GetByIdAsync(Guid id)
         {
-            return await appDbContext.OsiguranjeCijene.FirstOrDefaultAsync(o => o.Id == id);
+            return await appDbContext.InsurancePrices.FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<OsiguranjeCijene?> GetByInsuranceIdAsync(Guid id, int kw)
+        public async Task<InsurancePrice?> GetByInsuranceIdAsync(Guid id, int kw)
         {
-            return await appDbContext.OsiguranjeCijene.
-                Where(x=>x.MinKw<=kw && x.MaxKw>=kw).FirstOrDefaultAsync(x=>x.OsiguranjeId == id);
+            return await appDbContext.InsurancePrices.
+                Where(x=>x.MinKw<=kw && x.MaxKw>=kw).FirstOrDefaultAsync(x=>x.InsuranceId == id);
 
         }
     }

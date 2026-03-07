@@ -1,22 +1,22 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Repositories.Interface;
-using RegistracijaVozila.Results;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Results;
+using VehicleRegistrationSystem.Services.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Services.Implementation
+namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class InsurancePricingService : IInsurancePricingService
     {
         private readonly IInsurancePricingRepository insurancePricingRepository;
         private readonly IMapper mapper;
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
 
         public InsurancePricingService(IInsurancePricingRepository insurancePricingRepository, 
-            IMapper mapper, RegistracijaVozilaDbContext appDbContext)
+            IMapper mapper, VehicleRegistrationDbContext appDbContext)
         {
             this.insurancePricingRepository = insurancePricingRepository;
             this.mapper = mapper;
@@ -25,10 +25,10 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateCreateAsync(CreateInsurancePriceRequestDto request)
         {
-            if(!await appDbContext.Osiguranja.AnyAsync(x=>x.Id == request.OsiguranjeId))
+            if(!await appDbContext.Insurances.AnyAsync(x=>x.Id == request.InsuranceId))
             {
                 return RepositoryResult<bool>.Fail($"INVALID_Insurance_ID: Insurance" +
-                    $" with the id {request.OsiguranjeId} not found");
+                    $" with the id {request.InsuranceId} not found");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -43,7 +43,7 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<InsurancePriceDto>.Fail(validationResult.Message);
             }
 
-            var insurancePriceDomain = mapper.Map<OsiguranjeCijene>(request);
+            var insurancePriceDomain = mapper.Map<InsurancePrice>(request);
 
             insurancePriceDomain = await insurancePricingRepository.CreateAsync(insurancePriceDomain);
 
@@ -68,7 +68,7 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateGetByIdAsync(Guid id)
         {
-            if(!await appDbContext.OsiguranjeCijene.AnyAsync(x=>x.Id == id))
+            if(!await appDbContext.InsurancePrices.AnyAsync(x=>x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"INSURANCE_PRICE_ID_INVALID: Insurance price with the" +
                     $" id {id} not found");
@@ -95,9 +95,10 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateGetByInsuranceIdAsync(Guid id)
         {
-            if (!await appDbContext.OsiguranjeCijene.AnyAsync(x => x.OsiguranjeId == id))
+            if (!await appDbContext.InsurancePrices.AnyAsync(x => x.InsuranceId == id))
             {
-                return RepositoryResult<bool>.Fail($"INSURANCE_PRICE_INSURANCEID_INVALID: Insurance price with the" +
+                return RepositoryResult<bool>.Fail
+                    ($"INSURANCE_PRICE_INSURANCEID_INVALID: Insurance price with the" +
                     $" insurance id {id} not found");
             }
 

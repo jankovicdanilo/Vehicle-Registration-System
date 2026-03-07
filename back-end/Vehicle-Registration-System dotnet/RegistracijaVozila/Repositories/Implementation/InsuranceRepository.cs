@@ -1,52 +1,53 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Repositories.Interface;
+using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Repositories.Implementation
+namespace VehicleRegistrationSystem.Repositories.Implementation
 {
     public class InsuranceRepository : IInsuranceRepository
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
 
-        public InsuranceRepository(RegistracijaVozilaDbContext appDbContext)
+        public InsuranceRepository(VehicleRegistrationDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
         }
 
-        public async Task<Osiguranje> CreateInsuranceAsync(Osiguranje insurance)
+        public async Task<Insurance> CreateInsuranceAsync(Insurance insurance)
         {
-            await appDbContext.Osiguranja.AddAsync(insurance);
+            await appDbContext.Insurances.AddAsync(insurance);
             await appDbContext.SaveChangesAsync();
             return insurance;
 
         }
 
-        public async Task<Osiguranje?> DeleteAsync(Guid id)
+        public async Task<Insurance?> DeleteAsync(Guid id)
         {
-            var insurance = await appDbContext.Osiguranja.FirstOrDefaultAsync(x=>x.Id == id);
+            var insurance = await appDbContext.Insurances.FirstOrDefaultAsync(x=>x.Id == id);
 
-            appDbContext.Osiguranja.Remove(insurance);
+            appDbContext.Insurances.Remove(insurance);
             await appDbContext.SaveChangesAsync();
 
             return insurance;
         }
 
-        public async Task<List<Osiguranje>> GetAllAsync()
+        public async Task<List<Insurance>> GetAllAsync()
         {
-            return await appDbContext.Osiguranja.ToListAsync();
+            return await appDbContext.Insurances.ToListAsync();
         }
 
-        public async Task<Osiguranje?> GetInsuranceByIdAsync(Guid id)
+        public async Task<Insurance?> GetInsuranceByIdAsync(Guid id)
         {
-            return await appDbContext.Osiguranja.FirstOrDefaultAsync(x => x.Id == id);
+            return await appDbContext.Insurances.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<Osiguranje?> UpdateAsync(Osiguranje request)
+        public async Task<Insurance?> UpdateAsync(Insurance request)
         {
-            var existingInsurance = await appDbContext.Osiguranja.FirstOrDefaultAsync(x => x.Id == request.Id);
+            var existingInsurance = await appDbContext.Insurances.FirstOrDefaultAsync(x => x.Id == request.Id);
 
-            existingInsurance.Naziv = request.Naziv;
+            existingInsurance.Name = request.Name;
 
             await appDbContext.SaveChangesAsync();
 

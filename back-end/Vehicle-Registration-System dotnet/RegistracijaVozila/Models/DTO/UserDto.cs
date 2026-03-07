@@ -1,4 +1,4 @@
-﻿namespace RegistracijaVozila.Models.DTO
+﻿namespace VehicleRegistrationSystem.Models.DTO
 {
     public class UserDto
     {
@@ -8,7 +8,7 @@
 
         public string Email { get; set; }
 
-        public IEnumerable<string> Roles{ get; set; }
+        public IEnumerable<string> Roles { get; set; }
 
         public string MainRole { get; set; }
     }

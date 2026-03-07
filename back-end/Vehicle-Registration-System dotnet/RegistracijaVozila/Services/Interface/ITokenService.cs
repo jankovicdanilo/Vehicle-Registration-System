@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace RegistracijaVozila.Services.Interface
+namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface ITokenService
     {

@@ -1,8 +1,8 @@
-﻿using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Results;
+﻿using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Results;
 using System.Security.Claims;
 
-namespace RegistracijaVozila.Services.Interface
+namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface IAuthService
     {
@@ -17,7 +17,8 @@ namespace RegistracijaVozila.Services.Interface
         Task<RepositoryResult<UserDto>> UpdateUserAsync
             (UpdateUserRequestDto request, ClaimsPrincipal currentUser);
 
-        Task<RepositoryResult<UserDto>> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
+        Task<RepositoryResult<UserDto>> ChangePasswordAsync
+            (string userId, string currentPassword, string newPassword);
 
         Task<RepositoryResult<UserDto>> ResetPasswordAsync(string userId, string newPassword);
 

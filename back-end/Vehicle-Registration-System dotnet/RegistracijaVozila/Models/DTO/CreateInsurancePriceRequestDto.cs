@@ -1,4 +1,4 @@
-﻿namespace RegistracijaVozila.Models.DTO
+﻿namespace VehicleRegistrationSystem.Models.DTO
 {
     public class CreateInsurancePriceRequestDto
     {
@@ -8,6 +8,6 @@
 
         public decimal PricePerKw { get; set; }
 
-        public Guid OsiguranjeId { get; set; }
+        public Guid InsuranceId { get; set; }
     }
 }

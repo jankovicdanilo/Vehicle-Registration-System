@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace RegistracijaVozila.Migrations.AuthDb
+namespace VehicleRegistrationSystem.Migrations.AuthDb
 {
     /// <inheritdoc />
     public partial class Rolesefodsjekatoadmin : Migration

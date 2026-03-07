@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace RegistracijaVozila.Migrations
+namespace VehicleRegistrationSystem.Migrations
 {
     /// <inheritdoc />
     public partial class osiguranjenonnulltyperemoval : Migration

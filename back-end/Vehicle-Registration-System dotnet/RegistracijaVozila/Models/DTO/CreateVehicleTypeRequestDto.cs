@@ -1,8 +1,9 @@
-﻿namespace RegistracijaVozila.Models.DTO
+﻿namespace VehicleRegistrationSystem.Models.DTO
 {
     public class CreateVehicleTypeRequestDto
     {
-        public string Naziv { get; set; }
-        public string Kategorija { get; set; }
+        public string Name { get; set; }
+
+        public string Category { get; set; }
     }
 }

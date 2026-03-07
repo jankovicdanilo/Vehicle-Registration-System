@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RegistracijaVozila.Data;
+using VehicleRegistrationSystem.Data;
 
 #nullable disable
 
-namespace RegistracijaVozila.Migrations
+namespace VehicleRegistrationSystem.Migrations
 {
-    [DbContext(typeof(RegistracijaVozilaDbContext))]
+    [DbContext(typeof(VehicleRegistrationDbContext))]
     partial class RegistracijaVozilaDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -22,107 +22,70 @@ namespace RegistracijaVozila.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Klijent", b =>
+            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Client", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Adresa")
+                    b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BrojLicneKarte")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BrojTelefona")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DatumRodjenja")
+                    b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Ime")
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("JMBG")
+                    b.Property<string>("IdCardNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Prezime")
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Klijenti");
-                });
-
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.MarkaVozila", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Naziv")
+                    b.Property<string>("NationalId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("TipVozilaId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TipVozilaId");
-
-                    b.ToTable("MarkeVozila");
-                });
-
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.ModelVozila", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("MarkaVozilaId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Naziv")
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MarkaVozilaId");
-
-                    b.ToTable("ModeliVozila");
+                    b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Osiguranje", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Insurance", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Naziv")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Osiguranja");
+                    b.ToTable("Insurances");
                 });
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.OsiguranjeCijene", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.InsurancePrice", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("InsuranceId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("MaxKw")
@@ -131,243 +94,282 @@ namespace RegistracijaVozila.Migrations
                     b.Property<int>("MinKw")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("OsiguranjeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<decimal>("PricePerKw")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OsiguranjeId");
+                    b.HasIndex("InsuranceId");
 
-                    b.ToTable("OsiguranjeCijene");
+                    b.ToTable("InsurancePrices");
                 });
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Registracija", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Registration", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("CijenaRegistracije")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("DatumIstekaRegistracije")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DatumRegistracije")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("KlijentId")
+                    b.Property<Guid>("ClientId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("OsiguranjeId")
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("InsuranceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("PrivremenaRegistracija")
+                    b.Property<bool>("IsTemporary")
                         .HasColumnType("bit");
 
-                    b.Property<string>("RegistarskaOznaka")
+                    b.Property<string>("LicensePlate")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("VoziloId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("KlijentId");
-
-                    b.HasIndex("OsiguranjeId");
-
-                    b.HasIndex("VoziloId")
-                        .IsUnique();
-
-                    b.ToTable("Registracije");
-                });
-
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.TipVozila", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Kategorija")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Naziv")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TipoviVozila");
-                });
-
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Vozilo", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BrojSasije")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DatumPrveRegistracije")
+                    b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("GodinaProizvodnje")
-                        .HasColumnType("int");
+                    b.Property<decimal>("RegistrationPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("MarkaVozilaId")
+                    b.Property<Guid>("VehicleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<float>("Masa")
-                        .HasColumnType("real");
+                    b.HasKey("Id");
 
-                    b.Property<Guid>("ModelVozilaId")
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("InsuranceId");
+
+                    b.HasIndex("VehicleId")
+                        .IsUnique();
+
+                    b.ToTable("Registrations");
+                });
+
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Vehicle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("SnagaMotora")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("TipVozilaId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("VrstaGoriva")
+                    b.Property<string>("ChassisNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float>("ZapreminaMotora")
+                    b.Property<float>("EngineCapacity")
+                        .HasColumnType("real");
+
+                    b.Property<int>("EnginePowerKw")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FirstRegistrationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FuelType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductionYear")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("VehicleBrandId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("VehicleModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("VehicleTypeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<float>("Weight")
                         .HasColumnType("real");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MarkaVozilaId");
+                    b.HasIndex("VehicleBrandId");
 
-                    b.HasIndex("ModelVozilaId");
+                    b.HasIndex("VehicleModelId");
 
-                    b.HasIndex("TipVozilaId");
+                    b.HasIndex("VehicleTypeId");
 
-                    b.ToTable("Vozila");
+                    b.ToTable("Vehicles");
                 });
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.MarkaVozila", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.VehicleBrand", b =>
                 {
-                    b.HasOne("RegistracijaVozila.Models.Domain.TipVozila", "TipVozila")
-                        .WithMany("Marke")
-                        .HasForeignKey("TipVozilaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Navigation("TipVozila");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("VehicleTypeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleTypeId");
+
+                    b.ToTable("VehicleBrands");
                 });
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.ModelVozila", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.VehicleModel", b =>
                 {
-                    b.HasOne("RegistracijaVozila.Models.Domain.MarkaVozila", "MarkaVozila")
-                        .WithMany("Modeli")
-                        .HasForeignKey("MarkaVozilaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Navigation("MarkaVozila");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("VehicleBrandId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleBrandId");
+
+                    b.ToTable("VehicleModels");
                 });
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.OsiguranjeCijene", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.VehicleType", b =>
                 {
-                    b.HasOne("RegistracijaVozila.Models.Domain.Osiguranje", "Osiguranje")
-                        .WithMany("OsiguranjeCijene")
-                        .HasForeignKey("OsiguranjeId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VehicleTypes");
+                });
+
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.InsurancePrice", b =>
+                {
+                    b.HasOne("VehicleRegistrationSystem.Models.Domain.Insurance", "Insurance")
+                        .WithMany("InsurancePrices")
+                        .HasForeignKey("InsuranceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Osiguranje");
+                    b.Navigation("Insurance");
                 });
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Registracija", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Registration", b =>
                 {
-                    b.HasOne("RegistracijaVozila.Models.Domain.Klijent", "Vlasnik")
-                        .WithMany("Registracije")
-                        .HasForeignKey("KlijentId")
+                    b.HasOne("RegistracijaVozila.Models.Domain.Client", "Client")
+                        .WithMany("Registrations")
+                        .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RegistracijaVozila.Models.Domain.Osiguranje", "Osiguranje")
-                        .WithMany("Registracije")
-                        .HasForeignKey("OsiguranjeId")
+                    b.HasOne("VehicleRegistrationSystem.Models.Domain.Insurance", "Insurance")
+                        .WithMany("Registrations")
+                        .HasForeignKey("InsuranceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RegistracijaVozila.Models.Domain.Vozilo", "Vozilo")
-                        .WithOne("Registracija")
-                        .HasForeignKey("RegistracijaVozila.Models.Domain.Registracija", "VoziloId")
+                    b.HasOne("VehicleRegistrationSystem.Models.Domain.Vehicle", "Vehicle")
+                        .WithOne("Registration")
+                        .HasForeignKey("VehicleRegistrationSystem.Models.Domain.Registration", "VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Osiguranje");
+                    b.Navigation("Client");
 
-                    b.Navigation("Vlasnik");
+                    b.Navigation("Insurance");
 
-                    b.Navigation("Vozilo");
+                    b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Vozilo", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Vehicle", b =>
                 {
-                    b.HasOne("RegistracijaVozila.Models.Domain.MarkaVozila", "MarkaVozila")
+                    b.HasOne("VehicleRegistrationSystem.Models.Domain.VehicleBrand", "VehicleBrand")
                         .WithMany()
-                        .HasForeignKey("MarkaVozilaId")
+                        .HasForeignKey("VehicleBrandId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RegistracijaVozila.Models.Domain.ModelVozila", "ModelVozila")
+                    b.HasOne("VehicleRegistrationSystem.Models.Domain.VehicleModel", "VehicleModel")
                         .WithMany()
-                        .HasForeignKey("ModelVozilaId")
+                        .HasForeignKey("VehicleModelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RegistracijaVozila.Models.Domain.TipVozila", "TipVozila")
+                    b.HasOne("VehicleRegistrationSystem.Models.Domain.VehicleType", "VehicleType")
                         .WithMany()
-                        .HasForeignKey("TipVozilaId")
+                        .HasForeignKey("VehicleTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("MarkaVozila");
+                    b.Navigation("VehicleBrand");
 
-                    b.Navigation("ModelVozila");
+                    b.Navigation("VehicleModel");
 
-                    b.Navigation("TipVozila");
+                    b.Navigation("VehicleType");
                 });
 
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Klijent", b =>
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.VehicleBrand", b =>
                 {
-                    b.Navigation("Registracije");
-                });
-
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.MarkaVozila", b =>
-                {
-                    b.Navigation("Modeli");
-                });
-
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Osiguranje", b =>
-                {
-                    b.Navigation("OsiguranjeCijene");
-
-                    b.Navigation("Registracije");
-                });
-
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.TipVozila", b =>
-                {
-                    b.Navigation("Marke");
-                });
-
-            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Vozilo", b =>
-                {
-                    b.Navigation("Registracija")
+                    b.HasOne("VehicleRegistrationSystem.Models.Domain.VehicleType", "VehicleType")
+                        .WithMany("Brands")
+                        .HasForeignKey("VehicleTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("VehicleType");
+                });
+
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.VehicleModel", b =>
+                {
+                    b.HasOne("VehicleRegistrationSystem.Models.Domain.VehicleBrand", "VehicleBrand")
+                        .WithMany("Models")
+                        .HasForeignKey("VehicleBrandId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("VehicleBrand");
+                });
+
+            modelBuilder.Entity("RegistracijaVozila.Models.Domain.Client", b =>
+                {
+                    b.Navigation("Registrations");
+                });
+
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Insurance", b =>
+                {
+                    b.Navigation("InsurancePrices");
+
+                    b.Navigation("Registrations");
+                });
+
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.Vehicle", b =>
+                {
+                    b.Navigation("Registration")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.VehicleBrand", b =>
+                {
+                    b.Navigation("Models");
+                });
+
+            modelBuilder.Entity("VehicleRegistrationSystem.Models.Domain.VehicleType", b =>
+                {
+                    b.Navigation("Brands");
                 });
 #pragma warning restore 612, 618
         }

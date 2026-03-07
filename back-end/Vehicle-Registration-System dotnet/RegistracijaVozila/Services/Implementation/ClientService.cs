@@ -1,21 +1,23 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Repositories.Interface;
-using RegistracijaVozila.Results;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Results;
+using VehicleRegistrationSystem.Services.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.DTO;
 
-namespace RegistracijaVozila.Services.Implementation
+namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class ClientService : IClientService
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
         private readonly IMapper mapper;
         private readonly IClientRepository clientRepository;
 
-        public ClientService(RegistracijaVozilaDbContext appDbContext, IMapper mapper, IClientRepository clientRepository)
+        public ClientService(VehicleRegistrationDbContext appDbContext, 
+            IMapper mapper, IClientRepository clientRepository)
         {
             this.appDbContext = appDbContext;
             this.mapper = mapper;
@@ -24,19 +26,22 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateClientCreateRequestAsync(CreateClientRequestDto request)
         {
-            if (await appDbContext.Klijenti.AnyAsync(x => x.JMBG == request.JMBG))
+            if (await appDbContext.Clients.AnyAsync(x => x.NationalId == request.NationalId))
             {
-                return RepositoryResult<bool>.Fail("JMBG_EXISTS: A client with this social security number already exists");
+                return RepositoryResult<bool>.Fail
+                    ("JMBG_EXISTS: A client with this social security number already exists");
             }
 
-            if (await appDbContext.Klijenti.AnyAsync(x => x.BrojLicneKarte == request.BrojLicneKarte))
+            if (await appDbContext.Clients.AnyAsync(x => x.IdCardNumber == request.IdCardNumber))
             {
-                return RepositoryResult<bool>.Fail("ID_CARD_EXISTS: A client with this ID card number already exists");
+                return RepositoryResult<bool>.Fail
+                    ("ID_CARD_EXISTS: A client with this ID card number already exists");
             }
 
-            if (await appDbContext.Klijenti.AnyAsync(x => x.Email == request.Email))
+            if (await appDbContext.Clients.AnyAsync(x => x.Email == request.Email))
             {
-                return RepositoryResult<bool>.Fail("EMAIL_EXISTS: A client with this email adress already exists");
+                return RepositoryResult<bool>.Fail
+                    ("EMAIL_EXISTS: A client with this email adress already exists");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -51,7 +56,7 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<ClientDto>.Fail(validationResult.Message);
             }
 
-            var clientDomain = mapper.Map<Klijent>(request);
+            var clientDomain = mapper.Map<Client>(request);
 
             clientDomain = await clientRepository.AddClientAsync(clientDomain);
 
@@ -62,19 +67,19 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateClientDeleteRequestAsync(Guid id)
         {
-            var exists = await appDbContext.Klijenti.AnyAsync(x=>x.Id == id);
+            var exists = await appDbContext.Clients.AnyAsync(x=>x.Id == id);
 
             if(!exists)
             {
                 return RepositoryResult<bool>.Fail($"CLIENT_NOT_FOUND: Client with the Id {id} was not found");
             }
 
-            var isOwner = await appDbContext.Registracije.AnyAsync(x=>x.KlijentId == id);
+            var isOwner = await appDbContext.Registrations.AnyAsync(x=>x.ClientId == id);
 
             if (isOwner)
             {
                 return RepositoryResult<bool>.Fail
-                    ("CLIENT_REGISTRATION_EXISTS: Client cant be deleted because his registration still exists");
+                    ("CLIENT_REGISTRATION_EXISTS: Client can't be deleted because his registration still exists");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -98,26 +103,31 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateClientUpdateRequestAsync(UpdateClientRequestDto request)
         {
-            var exists = await appDbContext.Klijenti.AnyAsync(x => x.Id == request.Id);
+            var exists = await appDbContext.Clients.AnyAsync(x => x.Id == request.Id);
 
             if (!exists)
             {
-                return RepositoryResult<bool>.Fail($"CLIENT_NOT_FOUND: Client with the Id {request.Id} was not found");
+                return RepositoryResult<bool>.Fail
+                    ($"CLIENT_NOT_FOUND: Client with the Id {request.Id} was not found");
             }
 
-            if (await appDbContext.Klijenti.AnyAsync(x => x.JMBG == request.JMBG && x.Id!=request.Id))
+            if (await appDbContext.Clients.AnyAsync(x => x.NationalId == request.NationalId && x.Id!=request.Id))
             {
-                return RepositoryResult<bool>.Fail("JMBG_EXISTS: A client with this social security number already exists");
+                return RepositoryResult<bool>.Fail
+                    ("NationalId_EXISTS: A client with this social security number already exists");
             }
 
-            if (await appDbContext.Klijenti.AnyAsync(x => x.BrojLicneKarte == request.BrojLicneKarte && x.Id != request.Id))
+            if (await appDbContext.Clients.AnyAsync
+                (x => x.IdCardNumber == request.IdCardNumber && x.Id != request.Id))
             {
-                return RepositoryResult<bool>.Fail("ID_CARD_EXISTS: A client with this ID card number already exists");
+                return RepositoryResult<bool>.Fail
+                    ("ID_CARD_EXISTS: A client with this ID card number already exists");
             }
 
-            if (await appDbContext.Klijenti.AnyAsync(x => x.Email == request.Email && x.Id != request.Id))
+            if (await appDbContext.Clients.AnyAsync(x => x.Email == request.Email && x.Id != request.Id))
             {
-                return RepositoryResult<bool>.Fail("EMAIL_EXISTS: A client with this email adress already exists");
+                return RepositoryResult<bool>.Fail
+                    ("EMAIL_EXISTS: A client with this email adress already exists");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -132,7 +142,7 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<ClientDto>.Fail(validationResult.Message);
             }
 
-            var clientDomain = mapper.Map<Klijent>(request);
+            var clientDomain = mapper.Map<Client>(request);
 
             clientDomain = await clientRepository.UpdateClientAsync(clientDomain);
 
@@ -158,7 +168,7 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateClientId(Guid id)
         {
-            if (!await appDbContext.Klijenti.AnyAsync(x => x.Id == id))
+            if (!await appDbContext.Clients.AnyAsync(x => x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"CLIENT_NOT_FOUND, Client with the Id {id} was not found");
             }
@@ -166,7 +176,7 @@ namespace RegistracijaVozila.Services.Implementation
             return RepositoryResult<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<ClientDto>> GetClijentByIdAsync(Guid id)
+        public async Task<RepositoryResult<ClientDto>> GetClientByIdAsync(Guid id)
         {
             var validationResult = await ValidateClientId(id);
 
@@ -175,7 +185,7 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<ClientDto>.Fail(validationResult.Message);
             }
 
-            var clientDomain = await clientRepository.GetClijentByIdAsync(id);
+            var clientDomain = await clientRepository.GetClientByIdAsync(id);
 
             var response = mapper.Map<ClientDto>(clientDomain);
 

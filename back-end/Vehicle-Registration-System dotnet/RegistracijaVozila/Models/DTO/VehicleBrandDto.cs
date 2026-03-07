@@ -1,15 +1,15 @@
-﻿namespace RegistracijaVozila.Models.DTO
+﻿namespace VehicleRegistrationSystem.Models.DTO
 {
     public class VehicleBrandDto
     {
         public Guid Id { get; set; }
 
-        public string Naziv { get; set; }
+        public string Name { get; set; }
 
-        public Guid TipVozilaId { get; set; }
+        public Guid VehicleTypeId { get; set; }
 
-        public string TipVozila { get; set; }
+        public string VehicleType { get; set; }
 
-        public string Kategorija { get; set; }
+        public string Category { get; set; }
     }
 }

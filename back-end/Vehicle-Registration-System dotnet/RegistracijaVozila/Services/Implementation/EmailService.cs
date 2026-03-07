@@ -1,31 +1,42 @@
 ﻿using MailKit.Security;
 using MimeKit;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Services.Interface;
 using MailKit.Net.Smtp;
+using VehicleRegistrationSystem.Models.DTO;
+using Microsoft.Extensions.Options;
 
-namespace RegistracijaVozila.Services.Implementation
+namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class EmailService : IEmailService
     {
+        private readonly EmailSettings emailSettings;
+
+        public EmailService(IOptions<EmailSettings> emailSettings)
+        {
+            this.emailSettings = emailSettings.Value;
+        }
+
         public async Task SendConfirmationEmailAsync(string toEmail, byte[] pdfBytes)
         {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse("jankovic.danilo23@gmail.com"));
             email.To.Add(MailboxAddress.Parse(toEmail));
-            email.Subject = "Potvrda o registraciji vozila";
+            email.Subject = "Vehicle Registration Confirmation";
 
             var builder = new BodyBuilder
             {
-                TextBody = "Poštovani,\n\nU prilogu se nalazi potvrda o registraciji vašeg vozila." +
-                "\n\nSrdačan pozdrav,\nMinistarstvo unutrašnjih poslova Republike Srbije"
+                TextBody = 
+                "Dear Sir/Madam,\n\nAttached you will find the confirmation of your vehicle registration." +
+                "\n\nKind regards,\nMinistry of Interior of the Republic of Serbia"
             };
 
-            builder.Attachments.Add("PotvrdaRegistacije.pdf",pdfBytes,new ContentType("application", "pdf"));
+            builder.Attachments.Add
+                ("RegistrationConfirmation.pdf", pdfBytes, new ContentType("application", "pdf"));
             email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
-            await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-            await smtp.AuthenticateAsync("jankovic.danilo23@gmail.com", "twby lpec aotj fyrb");
+            await smtp.ConnectAsync(emailSettings.SmtpServer, emailSettings.Port, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(emailSettings.Email, emailSettings.Password);
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);
         }

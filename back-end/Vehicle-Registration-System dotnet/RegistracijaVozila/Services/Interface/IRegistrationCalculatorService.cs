@@ -1,4 +1,4 @@
-﻿namespace RegistracijaVozila.Services.Interface
+﻿namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface IRegistrationCalculatorService
     {
@@ -8,6 +8,7 @@
 
         decimal CalculateEcoTax(string ecoClass);
 
-        decimal CalculateRegistrationPrice(int kw, decimal pricePerKw, decimal cm3, int vehicleAge, string ecoClass);
+        decimal CalculateRegistrationPrice
+            (int kw, decimal pricePerKw, decimal cm3, int vehicleAge, string ecoClass);
     }
 }

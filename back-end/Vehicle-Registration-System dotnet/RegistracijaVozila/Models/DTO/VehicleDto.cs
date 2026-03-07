@@ -1,33 +1,33 @@
-﻿namespace RegistracijaVozila.Models.DTO
+﻿namespace VehicleRegistrationSystem.Models.DTO
 {
     public class VehicleDto
     {
         public Guid Id { get; set; }
 
-        public Guid TipVozilaId { get; set; }
+        public Guid VehicleTypeId { get; set; }
 
-        public Guid MarkaVozilaId { get; set; }
+        public Guid VehicleBrandId { get; set; }
 
-        public Guid ModelVozilaId { get; set; }
+        public Guid VehicleModelId { get; set; }
 
-        public string TipVozilaNaziv { get; set; }
+        public string VehicleTypeName { get; set; }
 
-        public string MarkaVozilaNaziv { get; set; }
+        public string VehicleBrandName { get; set; }
 
-        public string ModelVozilaNaziv { get; set; }
+        public string VehicleModelName { get; set; }
 
-        public int GodinaProizvodnje { get; set; }
+        public int ProductionYear { get; set; }
 
-        public float ZapreminaMotora { get; set; }
+        public float EngineCapacity { get; set; }
 
-        public string VrstaGoriva { get; set; }
+        public string FuelType { get; set; }
 
-        public float Masa { get; set; }
+        public float Weight { get; set; }
 
-        public int SnagaMotora { get; set; }
+        public int EnginePowerKw { get; set; }
 
-        public string BrojSasije { get; set; }
+        public string ChassisNumber { get; set; }
 
-        public DateTime DatumPrveRegistracije { get; set; }
+        public DateTime FirstRegistrationDate { get; set; }
     }
 }

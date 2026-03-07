@@ -1,4 +1,4 @@
-﻿namespace RegistracijaVozila.Results
+﻿namespace VehicleRegistrationSystem.Results
 {
     public class RepositoryResult<T>
     {

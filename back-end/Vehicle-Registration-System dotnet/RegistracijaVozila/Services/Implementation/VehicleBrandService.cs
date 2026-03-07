@@ -1,21 +1,21 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Repositories.Interface;
-using RegistracijaVozila.Results;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Results;
+using VehicleRegistrationSystem.Services.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Services.Implementation
+namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class VehicleBrandService : IVehicleBrandService
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
         private readonly IVehicleBrandRepository vehicleBrandRepository;
         private readonly IMapper mapper;
 
-        public VehicleBrandService(RegistracijaVozilaDbContext appDbContext, 
+        public VehicleBrandService(VehicleRegistrationDbContext appDbContext, 
             IVehicleBrandRepository vehicleBrandRepository,
             IMapper mapper)
         {
@@ -27,9 +27,9 @@ namespace RegistracijaVozila.Services.Implementation
         public async Task<RepositoryResult<bool>> 
             ValidateVehicleBrandCreateRequestAsync(CreateVehicleBrandRequestDto request)
         {
-            var existingBrand = await appDbContext.MarkeVozila.AnyAsync(
-                x => x.Naziv.ToLower() == request.Naziv.ToLower() &&
-                x.TipVozilaId == request.TipVozilaId);
+            var existingBrand = await appDbContext.VehicleBrands.AnyAsync(
+                x => x.Name.ToLower() == request.Name.ToLower() &&
+                x.VehicleTypeId == request.VehicleTypeId);
 
             if (existingBrand)
             {
@@ -37,10 +37,10 @@ namespace RegistracijaVozila.Services.Implementation
                     "Brand already exists for the given vehicle type");
             }
 
-            if(!await appDbContext.TipoviVozila.AnyAsync(x=>x.Id == request.TipVozilaId))
+            if(!await appDbContext.VehicleTypes.AnyAsync(x=>x.Id == request.VehicleTypeId))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_TYPE_NOT_FOUND: Vehicle type with the id " +
-                    $"{request.TipVozilaId} doesnt exist");
+                    $"{request.VehicleTypeId} doesnt exist");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -56,29 +56,30 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<VehicleBrandDto>.Fail(validationResult.Message);
             }
 
-            var vehicleBrandDomain = mapper.Map<MarkaVozila>(request);
+            var vehicleBrandDomain = mapper.Map<VehicleBrand>(request);
             var result = await vehicleBrandRepository.AddAsync(vehicleBrandDomain);
 
             var response = mapper.Map<VehicleBrandDto>(result);
 
-            return RepositoryResult<VehicleBrandDto>.Ok(response, "New vehicle brand has successfully been created!");
+            return RepositoryResult<VehicleBrandDto>.Ok
+                (response, "New vehicle brand has successfully been created!");
         }
 
         public async Task<RepositoryResult<bool>> ValidateVehicleBrandDeleteRequestAsync(Guid id)
         {
-            if(await appDbContext.ModeliVozila.AnyAsync(x=>x.MarkaVozilaId == id))
+            if(await appDbContext.VehicleModels.AnyAsync(x=>x.VehicleBrandId == id))
             {
                 return RepositoryResult<bool>.Fail("VEHICLE_BRAND_HAS_MODELS: " +
                     " Vehicle brand has models and can't be deleted");
             }
 
-            if(!await appDbContext.MarkeVozila.AnyAsync(x=>x.Id == id))
+            if(!await appDbContext.VehicleBrands.AnyAsync(x=>x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_BRAND_NOT_FOUND: " +
                     $"Vehicle brand with Id {id} was not found");
             }
 
-            if(await appDbContext.Vozila.AnyAsync(x=>x.MarkaVozilaId == id))
+            if(await appDbContext.Vehicles.AnyAsync(x=>x.VehicleBrandId == id))
             {
                 return RepositoryResult<bool>.Fail("VEHICLE_BRAND_IN_USE: " +
                     "Cannot delete brand because it's assigned to existing vehicles");
@@ -106,26 +107,26 @@ namespace RegistracijaVozila.Services.Implementation
         public async Task<RepositoryResult<bool>> 
             ValidateVehicleBrandUpdateRequestAsync(UpdateVehicleBrandRequestDto request)
         {
-            if (!await appDbContext.MarkeVozila.AnyAsync(x => x.Id == request.Id))
+            if(!await appDbContext.VehicleBrands.AnyAsync(x => x.Id == request.Id))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_BRAND_NOT_FOUND: " +
                     $"Vehicle brand with the id {request.Id} doesnt exist");
             }
 
-            var existingBrand = await appDbContext.MarkeVozila.AnyAsync(
-                x => x.Naziv.ToLower() == request.Naziv.ToLower() &&
-                x.TipVozilaId == request.TipVozilaId && x.Id!=request.Id);
+            var existingBrand = await appDbContext.VehicleBrands.AnyAsync(
+                x => x.Name.ToLower() == request.Name.ToLower() &&
+                x.VehicleTypeId == request.VehicleTypeId && x.Id!=request.Id);
 
-            if (existingBrand)
+            if(existingBrand)
             {
                 return RepositoryResult<bool>.Fail("VEHICLE_BRAND_EXISTS: " +
                     "Brand already exists for the given vehicle type");
             }
 
-            if (!await appDbContext.TipoviVozila.AnyAsync(x => x.Id == request.TipVozilaId))
+            if (!await appDbContext.VehicleTypes.AnyAsync(x => x.Id == request.VehicleTypeId))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_TYPE_NOT_FOUND: Vehicle type with the id " +
-                    $"{request.TipVozilaId} doesnt exist");
+                    $"{request.VehicleTypeId} doesnt exist");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -141,7 +142,7 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<VehicleBrandDto>.Fail(validationResult.Message);
             }
 
-            var vehicleBrandDomain = mapper.Map<MarkaVozila>(request);
+            var vehicleBrandDomain = mapper.Map<VehicleBrand>(request);
 
             var updatedBrandVehicle = await vehicleBrandRepository.UpdateAsync(vehicleBrandDomain);
 
@@ -152,7 +153,7 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateVehicleBrandGetListByTypeAsync(Guid id)
         {
-            if(!await appDbContext.MarkeVozila.AnyAsync(x=>x.TipVozilaId ==  id))
+            if(!await appDbContext.VehicleBrands.AnyAsync(x=>x.VehicleTypeId ==  id))
             {
                 return RepositoryResult<bool>.Fail($"INCORRECT TYPE ID: Vehicle type with the id {id}" +
                     $" doesn't exist!");
@@ -179,7 +180,7 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateVehicleBrandGetByIdAsync(Guid id)
         {
-            if (!await appDbContext.MarkeVozila.AnyAsync(x => x.Id == id))
+            if (!await appDbContext.VehicleBrands.AnyAsync(x => x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"INCORRECT BRAND ID: Vehicle brand with the  id {id}" +
                     $" doesn't exist!");

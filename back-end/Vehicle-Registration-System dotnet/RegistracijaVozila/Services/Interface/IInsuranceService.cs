@@ -1,7 +1,7 @@
-﻿using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Results;
+﻿using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Results;
 
-namespace RegistracijaVozila.Services.Interface
+namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface IInsuranceService
     {

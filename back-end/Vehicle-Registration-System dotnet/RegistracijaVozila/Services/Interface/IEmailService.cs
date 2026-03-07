@@ -1,4 +1,4 @@
-﻿namespace RegistracijaVozila.Services.Interface
+﻿namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface IEmailService
     {

@@ -1,50 +1,50 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Repositories.Interface;
+using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Data;
 
-namespace RegistracijaVozila.Repositories.Implementation
+namespace VehicleRegistrationSystem.Repositories.Implementation
 {
     public class ClientRepository : IClientRepository
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
 
-        public ClientRepository(RegistracijaVozilaDbContext appDbContext)
+        public ClientRepository(VehicleRegistrationDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
         }
 
-        public async Task<Klijent> AddClientAsync(Klijent klijent)
+        public async Task<Client> AddClientAsync(Client client)
         {
-            await appDbContext.Klijenti.AddAsync(klijent);
+            await appDbContext.Clients.AddAsync(client);
             await appDbContext.SaveChangesAsync();
-            return klijent;
+            return client;
         }
 
-        public async Task<Klijent?> DeleteClientAsync(Guid id)
+        public async Task<Client?> DeleteClientAsync(Guid id)
         {
-            var deletedClient = await appDbContext.Klijenti.FirstOrDefaultAsync(x => x.Id == id);
+            var clientDelete = await appDbContext.Clients.FirstOrDefaultAsync(x => x.Id == id);
 
 
-            appDbContext.Klijenti.Remove(deletedClient);
+            appDbContext.Clients.Remove(clientDelete);
             await appDbContext.SaveChangesAsync();
-            return deletedClient;
+            return clientDelete;
 
         }
 
-        public async Task<(List<Klijent> Items, int TotalCount)> GetAllAsync
+        public async Task<(List<Client> Items, int TotalCount)> GetAllAsync
             (string? searchQuery = null, int pageNumber = 1, int pageSize = 1000)
         {
-            var query = appDbContext.Klijenti.AsQueryable();
+            var query = appDbContext.Clients.AsQueryable();
 
             if (string.IsNullOrWhiteSpace(searchQuery) == false)
             {
                 query = query.Where(
-                x => x.Ime.Contains(searchQuery) ||
-                x.Prezime.Contains(searchQuery) ||
+                x => x.FirstName.Contains(searchQuery) ||
+                x.LastName.Contains(searchQuery) ||
                 x.Email.Contains(searchQuery) ||
-                x.BrojLicneKarte.Contains(searchQuery) ||
-                x.JMBG.Contains(searchQuery));
+                x.IdCardNumber.Contains(searchQuery) ||
+                x.NationalId.Contains(searchQuery));
             }
 
             var items = await query
@@ -57,28 +57,28 @@ namespace RegistracijaVozila.Repositories.Implementation
             return (items, totalCount);
         }
 
-        public async Task<Klijent?> GetClijentByIdAsync(Guid id)
+        public async Task<Client?> GetClientByIdAsync(Guid id)
         {
-            return await appDbContext.Klijenti.FirstOrDefaultAsync(x => x.Id == id);
+            return await appDbContext.Clients.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<Klijent?> UpdateClientAsync(Klijent client)
+        public async Task<Client?> UpdateClientAsync(Client client)
         {
-            var existingClient = await appDbContext.Klijenti.FirstOrDefaultAsync(x => x.Id == client.Id);
+            var existingClient = await appDbContext.Clients.FirstOrDefaultAsync(x => x.Id == client.Id);
 
             if (existingClient == null)
             {
                 return null;
             }
 
-            existingClient.Ime = client.Ime;
-            existingClient.Prezime = client.Prezime;
-            existingClient.JMBG = client.JMBG;
-            existingClient.BrojLicneKarte = client.BrojLicneKarte;
-            existingClient.DatumRodjenja = client.DatumRodjenja;
+            existingClient.FirstName = client.FirstName;
+            existingClient.LastName = client.LastName;
+            existingClient.NationalId = client.NationalId;
+            existingClient.IdCardNumber = client.IdCardNumber;
+            existingClient.DateOfBirth = client.DateOfBirth;
             existingClient.Email = client.Email;
-            existingClient.Adresa = client.Adresa;
-            existingClient.BrojTelefona = client.BrojTelefona;
+            existingClient.Address = client.Address;
+            existingClient.PhoneNumber = client.PhoneNumber;
 
             await appDbContext.SaveChangesAsync();
 

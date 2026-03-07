@@ -2,13 +2,13 @@
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
-namespace RegistracijaVozila.Models.DTO
+namespace VehicleRegistrationSystem.Models.DTO
 {
-    public class ConfirmationRegistrationDocument : IDocument
+    public class RegistrationConfirmationDocument : IDocument
     {
         private readonly RegistrationVehicleDto model;
 
-        public ConfirmationRegistrationDocument(RegistrationVehicleDto model)
+        public RegistrationConfirmationDocument(RegistrationVehicleDto model)
         {
             this.model = model;
         }
@@ -22,41 +22,40 @@ namespace RegistracijaVozila.Models.DTO
                 page.Margin(30);
                 page.Size(PageSizes.A4);
 
-                page.Header().PaddingBottom(30).Text("Potvrda o registraciji vozila")
+                page.Header().PaddingBottom(30).Text("Vehicle Registration Confirmation")
                 .FontSize(20).Bold().AlignCenter();
 
                 page.Content().Column(column =>
                 {
                     column.Spacing(10);
 
-                    column.Item().Text($"Ime vlasnika: {model.Vlasnik.Ime}");
-                    column.Item().Text($"Prezime vlasnika: {model.Vlasnik.Prezime}");
-                    column.Item().Text($"Email: {model.Vlasnik.Email}");
-                    column.Item().Text($"Broj lične karte: {model.Vlasnik.BrojLicneKarte}");
-                    column.Item().Text($"JMBG: {model.Vlasnik.JMBG}");
-                    column.Item().Text($"Adresa: {model.Vlasnik.Adresa}");
-                    column.Item().Text($"Broj telefona: {model.Vlasnik.BrojTelefona}");
-                    column.Item().Text($"Tip vozila: {model.Vozilo.TipVozilaNaziv}");
-                    column.Item().Text($"Marka vozila: {model.Vozilo.MarkaVozilaNaziv}");
-                    column.Item().Text($"Model vozila: {model.Vozilo.ModelVozilaNaziv}");
-                    column.Item().Text($"Registarska oznaka: {model.RegistarskaOznaka}");
-                    column.Item().Text($"Datum registracije: {model.DatumRegistracije:dd.MM.yyyy}");
-                    column.Item().Text($"Datum isteka registracije: " +
-                        $"{model.DatumIstekaRegistracije:dd.MM.yyyy}");
-                    column.Item().Text($"Broj šasije: {model.Vozilo.BrojSasije}");
-                    column.Item().Text($"Zapremina motora: {model.Vozilo.ZapreminaMotora}cm3");
-                    column.Item().Text($"Snaga motora: {model.Vozilo.SnagaMotora}kw");
-                    column.Item().Text($"Godina proizvodnje: {model.Vozilo.GodinaProizvodnje}");
-                    column.Item().Text($"Datum prve registracije: {model.Vozilo.DatumPrveRegistracije.Year}");
-                    column.Item().Text($"Težina vozila: {model.Vozilo.Masa}kg");
-                    column.Item().Text($"Vrsta goriva: {model.Vozilo.VrstaGoriva}");
-                    column.Item().Text($"Osiguranje {model.Osiguranje.Naziv}");
-                    column.Item().Text($"Ukupna cijena registracije: {model.CijenaRegistracije} dinara");
+                    column.Item().Text($"Owner First Name: {model.Client.FirstName}");
+                    column.Item().Text($"Owner Last Name: {model.Client.LastName}");
+                    column.Item().Text($"Email: {model.Client.Email}");
+                    column.Item().Text($"ID Card Number: {model.Client.IdCardNumber}");
+                    column.Item().Text($"National ID (JMBG): {model.Client.NationalId}");
+                    column.Item().Text($"Address: {model.Client.Address}");
+                    column.Item().Text($"Phone Number: {model.Client.PhoneNumber}");
+                    column.Item().Text($"Vehicle Type: {model.Vehicle.VehicleTypeName}");
+                    column.Item().Text($"Vehicle Brand: {model.Vehicle.VehicleBrandName}");
+                    column.Item().Text($"Vehicle Model: {model.Vehicle.VehicleModelName}");
+                    column.Item().Text($"License Plate: {model.LicensePlate}");
+                    column.Item().Text($"Registration Date: {model.RegistrationDate:dd.MM.yyyy}");
+                    column.Item().Text($"Registration Expiration Date: {model.ExpirationDate:dd.MM.yyyy}");
+                    column.Item().Text($"Chassis Number: {model.Vehicle.ChassisNumber}");
+                    column.Item().Text($"Engine Capacity: {model.Vehicle.EngineCapacity} cm3");
+                    column.Item().Text($"Engine Power: {model.Vehicle.EnginePowerKw} kw");
+                    column.Item().Text($"Production Year: {model.Vehicle.ProductionYear}");
+                    column.Item().Text($"First Registration Date: {model.Vehicle.FirstRegistrationDate.Year}");
+                    column.Item().Text($"Vehicle Weight: {model.Vehicle.Weight} kg");
+                    column.Item().Text($"Fuel Type: {model.Vehicle.FuelType}");
+                    column.Item().Text($"Insurance: {model.Insurance.Name}");
+                    column.Item().Text($"Total Registration Price: {model.RegistrationPrice} dinars");
                 });
 
                 page.Footer().AlignCenter().Text(txt =>
                 {
-                    txt.Span("Ministarstvo unutrašnjih poslova Republike Srbije @ " + DateTime.Now.Year);
+                    txt.Span("Ministry of Interior of the Republic of Serbia @ " + DateTime.Now.Year);
                 });
             });
         }

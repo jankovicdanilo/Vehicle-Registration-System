@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RegistracijaVozila.Data;
+using VehicleRegistrationSystem.Data;
 
 #nullable disable
 
-namespace RegistracijaVozila.Migrations.AuthDb
+namespace VehicleRegistrationSystem.Migrations.AuthDb
 {
     [DbContext(typeof(AuthDbContext))]
     partial class AuthDbContextModelSnapshot : ModelSnapshot
@@ -60,15 +60,15 @@ namespace RegistracijaVozila.Migrations.AuthDb
                         {
                             Id = "49b719cf-9ebf-4151-af09-835f9c03f6b6",
                             ConcurrencyStamp = "49b719cf-9ebf-4151-af09-835f9c03f6b6",
-                            Name = "Zaposleni",
-                            NormalizedName = "ZAPOSLENI"
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
                             Id = "f2f2ca54-7b0e-4d50-9b8a-7a5f9d6e3a11",
                             ConcurrencyStamp = "f2f2ca54-7b0e-4d50-9b8a-7a5f9d6e3a11",
-                            Name = "SefOdsjeka",
-                            NormalizedName = "SEFODSJEKA"
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
                         });
                 });
 
@@ -166,15 +166,15 @@ namespace RegistracijaVozila.Migrations.AuthDb
                         {
                             Id = "93e88597-7567-4e0a-af32-d3c79597ab97",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "dbc0d818-a294-43c2-b296-5c6aef87151d",
+                            ConcurrencyStamp = "e234f8a5-9f09-4fe2-8a72-843a6e9e2e3a",
                             Email = "jankovic.danilo23@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "JANKOVIC.DANILO23@GMAIL.COM",
                             NormalizedUserName = "DANILO",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ6vz1P3h5Gvm+whTKOFRippzBeKBA+WcuEkHT89VbQ2IM301BA4Qlb2Lbpt5kp7uw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENUlx+tPk9PoXImr/4I1wKq8FoedcLgs/JZp6T/ecKZE7PLfH/q5tGah/U79ohTYEg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d57f56d5-b08b-4ce8-8468-3d67f01b9dcd",
+                            SecurityStamp = "b156b53a-c5ac-40ac-8a52-9af07b768682",
                             TwoFactorEnabled = false,
                             UserName = "Danilo"
                         });

@@ -1,21 +1,21 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Repositories.Interface;
-using RegistracijaVozila.Results;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Results;
+using VehicleRegistrationSystem.Services.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Services.Implementation
+namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class VehicleService : IVehicleService
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
         private readonly IMapper mapper;
         private readonly IVehicleRepository vehicleRepository;
 
-        public VehicleService(RegistracijaVozilaDbContext appDbContext, IMapper mapper, 
+        public VehicleService(VehicleRegistrationDbContext appDbContext, IMapper mapper, 
             IVehicleRepository vehicleRepository)
         {
             this.appDbContext = appDbContext;
@@ -26,35 +26,35 @@ namespace RegistracijaVozila.Services.Implementation
         public async Task<RepositoryResult<bool>> 
             ValidateVehicleCreateRequestAsync(CreateVehicleRequestDto request)
         {
-            if (!await appDbContext.TipoviVozila.AnyAsync(t => t.Id == request.TipVozilaId))
-                return RepositoryResult<bool>.Fail("TIP_NOT_FOUND: Vehicle type doesn't exist");
+            if (!await appDbContext.VehicleTypes.AnyAsync(t => t.Id == request.VehicleTypeId))
+                return RepositoryResult<bool>.Fail("TYPE_NOT_FOUND: Vehicle type doesn't exist");
 
-            if (!await appDbContext.MarkeVozila.AnyAsync(m => m.Id == request.MarkaVozilaId))
-                return RepositoryResult<bool>.Fail("MARKA_NOT_FOUND: Vehicle brand doesn't exist");
+            if (!await appDbContext.VehicleBrands.AnyAsync(m => m.Id == request.VehicleBrandId))
+                return RepositoryResult<bool>.Fail("BRAND_NOT_FOUND: Vehicle brand doesn't exist");
 
-            if (!await appDbContext.ModeliVozila.AnyAsync(m => m.Id == request.ModelVozilaId))
+            if (!await appDbContext.VehicleModels.AnyAsync(m => m.Id == request.VehicleModelId))
                 return RepositoryResult<bool>.Fail("MODEL_NOT_FOUND: Vehicle model doesn't exist");
 
-            var isValid = await appDbContext.ModeliVozila.Include(m => m.MarkaVozila)
-                .AnyAsync(m => m.Id == request.ModelVozilaId &&
-                               m.MarkaVozilaId == request.MarkaVozilaId &&
-                               m.MarkaVozila.TipVozilaId == request.TipVozilaId);
+            var isValid = await appDbContext.VehicleModels.Include(m => m.VehicleBrand)
+                .AnyAsync(m => m.Id == request.VehicleModelId &&
+                               m.VehicleBrandId == request.VehicleBrandId &&
+                               m.VehicleBrand.VehicleTypeId == request.VehicleTypeId);
 
             if (!isValid)
                 return RepositoryResult<bool>.Fail("INVALID_COMBINATION: " +
                     "Model doesn't match brand and vehicle type");
 
-            if (await appDbContext.Vozila.AnyAsync(x => x.BrojSasije == request.BrojSasije))
+            if (await appDbContext.Vehicles.AnyAsync(x => x.ChassisNumber == request.ChassisNumber))
                 return RepositoryResult<bool>.Fail("CHASSIS_NUMBER_EXISTS: Chassis number already used");
 
-            if (request.GodinaProizvodnje < 1900 || request.GodinaProizvodnje > DateTime.Now.Year)
+            if (request.ProductionYear < 1900 || request.ProductionYear > DateTime.Now.Year)
                 return RepositoryResult<bool>.Fail("INVALID_YEAR: Invalid production year");
 
-            if (request.SnagaMotora <= 0)
+            if (request.EnginePowerKw <= 0)
                 return RepositoryResult<bool>.Fail("INVALID_ENGINE_POWER: " +
                     "Engine power must be greater than zero");
 
-            if (request.GodinaProizvodnje > request.DatumPrveRegistracije.Year)
+            if (request.ProductionYear > request.FirstRegistrationDate.Year)
                 return RepositoryResult<bool>.Fail("PRODUCTION_DATE_AFTER_FIRST_REGISTRATION: " +
                     "The car's production year must be before or equal to its first registration date.");
 
@@ -67,7 +67,7 @@ namespace RegistracijaVozila.Services.Implementation
             if (!validationResult.Success)
                 return RepositoryResult<VehicleDto>.Fail(validationResult.Message);
 
-            var vehicleDomain = mapper.Map<Vozilo>(request);
+            var vehicleDomain = mapper.Map<Vehicle>(request);
 
             vehicleDomain = await vehicleRepository.AddAsync(vehicleDomain);
 
@@ -79,19 +79,20 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>?> ValidateVehicleDeleteRequestAsync(Guid id)
         {
-            var existingVehicle = await appDbContext.Vozila.AnyAsync(x => x.Id == id);
+            var existingVehicle = await appDbContext.Vehicles.AnyAsync(x => x.Id == id);
             
             if(!existingVehicle)
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_NOT_FOUND: Vehicle with Id {id} was not found");
             }
 
-            var isRegistered = await appDbContext.Registracije.AnyAsync(x => x.VoziloId == id);
+            var isRegistered = await appDbContext.Registrations.AnyAsync(x => x.VehicleId == id);
 
             if (isRegistered)
             {
                 return RepositoryResult<bool>.Fail(
-                    "VEHICLE_REGISTRATION_EXISTS: Vehicle can't be deleted because its registration still exists");
+                    "VEHICLE_REGISTRATION_EXISTS: " +
+                    "Vehicle can't be deleted because its registration still exists");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -121,25 +122,25 @@ namespace RegistracijaVozila.Services.Implementation
                     "Vehicle ID is required and cannot be empty");
             }
 
-            if(!await appDbContext.Vozila.AnyAsync(x => x.Id == request.Id))
+            if(!await appDbContext.Vehicles.AnyAsync(x => x.Id == request.Id))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_NOT_FOUND: " +
                     $"Vehicle with the Id {request?.Id} was not found");
             }
 
-            if (!await appDbContext.TipoviVozila.AnyAsync(t => t.Id == request.TipVozilaId))
-                return RepositoryResult<bool>.Fail("TIP_NOT_FOUND: Vehicle type doesn't exist");
+            if (!await appDbContext.VehicleTypes.AnyAsync(t => t.Id == request.VehicleTypeId))
+                return RepositoryResult<bool>.Fail("TYPE_NOT_FOUND: Vehicle type doesn't exist");
 
-            if (!await appDbContext.MarkeVozila.AnyAsync(m => m.Id == request.MarkaVozilaId))
-                return RepositoryResult<bool>.Fail("MARKA_NOT_FOUND: Vehicle brand doesn't exist");
+            if (!await appDbContext.VehicleBrands.AnyAsync(m => m.Id == request.VehicleBrandId))
+                return RepositoryResult<bool>.Fail("BRAND_NOT_FOUND: Vehicle brand doesn't exist");
 
-            if (!await appDbContext.ModeliVozila.AnyAsync(m => m.Id == request.ModelVozilaId))
+            if (!await appDbContext.VehicleModels.AnyAsync(m => m.Id == request.VehicleModelId))
                 return RepositoryResult<bool>.Fail("MODEL_NOT_FOUND: Vehicle model doesn't exist");
 
-            var isValid = await appDbContext.ModeliVozila.Include(m => m.MarkaVozila)
-                .AnyAsync(m => m.Id == request.ModelVozilaId &&
-                               m.MarkaVozilaId == request.MarkaVozilaId &&
-                               m.MarkaVozila.TipVozilaId == request.TipVozilaId);
+            var isValid = await appDbContext.VehicleModels.Include(m => m.VehicleBrand)
+                .AnyAsync(m => m.Id == request.VehicleModelId &&
+                               m.VehicleBrandId == request.VehicleBrandId &&
+                               m.VehicleBrand.VehicleTypeId == request.VehicleTypeId);
 
             if (!isValid)
                 return RepositoryResult<bool>.Fail("INVALID_COMBINATION: " +
@@ -147,18 +148,18 @@ namespace RegistracijaVozila.Services.Implementation
 
             
 
-            if (await appDbContext.Vozila.AnyAsync(x => x.BrojSasije == request.BrojSasije &&
+            if (await appDbContext.Vehicles.AnyAsync(x => x.ChassisNumber == request.ChassisNumber &&
             x.Id!=request.Id))
                 return RepositoryResult<bool>.Fail("CHASSIS_NUMBER_EXISTS: Chassis number already used");
 
-            if (request.GodinaProizvodnje < 1900 || request.GodinaProizvodnje > DateTime.Now.Year)
+            if (request.ProductionYear < 1900 || request.ProductionYear > DateTime.Now.Year)
                 return RepositoryResult<bool>.Fail("INVALID_YEAR: Invalid production year");
 
-            if (request.SnagaMotora <= 0)
+            if (request.EnginePowerKw <= 0)
                 return RepositoryResult<bool>.Fail("INVALID_ENGINE_POWER: " +
                     "Engine power must be greater than zero");
 
-            if (request.GodinaProizvodnje > request.DatumPrveRegistracije.Year)
+            if (request.ProductionYear > request.FirstRegistrationDate.Year)
                 return RepositoryResult<bool>.Fail("PRODUCTION_DATE_AFTER_FIRST_REGISTRATION: " +
                     "The car's production year must be before or equal to its first registration date.");
 
@@ -174,7 +175,7 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<VehicleDto>.Fail(validationResut.Message);
             }
 
-            var vehicleDomain = mapper.Map<Vozilo>(request);
+            var vehicleDomain = mapper.Map<Vehicle>(request);
 
             var updatedVehicle = await vehicleRepository.UpdateVehicleAsync(vehicleDomain);
 
@@ -197,9 +198,9 @@ namespace RegistracijaVozila.Services.Implementation
             return RepositoryResult<PagedResult<VehicleDto>>.Ok(response);
         }
 
-        public async Task<RepositoryResult<bool>?> ValidateGetVehicleByIdAsyncRequestAsync(Guid id)
+        public async Task<RepositoryResult<bool>?> ValidateGetVehicleByIdRequestAsync(Guid id)
         {
-            if(!await appDbContext.Vozila.AnyAsync(x=>x.Id == id))
+            if(!await appDbContext.Vehicles.AnyAsync(x=>x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_NOT_FOUND: Vehicle with the Id {id} was not found");
             }
@@ -209,7 +210,7 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<VehicleDto>> GetVehicleByIdAsync(Guid id)
         {
-            var validationResult = await ValidateGetVehicleByIdAsyncRequestAsync(id);
+            var validationResult = await ValidateGetVehicleByIdRequestAsync(id);
 
             if (!validationResult.Success)
             {

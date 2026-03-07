@@ -1,6 +1,6 @@
-﻿using RegistracijaVozila.Services.Interface;
+﻿using VehicleRegistrationSystem.Services.Interface;
 
-namespace RegistracijaVozila.Services.Implementation
+namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class RegistrationCalculatorService : IRegistrationCalculatorService
     {
@@ -11,12 +11,12 @@ namespace RegistracijaVozila.Services.Implementation
         {
             return ecoClass switch
             {
-                "Tečni naftni gas" => 3000,
-                "Dizel" => 2500,
-                "Kompresovani prirodni gas" =>2250,
-                "Benzin" => 2000,
-                "Hibrid" => 1500,
-                "Električni pogon" => 1200,
+                "Liquefied Petroleum Gas" => 3000,
+                "Diesel" => 2500,
+                "Compressed Natural Gas" => 2250,
+                "Petrol" => 2000,
+                "Hybrid" => 1500,
+                "Electric" => 1200,
                 _ => 3000
             };
         }

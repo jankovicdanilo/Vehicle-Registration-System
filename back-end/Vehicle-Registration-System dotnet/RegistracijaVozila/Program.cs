@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Mappings;
-using RegistracijaVozila.Repositories.Implementation;
-using RegistracijaVozila.Repositories.Interface;
-using RegistracijaVozila.Services.Implementation;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Mappings;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Repositories.Implementation;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Services.Implementation;
+using VehicleRegistrationSystem.Services.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,10 +22,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<RegistracijaVozilaDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("RegistracijaVozilaDbConnectionString")));
+builder.Services.AddDbContext<VehicleRegistrationDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("VehicleRegistrationDbConnectionString")));
 builder.Services.AddDbContext<AuthDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("RegistracijaVozilaDbConnectionString")));
+options.UseSqlServer(builder.Configuration.GetConnectionString("VehicleRegistrationDbConnectionString")));
 
 
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
@@ -50,7 +51,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddIdentityCore<IdentityUser>()
     .AddRoles<IdentityRole>()
-    .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("RegistracijaVozila")
+    .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("VehicleRegistrationSystem")
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
 
@@ -63,6 +64,9 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = true;
     options.Password.RequiredLength = 3;
 });
+
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

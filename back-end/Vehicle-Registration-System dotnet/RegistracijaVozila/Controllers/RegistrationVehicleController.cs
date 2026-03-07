@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuestPDF.Fluent;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Services.Interface;
 
-namespace RegistracijaVozila.Controllers
+namespace VehicleRegistrationSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -37,9 +37,9 @@ namespace RegistracijaVozila.Controllers
             }
 
             var confirmationData = await registrationVehicleService.GenerateConfirmation(result.Data.Id);
-            var document = new ConfirmationRegistrationDocument(confirmationData.Data);
+            var document = new RegistrationConfirmationDocument(confirmationData.Data);
             var pdfBytes = document.GeneratePdf();
-            await emailService.SendConfirmationEmailAsync(confirmationData.Data.Vlasnik.Email, pdfBytes);
+            await emailService.SendConfirmationEmailAsync(confirmationData.Data.Client.Email, pdfBytes);
 
             return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
         }
@@ -110,28 +110,28 @@ namespace RegistracijaVozila.Controllers
             return Ok(result);
         }
 
-        [HttpGet("potvrda/{id}")]
+        [HttpGet("confirmation/{id}")]
         public async Task<IActionResult> GenerateConfirmation(Guid id)
         {
             var result = await registrationVehicleService.GenerateConfirmation(id);
 
-            var document = new ConfirmationRegistrationDocument(result.Data);
+            var document = new RegistrationConfirmationDocument(result.Data);
             var pdfBytes = document.GeneratePdf();
 
-            return File(pdfBytes, "application/pdf", "PotvrdaRegistracije.pdf");
+            return File(pdfBytes, "application/pdf", "RegistrationConfirmation.pdf");
         }
 
-        [HttpGet("potvrda-mail/{id}")]
+        [HttpGet("confirmation-email/{id}")]
         public async Task<IActionResult> GenerateAndSendConfirmation(Guid id)
         {
             var result = await registrationVehicleService.GenerateConfirmation(id);
 
-            var document = new ConfirmationRegistrationDocument(result.Data);
+            var document = new RegistrationConfirmationDocument(result.Data);
             var pdfBytes = document.GeneratePdf();
 
-            await emailService.SendConfirmationEmailAsync(result.Data.Vlasnik.Email, pdfBytes);
+            await emailService.SendConfirmationEmailAsync(result.Data.Client.Email, pdfBytes);
 
-            return Ok("PDF potvrda je poslata mejlom");
+            return Ok("PDF confirmation has been sent via email");
         }
     }
 }

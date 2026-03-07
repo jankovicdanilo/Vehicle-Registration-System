@@ -1,17 +1,19 @@
-﻿using RegistracijaVozila.Models.Domain;
+﻿using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Repositories.Interface
+namespace VehicleRegistrationSystem.Repositories.Interface
 {
     public interface IVehicleRepository
     {
-        Task<Vozilo> AddAsync(Vozilo vozilo);
+        Task<Vehicle> AddAsync(Vehicle vehicle);
 
-        Task<(List<Vozilo> Items, int TotalCount)> GetAllAsync(string? searchQuery = null, int pageSize = 1000, int pageNumber = 1);
+        Task<(List<Vehicle> Items, int TotalCount)> GetAllAsync
+            (string? searchQuery = null, int pageSize = 1000, int pageNumber = 1);
 
-        Task<Vozilo?> GetVehicleByIdAsync(Guid id);
+        Task<Vehicle?> GetVehicleByIdAsync(Guid id);
 
-        Task<Vozilo?> DeleteVehicleAsync(Guid id);
+        Task<Vehicle?> DeleteVehicleAsync(Guid id);
 
-        Task<Vozilo?> UpdateVehicleAsync(Vozilo vozilo);
+        Task<Vehicle?> UpdateVehicleAsync(Vehicle vehicle);
     }
 }

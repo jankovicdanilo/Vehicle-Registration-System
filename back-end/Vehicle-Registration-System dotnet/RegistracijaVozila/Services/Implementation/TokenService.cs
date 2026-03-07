@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Services.Interface;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 
-namespace RegistracijaVozila.Services.Implementation
+namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class TokenService : ITokenService
     {
         private readonly IConfiguration configuration;
-        private readonly Microsoft.AspNetCore.Identity.UserManager<IdentityUser> userManager;
+        private readonly UserManager<IdentityUser> userManager;
 
         public TokenService(IConfiguration configuration, UserManager<IdentityUser> userManager)
         {

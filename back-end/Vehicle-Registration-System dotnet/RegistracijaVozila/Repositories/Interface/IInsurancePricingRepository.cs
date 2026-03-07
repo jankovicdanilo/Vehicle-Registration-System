@@ -1,15 +1,16 @@
-﻿using RegistracijaVozila.Models.Domain;
+﻿using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Repositories.Interface
+namespace VehicleRegistrationSystem.Repositories.Interface
 {
     public interface IInsurancePricingRepository
     {
-        Task<OsiguranjeCijene> CreateAsync(OsiguranjeCijene osiguranjeCijene);
+        Task<InsurancePrice> CreateAsync(InsurancePrice insurancePrice);
 
-        Task<List<OsiguranjeCijene>> GetAllAsync();
+        Task<List<InsurancePrice>> GetAllAsync();
 
-        Task<OsiguranjeCijene?> GetByIdAsync(Guid id);
+        Task<InsurancePrice?> GetByIdAsync(Guid id);
 
-        Task<OsiguranjeCijene?> GetByInsuranceIdAsync(Guid id, int kw);
+        Task<InsurancePrice?> GetByInsuranceIdAsync(Guid id, int kw);
     }
 }

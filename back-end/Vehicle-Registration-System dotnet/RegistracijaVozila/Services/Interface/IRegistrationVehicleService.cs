@@ -1,7 +1,7 @@
-﻿using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Results;
+﻿using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Results;
 
-namespace RegistracijaVozila.Services.Interface
+namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface IRegistrationVehicleService
     {
@@ -23,7 +23,8 @@ namespace RegistracijaVozila.Services.Interface
         Task<RepositoryResult<RegistrationVehicleDto>> 
             UpdateRegistrationAsync(UpdateRegistrationVehicleRequestDto request);
 
-        Task<RepositoryResult<PagedResult<RegistrationVehicleDto>>> GetAllAsync(string? searchQuery = null, int pageNumber = 1, int pageSize = 1000);
+        Task<RepositoryResult<PagedResult<RegistrationVehicleDto>>> GetAllAsync
+            (string? searchQuery = null, int pageNumber = 1, int pageSize = 1000);
 
         Task<RepositoryResult<RegistrationVehicleDto>> GetByIdAsync(Guid id);
 

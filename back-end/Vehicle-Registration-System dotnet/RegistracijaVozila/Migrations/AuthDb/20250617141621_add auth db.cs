@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace RegistracijaVozila.Migrations.AuthDb
+namespace VehicleRegistrationSystem.Migrations.AuthDb
 {
     /// <inheritdoc />
     public partial class addauthdb : Migration

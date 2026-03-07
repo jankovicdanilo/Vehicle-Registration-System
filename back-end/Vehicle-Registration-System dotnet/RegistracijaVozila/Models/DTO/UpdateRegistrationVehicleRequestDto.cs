@@ -1,21 +1,20 @@
-﻿using RegistracijaVozila.Models.Domain;
-
-namespace RegistracijaVozila.Models.DTO
+﻿
+namespace VehicleRegistrationSystem.Models.DTO
 {
     public class UpdateRegistrationVehicleRequestDto
     {
         public Guid Id { get; set; }
 
-        public string RegistarskaOznaka { get; set; }
+        public string LicensePlate { get; set; }
 
-        public DateTime DatumRegistracije { get; set; }
+        public DateTime RegistrationDate { get; set; }
 
-        public bool PrivremenaRegistracija { get; set; }
+        public bool IsTemporary { get; set; }
 
-        public Guid KlijentId { get; set; }
+        public Guid ClientId { get; set; }
 
-        public Guid VoziloId { get; set; }
+        public Guid VehicleId { get; set; }
 
-        public Guid OsiguranjeId { get; set; }
+        public Guid InsuranceId { get; set; }
     }
 }

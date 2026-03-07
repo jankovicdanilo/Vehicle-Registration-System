@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Results;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Services.Interface;
 
-namespace RegistracijaVozila.Controllers
+namespace VehicleRegistrationSystem.Controllers
 {
     
     [Route("api/[controller]")]
@@ -23,7 +22,7 @@ namespace RegistracijaVozila.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin,SefOdsjeka")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> List()
         {
             var currentUser = await userManager.GetUserAsync(User);
@@ -33,8 +32,8 @@ namespace RegistracijaVozila.Controllers
 
             if (roles.Contains("Admin"))
                 callerRole = "Admin";
-            else if (roles.Contains("SefOdsjeka"))
-                callerRole = "SefOdsjeka";
+            else if (roles.Contains("Manager"))
+                callerRole = "Manager";
 
             if (callerRole == null)
                 return Forbid();
@@ -141,7 +140,7 @@ namespace RegistracijaVozila.Controllers
         }
 
         [HttpPut("changePassword")]
-        [Authorize(Roles = "Admin, SefOdsjeka")]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> ChangePassword([FromBody] PasswordChangeRequestDto request)
         {
             var userId = userManager.GetUserId(User);
@@ -158,7 +157,7 @@ namespace RegistracijaVozila.Controllers
         }
 
         [HttpPut("resetPassword")]
-        [Authorize(Roles = "Admin, SefOdsjeka")]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> ResetPassword([FromBody] PasswordResetRequestDto request)
         {
             var result = await authService.ResetPasswordAsync(request.Id, request.NewPassword);
@@ -169,20 +168,6 @@ namespace RegistracijaVozila.Controllers
             }
 
             return Ok(result);
-        }
-
-
-        [HttpGet]
-        [Route("vratiNesto")]
-        public async Task<IActionResult> VratiNesto()
-        {
-            var response = new
-            {
-                message = "Đe si, što ima?",
-                time = DateTime.Now
-            };
-
-            return Ok(response);
         }
             
     }

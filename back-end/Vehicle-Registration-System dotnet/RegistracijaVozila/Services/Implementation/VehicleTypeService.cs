@@ -1,21 +1,21 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Repositories.Interface;
-using RegistracijaVozila.Results;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Results;
+using VehicleRegistrationSystem.Services.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Services.Implementation
+namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class VehicleTypeService : IVehicleTypeService
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
         private readonly IMapper mapper;
         private readonly IVehicleTypeRepository vehicleTypeRepository;
 
-        public VehicleTypeService(RegistracijaVozilaDbContext appDbContext, IMapper mapper, 
+        public VehicleTypeService(VehicleRegistrationDbContext appDbContext, IMapper mapper, 
             IVehicleTypeRepository vehicleTypeRepository)
         {
             this.appDbContext = appDbContext;
@@ -23,11 +23,12 @@ namespace RegistracijaVozila.Services.Implementation
             this.vehicleTypeRepository = vehicleTypeRepository;
         }
 
-        public async Task<RepositoryResult<bool>> ValidateVehicleTypeCreateRequestAsync(CreateVehicleTypeRequestDto request)
+        public async Task<RepositoryResult<bool>> 
+            ValidateVehicleTypeCreateRequestAsync(CreateVehicleTypeRequestDto request)
         {
 
-            var existingCategory = await appDbContext.TipoviVozila.AnyAsync(x =>
-                x.Kategorija == request.Kategorija);
+            var existingCategory = await appDbContext.VehicleTypes.AnyAsync(x =>
+                x.Category == request.Category);
 
 
             if (existingCategory)
@@ -36,7 +37,7 @@ namespace RegistracijaVozila.Services.Implementation
                     "The type of category already exists");
             }
 
-            var existingName = await appDbContext.TipoviVozila.AnyAsync(x => x.Naziv == request.Naziv);
+            var existingName = await appDbContext.VehicleTypes.AnyAsync(x => x.Name == request.Name);
 
             if (existingName)
             {
@@ -48,7 +49,8 @@ namespace RegistracijaVozila.Services.Implementation
 
 
 
-        public async Task<RepositoryResult<VehicleTypeDto>> CreateVehicleTypeAsync(CreateVehicleTypeRequestDto request)
+        public async Task<RepositoryResult<VehicleTypeDto>> 
+            CreateVehicleTypeAsync(CreateVehicleTypeRequestDto request)
         {
             var validationResult = await ValidateVehicleTypeCreateRequestAsync(request);
 
@@ -57,18 +59,19 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<VehicleTypeDto>.Fail(validationResult.Message);
             }
 
-            var vehicleDomain = mapper.Map<TipVozila>(request);
+            var vehicleDomain = mapper.Map<VehicleType>(request);
 
             vehicleDomain = await vehicleTypeRepository.AddAsync(vehicleDomain);
 
             var response = mapper.Map<VehicleTypeDto>(vehicleDomain);
 
-            return RepositoryResult<VehicleTypeDto>.Ok(response, "New type of vehicle has successfully been created!");
+            return RepositoryResult<VehicleTypeDto>.Ok
+                (response, "New type of vehicle has successfully been created!");
         }
 
         public async Task<RepositoryResult<bool>> ValidateVehicleTypeDeleteRequestAsync(Guid id)
         {
-            var hasBrands = await appDbContext.MarkeVozila.AnyAsync(x => x.TipVozilaId == id);
+            var hasBrands = await appDbContext.VehicleBrands.AnyAsync(x => x.VehicleTypeId == id);
 
             if (hasBrands)
             {
@@ -76,11 +79,12 @@ namespace RegistracijaVozila.Services.Implementation
                     ("TYPE_HAS_BRANDS: Vehicle type cannot be deleted because it has associated brands.");
             }
 
-            var exists = await appDbContext.TipoviVozila.AnyAsync(x => x.Id == id);
+            var exists = await appDbContext.VehicleTypes.AnyAsync(x => x.Id == id);
 
             if (!exists)
             {
-                return RepositoryResult<bool>.Fail($"VEHICLE_TYPE_NOT_FOUND: Vehicle type with the id {id} doesnt exist");
+                return RepositoryResult<bool>.Fail
+                    ($"VEHICLE_TYPE_NOT_FOUND: Vehicle type with the id {id} doesnt exist");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -102,25 +106,29 @@ namespace RegistracijaVozila.Services.Implementation
             return RepositoryResult<VehicleTypeDto>.Ok(reponse, "Vehicle type has successfully been deleted!");
         }
 
-        public async Task<RepositoryResult<bool>> ValidateVehicleTypeUpdateRequestAsync(UpdateVehicleTypeRequestDto request)
+        public async Task<RepositoryResult<bool>> 
+            ValidateVehicleTypeUpdateRequestAsync(UpdateVehicleTypeRequestDto request)
         {
-            var exists = await appDbContext.TipoviVozila.AnyAsync(x => x.Id == request.Id);
+            var exists = await appDbContext.VehicleTypes.AnyAsync(x => x.Id == request.Id);
 
             if (!exists)
             {
-                return RepositoryResult<bool>.Fail($"VEHICLE_TYPE_NOT_FOUND: Vehicle with the id {request.Id} doesnt exist");
+                return RepositoryResult<bool>.Fail
+                    ($"VEHICLE_TYPE_NOT_FOUND: Vehicle with the id {request.Id} doesnt exist");
             }
 
-            var existingCategory = await appDbContext.TipoviVozila.AnyAsync(x =>
-                x.Kategorija == request.Kategorija && x.Id!=request.Id);
+            var existingCategory = await appDbContext.VehicleTypes.AnyAsync(x =>
+                x.Category == request.Category && x.Id!=request.Id);
 
 
             if (existingCategory)
             {
-                return RepositoryResult<bool>.Fail("VEHICLE_TYPE_CATEGORY_EXISTS: The type of category already exists");
+                return RepositoryResult<bool>.Fail
+                    ("VEHICLE_TYPE_CATEGORY_EXISTS: The type of category already exists");
             }
 
-            var existingName = await appDbContext.TipoviVozila.AnyAsync(x => x.Naziv == request.Naziv && x.Id!=request.Id);
+            var existingName = await appDbContext.VehicleTypes.AnyAsync
+                (x => x.Name == request.Name && x.Id!=request.Id);
 
             if (existingName)
             {
@@ -130,7 +138,8 @@ namespace RegistracijaVozila.Services.Implementation
             return RepositoryResult<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<VehicleTypeDto>> UpdateVehicleTypeAsync(UpdateVehicleTypeRequestDto request)
+        public async Task<RepositoryResult<VehicleTypeDto>> 
+            UpdateVehicleTypeAsync(UpdateVehicleTypeRequestDto request)
         {
             var validationResult = await ValidateVehicleTypeUpdateRequestAsync(request);
 
@@ -139,7 +148,7 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<VehicleTypeDto>.Fail(validationResult.Message);
             }
 
-            var vehicleTypeDomain = mapper.Map<TipVozila>(request);
+            var vehicleTypeDomain = mapper.Map<VehicleType>(request);
 
             vehicleTypeDomain = await vehicleTypeRepository.UpdateAsync(vehicleTypeDomain);
 
@@ -159,9 +168,10 @@ namespace RegistracijaVozila.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateVehicleTypeGetByIdAsync(Guid id)
         {
-            if(!await appDbContext.TipoviVozila.AnyAsync(x=>x.Id == id))
+            if(!await appDbContext.VehicleTypes.AnyAsync(x=>x.Id == id))
             {
-                return RepositoryResult<bool>.Fail($"VEHICLE_TYPE_NOT_FOUND: Vehicle type with the Id {id} was not found");
+                return RepositoryResult<bool>.Fail
+                    ($"VEHICLE_TYPE_NOT_FOUND: Vehicle type with the Id {id} was not found");
             }
 
             return RepositoryResult<bool>.Ok(true);

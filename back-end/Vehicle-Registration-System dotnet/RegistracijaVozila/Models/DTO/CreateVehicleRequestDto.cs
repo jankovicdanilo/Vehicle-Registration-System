@@ -1,31 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RegistracijaVozila.Models.DTO
+namespace VehicleRegistrationSystem.Models.DTO
 {
     public class CreateVehicleRequestDto
     {
-        [Required(ErrorMessage = "TipVozilaId field is required")]
-        public Guid? TipVozilaId { get; set; }
+        [Required(ErrorMessage = "VehicleTypeId field is required")]
+        public Guid? VehicleTypeId { get; set; }
 
-        [Required(ErrorMessage = "MarkaVozilaId field is required")]
-        public Guid? MarkaVozilaId { get; set; }
+        [Required(ErrorMessage = "VehicleBrandId field is required")]
+        public Guid? VehicleBrandId { get; set; }
 
-        [Required(ErrorMessage = "ModelVozilaId field is required")]
-        public Guid? ModelVozilaId { get; set; }
+        [Required(ErrorMessage = "VehicleModelId field is required")]
+        public Guid? VehicleModelId { get; set; }
 
-        public int GodinaProizvodnje { get; set; }
+        public int ProductionYear { get; set; }
 
-        public float ZapreminaMotora { get; set; }
+        public float EngineCapacity { get; set; }
 
-        public string VrstaGoriva { get; set; }
+        public string FuelType { get; set; }
 
-        public float Masa { get; set; }
+        public float Weight { get; set; }
 
-        public int SnagaMotora { get; set; }
+        public int EnginePowerKw { get; set; }
 
-        public string BrojSasije { get; set; }
+        public string ChassisNumber { get; set; }
 
-        public DateTime DatumPrveRegistracije { get; set; }
+        public DateTime FirstRegistrationDate { get; set; }
     }
 }
 

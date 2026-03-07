@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Results;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Results;
+using VehicleRegistrationSystem.Services.Interface;
 using System.Security.Claims;
+using VehicleRegistrationSystem.Data;
 
-namespace RegistracijaVozila.Services.Implementation
+namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class AuthService : IAuthService
     {
@@ -27,7 +27,8 @@ namespace RegistracijaVozila.Services.Implementation
             this.roleManager = roleManager;
         }
 
-        public async Task<RepositoryResult<UserDto>> RegisterAsync(RegisterRequestDto request, ClaimsPrincipal currentUser)
+        public async Task<RepositoryResult<UserDto>> RegisterAsync
+            (RegisterRequestDto request, ClaimsPrincipal currentUser)
         {
             var user = new IdentityUser
             {
@@ -43,15 +44,15 @@ namespace RegistracijaVozila.Services.Implementation
                 return RepositoryResult<UserDto>.Fail(string.Join(" | ", errors));
             }
 
-            await userManager.AddToRoleAsync(user, "Zaposleni");
+            await userManager.AddToRoleAsync(user, "Employee");
 
             if (request.Roles != null && request.Roles.Any())
             {
                 foreach (var role in request.Roles)
                 {
                     if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
-                        role.Equals("Šef odsjeka", StringComparison.OrdinalIgnoreCase) ||
-                        role.Equals("SefOdsjeka", StringComparison.OrdinalIgnoreCase))
+                        role.Equals("Manager", StringComparison.OrdinalIgnoreCase) ||
+                        role.Equals("Manager", StringComparison.OrdinalIgnoreCase))
                     {
                         if (!currentUser.IsInRole("Admin"))
                         {
@@ -67,10 +68,10 @@ namespace RegistracijaVozila.Services.Implementation
 
                         if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                         {
-                            var sefRole = "SefOdsjeka"; 
-                            if (await roleManager.RoleExistsAsync(sefRole))
+                            var managerRole = "Manager"; 
+                            if (await roleManager.RoleExistsAsync(managerRole))
                             {
-                                await userManager.AddToRoleAsync(user, sefRole);
+                                await userManager.AddToRoleAsync(user, managerRole);
                             }
                         }
                     }
@@ -90,7 +91,8 @@ namespace RegistracijaVozila.Services.Implementation
 
             if (identityUser == null)
             {
-                return RepositoryResult<LoginResponseDto>.Fail($"INVALID_USERNAME: Username {request.Username} not found");
+                return RepositoryResult<LoginResponseDto>.Fail
+                    ($"INVALID_USERNAME: Username {request.Username} not found");
             }
 
             if (!string.Equals( identityUser.Email, request.Email, StringComparison.OrdinalIgnoreCase))
@@ -163,7 +165,8 @@ namespace RegistracijaVozila.Services.Implementation
                 var responseProtected = mapper.Map<UserDto>(user);
                 responseProtected.Roles = await userManager.GetRolesAsync(user);
 
-                return RepositoryResult<UserDto>.Ok(responseProtected, "Protected Admin user updated (roles unchanged)");
+                return RepositoryResult<UserDto>.Ok(responseProtected, 
+                    "Protected Admin user updated (roles unchanged)");
             }
 
             user.Email = request.Email?.Trim();
@@ -195,7 +198,7 @@ namespace RegistracijaVozila.Services.Implementation
 
                 if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                 {
-                    var sefRole = "SefOdsjeka";
+                    var sefRole = "Manager";
                     if (await roleManager.RoleExistsAsync(sefRole) && !finalRoles.Contains(sefRole))
                     {
                         finalRoles.Add(sefRole);
@@ -203,7 +206,7 @@ namespace RegistracijaVozila.Services.Implementation
                 }
             }
 
-            await userManager.AddToRoleAsync(user, "Zaposleni");
+            await userManager.AddToRoleAsync(user, "Employee");
             await userManager.AddToRolesAsync(user, finalRoles);
 
             var result = await userManager.UpdateAsync(user);
@@ -287,10 +290,10 @@ namespace RegistracijaVozila.Services.Implementation
                 string mainRole;
                 if (roles.Contains("Admin"))
                     mainRole = "Admin";
-                else if (roles.Contains("SefOdsjeka"))
-                    mainRole = "SefOdsjeka";
+                else if (roles.Contains("Manager"))
+                    mainRole = "Manager";
                 else
-                    mainRole = "Zaposleni";
+                    mainRole = "Employee";
 
                 results.Add(new UserDto
                 {
@@ -302,10 +305,10 @@ namespace RegistracijaVozila.Services.Implementation
                 });
             }
 
-            if (callerRole == "SefOdsjeka")
+            if (callerRole == "Manager")
             {
                 results = results
-                    .Where(u => u.Roles.Count() == 1 && u.Roles.Contains("Zaposleni"))
+                    .Where(u => u.Roles.Count() == 1 && u.Roles.Contains("Employee"))
                     .ToList();
             }
 

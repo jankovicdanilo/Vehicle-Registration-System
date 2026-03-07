@@ -1,40 +1,41 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Repositories.Interface;
+using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Repositories.Implementation
+namespace VehicleRegistrationSystem.Repositories.Implementation
 {
     public class VehicleModelRepository : IVehicleModelRepository
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
+        private readonly VehicleRegistrationDbContext appDbContext;
 
-        public VehicleModelRepository(RegistracijaVozilaDbContext appDbContext)
+        public VehicleModelRepository(VehicleRegistrationDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
         }
 
-        public async Task<List<ModelVozila>> ListByBrandId(Guid id)
+        public async Task<List<VehicleModel>> ListByBrandId(Guid id)
         {
-            return await appDbContext.ModeliVozila
-                .Include(x=>x.MarkaVozila)
-                .ThenInclude(x=>x.TipVozila)
-                .Where(x => x.MarkaVozilaId == id).ToListAsync();
+            return await appDbContext.VehicleModels
+                .Include(x=>x.VehicleBrand)
+                .ThenInclude(x=>x.VehicleType)
+                .Where(x => x.VehicleBrandId == id).ToListAsync();
         }
 
-        public async Task<ModelVozila> AddAsync(ModelVozila modelVozila)
+        public async Task<VehicleModel> AddAsync(VehicleModel vehicleModel)
         {
-            await appDbContext.ModeliVozila.AddAsync(modelVozila);
+            await appDbContext.VehicleModels.AddAsync(vehicleModel);
             await appDbContext.SaveChangesAsync();
-            await appDbContext.Entry(modelVozila).Reference(m => m.MarkaVozila).LoadAsync();
-            return modelVozila;
+            await appDbContext.Entry(vehicleModel).Reference(m => m.VehicleBrand).LoadAsync();
+            return vehicleModel;
         }
 
-        public async Task<ModelVozila?> DeleteAsync(Guid id)
+        public async Task<VehicleModel?> DeleteAsync(Guid id)
         {
-            var existingVehicle = await appDbContext.ModeliVozila
-                .Include(x=>x.MarkaVozila)
-                .ThenInclude(x=>x.TipVozila)
+            var existingVehicle = await appDbContext.VehicleModels
+                .Include(x=>x.VehicleBrand)
+                .ThenInclude(x=>x.VehicleType)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (existingVehicle == null)
@@ -42,30 +43,30 @@ namespace RegistracijaVozila.Repositories.Implementation
                 return null;
             }
 
-            appDbContext.ModeliVozila.Remove(existingVehicle);
+            appDbContext.VehicleModels.Remove(existingVehicle);
             await appDbContext.SaveChangesAsync();
             return existingVehicle;
         }
 
-        public async Task<ModelVozila?> GetByIdAsync(Guid id)
+        public async Task<VehicleModel?> GetByIdAsync(Guid id)
         {
-            return await appDbContext.ModeliVozila
-                .Include(x=>x.MarkaVozila)
-                .ThenInclude(x=>x.TipVozila)
+            return await appDbContext.VehicleModels
+                .Include(x=>x.VehicleBrand)
+                .ThenInclude(x=>x.VehicleType)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<ModelVozila?> UpdateAsync(ModelVozila modelVozila)
+        public async Task<VehicleModel?> UpdateAsync(VehicleModel vehicleModel)
         {
-            var existingVehicle = await appDbContext.ModeliVozila
-                 .Include(x=>x.MarkaVozila)
-                 .ThenInclude(x=>x.TipVozila)
-                 .FirstOrDefaultAsync(x => x.Id == modelVozila.Id);
+            var existingVehicle = await appDbContext.VehicleModels
+                 .Include(x=>x.VehicleBrand)
+                 .ThenInclude(x=>x.VehicleType)
+                 .FirstOrDefaultAsync(x => x.Id == vehicleModel.Id);
 
             if (existingVehicle != null)
             {
-                existingVehicle.Naziv = modelVozila.Naziv;
-                existingVehicle.MarkaVozilaId = modelVozila.MarkaVozilaId;
+                existingVehicle.Name = vehicleModel.Name;
+                existingVehicle.VehicleBrandId = vehicleModel.VehicleBrandId;
                 await appDbContext.SaveChangesAsync();
                 return existingVehicle;
             }

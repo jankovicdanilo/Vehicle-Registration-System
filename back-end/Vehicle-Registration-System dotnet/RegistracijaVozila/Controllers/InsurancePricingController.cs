@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Services.Interface;
 
-namespace RegistracijaVozila.Controllers
+namespace VehicleRegistrationSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

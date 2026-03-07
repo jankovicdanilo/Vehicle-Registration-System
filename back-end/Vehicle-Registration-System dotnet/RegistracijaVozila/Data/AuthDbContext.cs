@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace RegistracijaVozila.Data
+namespace VehicleRegistrationSystem.Data
 {
     public class AuthDbContext : IdentityDbContext
     {
@@ -16,8 +16,8 @@ namespace RegistracijaVozila.Data
             base.OnModelCreating(builder);
 
             var adminRoleId = "80e38d55-3872-4320-9f5b-54d5b2e50d38";
-            var zaposleniRoleId = "49b719cf-9ebf-4151-af09-835f9c03f6b6";
-            var sefOdsjekaRoleId = "f2f2ca54-7b0e-4d50-9b8a-7a5f9d6e3a11";
+            var employeeRoleId = "49b719cf-9ebf-4151-af09-835f9c03f6b6";
+            var managerRoleId = "f2f2ca54-7b0e-4d50-9b8a-7a5f9d6e3a11";
 
             var roles = new List<IdentityRole>
             {
@@ -25,22 +25,22 @@ namespace RegistracijaVozila.Data
                 {
                     Id = adminRoleId,
                     Name = "Admin",
-                    NormalizedName = "Admin".ToUpper(),
+                    NormalizedName = "ADMIN",
                     ConcurrencyStamp = adminRoleId
                 },
                 new IdentityRole
                 {
-                    Id = zaposleniRoleId,
-                    Name = "Zaposleni",
-                    NormalizedName = "Zaposleni".ToUpper(),
-                    ConcurrencyStamp = zaposleniRoleId
+                    Id = employeeRoleId,
+                    Name = "Employee",
+                    NormalizedName = "EMPLOYEE",
+                    ConcurrencyStamp = employeeRoleId
                 },
                 new IdentityRole
                 {
-                    Id = sefOdsjekaRoleId,
-                    Name = "SefOdsjeka",
-                    NormalizedName = "SefOdsjeka".ToUpper(),
-                    ConcurrencyStamp = sefOdsjekaRoleId
+                    Id = managerRoleId,
+                    Name = "Manager",
+                    NormalizedName = "MANAGER",
+                    ConcurrencyStamp = managerRoleId
                 }
             };
 
@@ -53,40 +53,41 @@ namespace RegistracijaVozila.Data
                 Id = adminUserId,
                 UserName = "Danilo",
                 Email = "jankovic.danilo23@gmail.com",
-                NormalizedEmail = "jankovic.danilo23@gmail.com".ToUpper(),
-                NormalizedUserName = "Danilo".ToUpper()
+                NormalizedEmail = "JANKOVIC.DANILO23@GMAIL.COM",
+                NormalizedUserName = "DANILO"
             };
 
-            admin.PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(admin, "tuv77tuv");
+            admin.PasswordHash = new PasswordHasher<IdentityUser>()
+                .HashPassword(admin, "Admin123!");
 
             builder.Entity<IdentityUser>().HasData(admin);
 
             var adminRoles = new List<IdentityUserRole<string>>
             {
-                new()
+                new IdentityUserRole<string>
                 {
                     UserId = adminUserId,
-                    RoleId = adminRoleId,
+                    RoleId = adminRoleId
                 },
-                new()
+                new IdentityUserRole<string>
                 {
                     UserId = adminUserId,
-                    RoleId = zaposleniRoleId
+                    RoleId = employeeRoleId
                 },
-                new()
+                new IdentityUserRole<string>
                 {
                     UserId = adminUserId,
-                    RoleId = sefOdsjekaRoleId
+                    RoleId = managerRoleId
                 }
             };
 
             builder.Entity<IdentityUserRole<string>>().HasData(adminRoles);
-
-
         }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+            optionsBuilder.ConfigureWarnings(warnings =>
+                warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
         }
     }
 }

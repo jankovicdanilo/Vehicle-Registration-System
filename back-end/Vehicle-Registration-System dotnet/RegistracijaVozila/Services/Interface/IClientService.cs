@@ -1,7 +1,8 @@
-﻿using RegistracijaVozila.Models.DTO;
-using RegistracijaVozila.Results;
+﻿using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Results;
+using VehicleRegistrationSystem.Models.DTO;
 
-namespace RegistracijaVozila.Services.Interface
+namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface IClientService
     {
@@ -22,7 +23,7 @@ namespace RegistracijaVozila.Services.Interface
         Task<RepositoryResult<PagedResult<ClientDto>>> GetClientsAsync
             (string? searchQuery = null, int pageNumber = 1, int pageSize = 1000);
 
-        Task<RepositoryResult<ClientDto>> GetClijentByIdAsync(Guid id);
+        Task<RepositoryResult<ClientDto>> GetClientByIdAsync(Guid id);
 
         
     }

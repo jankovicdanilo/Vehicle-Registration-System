@@ -1,17 +1,18 @@
-﻿using RegistracijaVozila.Models.Domain;
+﻿using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Models.Domain;
 
-namespace RegistracijaVozila.Repositories.Interface
+namespace VehicleRegistrationSystem.Repositories.Interface
 {
     public interface IVehicleTypeRepository
     {
-        Task<List<TipVozila>> GetAllAsync();
+        Task<List<VehicleType>> GetAllAsync();
 
-        Task<TipVozila> AddAsync(TipVozila tipVozila);
+        Task<VehicleType> AddAsync(VehicleType vehicleType);
 
-        Task<TipVozila?> GetByIdAsync(Guid id);
+        Task<VehicleType?> GetByIdAsync(Guid id);
 
-        Task<TipVozila?> DeleteAsync(Guid id);
+        Task<VehicleType?> DeleteAsync(Guid id);
 
-        Task<TipVozila?> UpdateAsync(TipVozila tipVozila);
+        Task<VehicleType?> UpdateAsync(VehicleType vehicleType);
     }
 }

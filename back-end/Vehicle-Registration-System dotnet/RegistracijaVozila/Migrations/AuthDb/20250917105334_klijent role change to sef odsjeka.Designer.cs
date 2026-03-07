@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RegistracijaVozila.Data;
+using VehicleRegistrationSystem.Data;
 
 #nullable disable
 
-namespace RegistracijaVozila.Migrations.AuthDb
+namespace VehicleRegistrationSystem.Migrations.AuthDb
 {
     [DbContext(typeof(AuthDbContext))]
     [Migration("20250917105334_klijent role change to sef odsjeka")]

@@ -1,53 +1,53 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RegistracijaVozila.Data;
-using RegistracijaVozila.Models.Domain;
-using RegistracijaVozila.Repositories.Interface;
-using RegistracijaVozila.Services.Interface;
+using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Services.Interface;
+using VehicleRegistrationSystem.Data;
 
-namespace RegistracijaVozila.Repositories.Implementation
+namespace VehicleRegistrationSystem.Repositories.Implementation
 {
     public class RegistrationVehicleRepository : IRegistrationVehicleRepository
     {
-        private readonly RegistracijaVozilaDbContext appDbContext;
-        private readonly IRegistrationCalculatorService registrationCalculatorService;
+        private readonly VehicleRegistrationDbContext appDbContext;
 
-        public RegistrationVehicleRepository(RegistracijaVozilaDbContext appDbContext, 
+        public RegistrationVehicleRepository(VehicleRegistrationDbContext appDbContext, 
             IRegistrationCalculatorService registrationCalculatorService)
         {
             this.appDbContext = appDbContext;
-            this.registrationCalculatorService = registrationCalculatorService;
         }
 
-        public async Task<Registracija> AddRegistrationAsync(Registracija request)
+        public async Task<Registration> AddRegistrationAsync(Registration request)
         {
-            await appDbContext.Registracije.AddAsync(request);
+            await appDbContext.Registrations.AddAsync(request);
             await appDbContext.SaveChangesAsync();
             return request;
         }
 
-        public async Task<(List<Registracija> Items, int TotalCount)> GetAllAsync(string? searchQuery = null, int pageNumber = 1,
-            int pageSize = 1000)
+        public async Task<(List<Registration> Items, int TotalCount)> GetAllAsync(string? searchQuery = null, 
+            int pageNumber = 1, int pageSize = 1000)
         {
-            var query = appDbContext.Registracije
-                .Include(x => x.Vlasnik)
-                .Include(x => x.Vozilo)
-                .Include(x => x.Vozilo.TipVozila)
-                .Include(x => x.Vozilo.MarkaVozila)
-                .Include(x=>x.Osiguranje)
-                .Include(x => x.Vozilo.ModelVozila).AsQueryable();
+            var query = appDbContext.Registrations
+                .Include(x => x.Client)
+                .Include(x => x.Vehicle)
+                .Include(x => x.Vehicle.VehicleType)
+                .Include(x => x.Vehicle.VehicleBrand)
+                .Include(x=>x.Insurance)
+                .Include(x => x.Vehicle.VehicleModel).AsQueryable();
 
-            if (string.IsNullOrWhiteSpace(searchQuery) == false)
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                query = query.Where(x => x.Vlasnik.Ime.Contains(searchQuery) ||
-                x.Vlasnik.BrojLicneKarte.Contains(searchQuery) ||
-                x.Vlasnik.Email.Contains(searchQuery) ||
-                x.Vlasnik.JMBG.Contains(searchQuery) ||
-                x.Vlasnik.Prezime.Contains(searchQuery) ||
-                x.Vozilo.MarkaVozila.Naziv.Contains(searchQuery) ||
-                x.Vozilo.ModelVozila.Naziv.Contains(searchQuery) ||
-                x.Vozilo.TipVozila.Naziv.Contains(searchQuery) ||
-                x.Osiguranje.Naziv.Contains(searchQuery)||
-                x.RegistarskaOznaka.Contains(searchQuery));
+                query = query.Where(x =>
+                    x.Client.FirstName.Contains(searchQuery) ||
+                    x.Client.IdCardNumber.Contains(searchQuery) ||
+                    x.Client.Email.Contains(searchQuery) ||
+                    x.Client.NationalId.Contains(searchQuery) ||
+                    x.Client.LastName.Contains(searchQuery) ||
+                    x.Vehicle.VehicleBrand.Name.Contains(searchQuery) ||
+                    x.Vehicle.VehicleModel.Name.Contains(searchQuery) ||
+                    x.Vehicle.VehicleType.Name.Contains(searchQuery) ||
+                    x.Insurance.Name.Contains(searchQuery) ||
+                    x.LicensePlate.Contains(searchQuery)
+                );
             }
 
             var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
@@ -56,50 +56,57 @@ namespace RegistracijaVozila.Repositories.Implementation
             return (items, totalCount);
         }
 
-        public async Task<Registracija?> GetByIdAsync(Guid id)
+        public async Task<Registration?> GetByIdAsync(Guid id)
         {
-            return await appDbContext.Registracije
-                            .Include(x => x.Vlasnik)
-                            .Include(x => x.Vozilo.TipVozila)
-                            .Include(x => x.Vozilo.MarkaVozila)
-                            .Include(x => x.Vozilo.ModelVozila)
-                            .Include(x => x.Osiguranje)
-                            .FirstOrDefaultAsync(x => x.Id == id);
+            return await appDbContext.Registrations
+                .Include(x => x.Client)
+                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleType)
+                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleBrand)
+                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleModel)
+                .Include(x => x.Insurance)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<Registracija?> DeleteAsync(Guid id)
+        public async Task<Registration?> DeleteAsync(Guid id)
         {
-            var existingRegistration = await appDbContext.Registracije.
-                Include(x => x.Vlasnik).
-                Include(x => x.Vozilo.TipVozila).
-                Include(x => x.Vozilo.MarkaVozila).
-                Include(x => x.Osiguranje).
-                Include(x => x.Vozilo.ModelVozila).FirstOrDefaultAsync(x => x.Id == id);
+            var existingRegistration = await appDbContext.Registrations
+                .Include(x => x.Client)
+                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleType)
+                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleBrand)
+                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleModel)
+                .Include(x => x.Insurance)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-            appDbContext.Registracije.Remove(existingRegistration);
+            if (existingRegistration == null)
+                return null;
+
+            appDbContext.Registrations.Remove(existingRegistration);
 
             await appDbContext.SaveChangesAsync();
 
             return existingRegistration;
         }
 
-        public async Task<Registracija?> UpdateAsync(Registracija request)
+        public async Task<Registration?> UpdateAsync(Registration request)
         {
-            var existingRegistration = await appDbContext.Registracije.
-                Include(x => x.Vlasnik).
-                Include(x => x.Vozilo.TipVozila).
-                Include(x => x.Vozilo.MarkaVozila).
-                Include(x=>x.Osiguranje).
-                Include(x => x.Vozilo.ModelVozila).FirstOrDefaultAsync(x => x.Id == request.Id);
+            var existingRegistration = await appDbContext.Registrations
+                .Include(x => x.Client)
+                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleType)
+                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleBrand)
+                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleModel)
+                .Include(x => x.Insurance)
+                .FirstOrDefaultAsync(x => x.Id == request.Id);
 
-            
-            existingRegistration.RegistarskaOznaka = request.RegistarskaOznaka;
-            existingRegistration.DatumRegistracije = request.DatumRegistracije;
-            existingRegistration.PrivremenaRegistracija = request.PrivremenaRegistracija;
-            existingRegistration.VoziloId = request.VoziloId;
-            existingRegistration.KlijentId = request.KlijentId;
-            existingRegistration.OsiguranjeId = request.OsiguranjeId;
-            existingRegistration.DatumIstekaRegistracije = request.DatumRegistracije.AddMonths(12);
+            if (existingRegistration == null)
+                return null;
+
+            existingRegistration.LicensePlate = request.LicensePlate;
+            existingRegistration.RegistrationDate = request.RegistrationDate;
+            existingRegistration.IsTemporary = request.IsTemporary;
+            existingRegistration.VehicleId = request.VehicleId;
+            existingRegistration.ClientId = request.ClientId;
+            existingRegistration.InsuranceId = request.InsuranceId;
+            existingRegistration.ExpirationDate = request.RegistrationDate.AddMonths(12);
 
             await appDbContext.SaveChangesAsync();
 

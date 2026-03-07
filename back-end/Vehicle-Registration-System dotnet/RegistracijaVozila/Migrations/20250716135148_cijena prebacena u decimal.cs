@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace RegistracijaVozila.Migrations
+namespace VehicleRegistrationSystem.Migrations
 {
     /// <inheritdoc />
     public partial class cijenaprebacenaudecimal : Migration
