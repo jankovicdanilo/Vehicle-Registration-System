@@ -11,6 +11,7 @@ import { Client } from '../../../../core/models/client.model';
 
 @Component({
   selector: "app-client-form",
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -24,15 +25,16 @@ import { Client } from '../../../../core/models/client.model';
   templateUrl: "./client-form.component.html",
 })
 export class ClientFormComponent {
-  @Input() clientId: string;
-  @Input() client: Client;
-  clientForm: FormGroup;
-  @Output() clientAdded = new EventEmitter<void>();
-  @Output() clientChanged = new EventEmitter<void>();
 
-  constructor(
-    private fb: FormBuilder,
-  ) {}
+  @Input() clientId!: string;
+  @Input() client!: Client;
+
+  clientForm!: FormGroup;
+
+  @Output() clientAdded = new EventEmitter<any>();
+  @Output() clientChanged = new EventEmitter<any>();
+
+  constructor(private fb: FormBuilder) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['client'] && this.clientForm && this.client) {
@@ -40,17 +42,16 @@ export class ClientFormComponent {
     }
   }
 
-
   ngOnInit(): void {
     this.clientForm = this.fb.group({
-      ime: ["", Validators.required],
-      prezime: ["", Validators.required],
-      jmbg: ["", [Validators.required, Validators.pattern(/^\d{13}$/)]],
-      adresa: ["", Validators.required],
-      brojTelefona: [""],
+      firstName: ["", Validators.required],
+      lastName: ["", Validators.required],
+      nationalId: ["", [Validators.required, Validators.pattern(/^\d{13}$/)]],
+      address: ["", Validators.required],
+      phoneNumber: [""],
       email: ["", Validators.email],
-      datumRodjenja: [""],
-      brojLicneKarte: ["", [Validators.required, Validators.pattern(/^\d{9}$/)]],
+      dateOfBirth: [""],
+      idCardNumber: ["", [Validators.required, Validators.pattern(/^\d{6,9}$/)]],
     });
   }
 
@@ -62,7 +63,7 @@ export class ClientFormComponent {
     this.clientChanged.emit(this.clientForm.value);
   }
 
-  onAddNewClient() {
+  onAddNewClient(): void {
     if (this.clientForm.valid) {
       this.clientAdded.emit(this.clientForm.value);
     }

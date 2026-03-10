@@ -4,7 +4,7 @@ export class User {
   email: string;
   role: Array<string>;
 
-  constructor(user) {
+  constructor(user: any) {
     this.id = user.id || undefined;
     this.name = user.name || undefined; 
     this.email = user.email || undefined;

@@ -7,16 +7,18 @@ import { HeaderComponent } from '../../../shared/components/header/header.compon
 import { UserFormComponent } from '../../../shared/components/user-form/user-form.component';
 
 @Component({
+  selector: "app-edit-user",
+  standalone: true,
+  templateUrl: "./edit-user.component.html",
   imports: [
     UserFormComponent,
     MatCardModule,
     HeaderComponent
   ],
-  selector: "app-edit-user",
-  templateUrl: "./edit-user.component.html",
 })
 export class EditUserComponent implements OnInit {
-  userId: string;
+
+  userId!: string;
   user: any;
 
   constructor(
@@ -29,7 +31,6 @@ export class EditUserComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
       this.userId = params["id"];
-
       this.getUserById();
     });
   }
@@ -45,33 +46,35 @@ export class EditUserComponent implements OnInit {
     });
   }
 
-    editUser(userData: any): void {
-        if (userData) {
-            let roles: string[] = ["Zaposleni"]; // everyone has at least this
+  editUser(userData: any): void {
 
-            if (userData.role === "Admin") {
-                roles.unshift("Admin");
-            } else if (userData.role === "SefOdsjeka") {
-                roles.unshift("SefOdsjeka");
-            }
+    if (!userData) return;
 
-            const data = {
-                id: this.userId,
-                username: userData.username,
-                email: userData.email,
-                password: userData.password || null,
-                roles: roles
-            };
+    let roles: string[] = ["Employee"]; // everyone has at least this
 
-            this.authService.updateUser(data).subscribe({
-                next: () => {
-                    this.messageService.success("Korisnik je uspješno izmijenjen");
-                    this.router.navigate(["/user/list"]);
-                },
-                error: (err) => {
-                    this.messageService.error(err);
-                },
-            });
-        }
+    if (userData.role === "Admin") {
+      roles.unshift("Admin");
     }
+    else if (userData.role === "Manager") {
+      roles.unshift("Manager");
+    }
+
+    const data = {
+      id: this.userId,
+      username: userData.username,
+      email: userData.email,
+      password: userData.password || null,
+      roles: roles
+    };
+
+    this.authService.updateUser(data).subscribe({
+      next: () => {
+        this.messageService.success("User updated successfully.");
+        this.router.navigate(["/user/list"]);
+      },
+      error: (err) => {
+        this.messageService.error(err);
+      },
+    });
+  }
 }

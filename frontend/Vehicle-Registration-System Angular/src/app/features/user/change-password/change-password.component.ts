@@ -12,6 +12,7 @@ import { User } from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-user-change-password',
+  standalone: true,
   templateUrl: './change-password.component.html',
   imports: [
     UserSidebarComponent,
@@ -22,35 +23,40 @@ import { User } from '../../../core/models/user.model';
     MatButtonModule
   ]
 })
-
 export class ChangePasswordComponent {
-  passwordForm: FormGroup
-  currentUser: User;
 
-  constructor(private fb: FormBuilder,
-              private authService: AuthService,
-              private messageService: MessageService,
-              private userService: UserService
+  passwordForm!: FormGroup;
+  currentUser!: User;
+
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private messageService: MessageService,
+    private userService: UserService
   ) {}
 
-
   ngOnInit(): void {
-    this.currentUser = JSON.parse(this.userService.getCurrentUser());
+
+    this.currentUser = JSON.parse(this.userService.getCurrentUser() || '{}');
 
     this.passwordForm = this.fb.group({
-      CurrentPassword: ['', Validators.required],
-      NewPassword: ['', Validators.required],
+      currentPassword: ['', Validators.required],
+      newPassword: ['', Validators.required],
     });
   }
 
   changePassword(): void {
+
+    if (this.passwordForm.invalid) return;
+
     this.authService.changePassword(this.passwordForm.value).subscribe({
       next: () => {
-        this.messageService.success('Lozinka je uspješno promijenjena');
+        this.messageService.success('Password successfully changed.');
+        this.passwordForm.reset();
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 }

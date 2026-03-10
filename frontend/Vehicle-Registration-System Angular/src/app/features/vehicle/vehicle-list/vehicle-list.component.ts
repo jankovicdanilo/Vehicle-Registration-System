@@ -11,12 +11,15 @@ import { MatDialog } from "@angular/material/dialog";
 import { QuestionModalComponent } from "../../../shared/components/question-modal/question-modal.component";
 import { CommonModule } from "@angular/common";
 import { EmptyListComponent } from "../../../shared/components/empty-list/empty-list.component";
-import { SearchComponent } from '../../../shared/components/search/search.component';
-import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
-import { Vehicle } from '../../../core/models/vehicle.model';
-import { UserService } from '../../../core/services/user.service';
+import { SearchComponent } from "../../../shared/components/search/search.component";
+import { PaginationComponent } from "../../../shared/components/pagination/pagination.component";
+import { Vehicle } from "../../../core/models/vehicle.model";
+import { UserService } from "../../../core/services/user.service";
 
 @Component({
+  selector: "app-vehicle-list",
+  standalone: true,
+  templateUrl: "./vehicle-list.component.html",
   imports: [
     CommonModule,
     MatTableModule,
@@ -26,25 +29,24 @@ import { UserService } from '../../../core/services/user.service';
     ToastrModule,
     EmptyListComponent,
     SearchComponent,
-    PaginationComponent
+    PaginationComponent,
   ],
-  selector: "app-vehicle-list",
-  templateUrl: "./vehicle-list.component.html",
 })
 export class VehicleListComponent {
   dialog = inject(MatDialog);
-  vehicles: Array<Vehicle> = [];
-  searchTerm: string = '';
-  totalItems: number;
+
+  vehicles: Vehicle[] = [];
+  searchTerm: string = "";
+  totalItems!: number;
   currentPageSize: number = 5;
   currentPage: number = 1;
 
   displayedColumns: string[] = [
-    "tip",
-    "marka",
-    "model",
-    "godinaProizvodnje",
-    "vrstaGoriva",
+    "vehicleType",
+    "vehicleBrand",
+    "vehicleModel",
+    "productionYear",
+    "fuelType",
     "actions",
   ];
 
@@ -60,18 +62,17 @@ export class VehicleListComponent {
   }
 
   getListOfVehicles(): void {
-    this.vehicleService.getAllVehicles(this.searchTerm, this.currentPageSize, this.currentPage).subscribe({
-      next: (res) => {
-        this.vehicles = [];
-        res.data.items.forEach((vehicle) => {
-          this.vehicles.push(vehicle);
-        });
-        this.totalItems = res.data.totalCount;
-      },
-      error: (err) => {
-        this.messageService.error(err);
-      },
-    });
+    this.vehicleService
+      .getAllVehicles(this.searchTerm, this.currentPageSize, this.currentPage)
+      .subscribe({
+        next: (res) => {
+          this.vehicles = res.data.items;
+          this.totalItems = res.data.totalCount;
+        },
+        error: (err) => {
+          this.messageService.error(err);
+        },
+      });
   }
 
   onSearchChange(value: string): void {
@@ -104,7 +105,7 @@ export class VehicleListComponent {
     this.vehicleService.deleteVehicle(vehicle.id).subscribe({
       next: () => {
         this.getListOfVehicles();
-        this.messageService.success("Uspješno ste obrisali vozilo.");
+        this.messageService.success("Vehicle deleted successfully.");
       },
       error: (err) => {
         this.messageService.error(err);

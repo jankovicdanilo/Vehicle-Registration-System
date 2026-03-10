@@ -8,17 +8,20 @@ import { Registration } from '../../../core/models/registration.model';
 
 @Component({
   selector: 'app-registration-details',
+  standalone: true,
   templateUrl: './registration-details.component.html',
   imports: [MatCardModule, RegistrationFormComponent],
 })
 export class RegistrationDetailsComponent {
-  registrationId: string;
-  registration: Registration;
 
-  constructor(private route: ActivatedRoute,
-              private registrationService: RegistrationService,
-              private messageService: MessageService,
-              private router: Router
+  registrationId!: string;
+  registration!: Registration;
+
+  constructor(
+    private route: ActivatedRoute,
+    private registrationService: RegistrationService,
+    private messageService: MessageService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -36,20 +39,22 @@ export class RegistrationDetailsComponent {
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 
   editRegistration(registrationData: any): void {
-    if (registrationData) {
-      this.registrationService.editRegistration({...registrationData, id: this.registrationId}).subscribe({
-        next: (res) => {
-          this.messageService.success('Podaci o registraciji su uspješno izmijenjeni');
+    if (!registrationData) return;
+
+    this.registrationService
+      .editRegistration({ ...registrationData, id: this.registrationId })
+      .subscribe({
+        next: () => {
+          this.messageService.success('Registration updated successfully');
           this.router.navigate(['/registration/list']);
         },
         error: (err) => {
           this.messageService.error(err);
         }
-      })
-    }
+      });
   }
 }

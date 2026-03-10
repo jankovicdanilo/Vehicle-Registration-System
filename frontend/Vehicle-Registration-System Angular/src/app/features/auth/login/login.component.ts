@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { MessageService } from '../../../core/services/message.service';
+import { inject } from '@angular/core';
 
 @Component({
   standalone: true,
@@ -25,7 +26,10 @@ import { MessageService } from '../../../core/services/message.service';
 })
 
 export class LoginComponent {
-  constructor(private fb: FormBuilder,
+
+  fb = inject(FormBuilder);
+
+  constructor(
     private authService: AuthService,
     private messageService: MessageService,
     private router: Router

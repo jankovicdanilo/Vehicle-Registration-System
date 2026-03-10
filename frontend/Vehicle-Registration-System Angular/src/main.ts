@@ -22,11 +22,11 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(
       LoadingBarModule,
       LoadingBarHttpClientModule,
-    ),
-    ...ToastrModule.forRoot({
-      timeOut: 3000,
-      closeButton: true,
-      positionClass: 'toast-top-right',
-    }).providers
+      ToastrModule.forRoot({
+        timeOut: 3000,
+        closeButton: true,
+        positionClass: 'toast-top-right',
+      })
+    )
   ]
 });

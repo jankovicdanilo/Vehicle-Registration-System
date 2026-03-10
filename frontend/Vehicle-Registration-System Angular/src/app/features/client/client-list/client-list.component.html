@@ -2,11 +2,17 @@
   <mat-card class="card">
     <mat-card-header class="card-header">
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 16px; flex-wrap: wrap;">
-        <mat-card-title class="card-header-title" style="margin: 0; flex: 0 0 auto;">Lista klijenata</mat-card-title>
+        <mat-card-title class="card-header-title" style="margin: 0; flex: 0 0 auto;">
+          Client List
+        </mat-card-title>
+
         <div style="display: flex; align-items: center; gap: 12px;">
-          <app-search [placeholder]="'Unesite ime, prezime, adresu, jmbg...'" 
-                      [label]="'Pretražite klijente'"
-                      (searchChange)="onSearchChange($event)"></app-search>
+          <app-search
+            [placeholder]="'Enter first name, last name, address, national ID...'"
+            [label]="'Search clients'"
+            (searchChange)="onSearchChange($event)">
+          </app-search>
+
           <button
             mat-flat-button
             color="primary"
@@ -14,99 +20,106 @@
             style="height: 56px; white-space: nowrap;"
           >
             <mat-icon>add</mat-icon>
-            Dodajte klijenta
+            Add Client
           </button>
         </div>
       </div>
     </mat-card-header>
+
     <mat-card-content class="card-body">
       <div class="table-wrapper">
         <ng-container *ngIf="clients.length > 0; else noClients">
-          <table
-            mat-table
-            [dataSource]="clients"
-            class="mat-elevation-z8 table"
-          >
-            <ng-container matColumnDef="ime">
-              <th mat-header-cell *matHeaderCellDef>Ime</th>
+          <table mat-table [dataSource]="clients" class="mat-elevation-z8 table">
+
+            <ng-container matColumnDef="firstName">
+              <th mat-header-cell *matHeaderCellDef>First Name</th>
               <td mat-cell *matCellDef="let client">
-                {{ client.ime }}
+                {{ client.firstName }}
               </td>
             </ng-container>
-            <ng-container matColumnDef="prezime">
-              <th mat-header-cell *matHeaderCellDef>Prezime</th>
+
+            <ng-container matColumnDef="lastName">
+              <th mat-header-cell *matHeaderCellDef>Last Name</th>
               <td mat-cell *matCellDef="let client">
-                {{ client.prezime }}
+                {{ client.lastName }}
               </td>
             </ng-container>
-            <ng-container matColumnDef="adresa">
-              <th mat-header-cell *matHeaderCellDef>Adresa</th>
-              <td mat-cell *matCellDef="let client">{{ client.adresa }}</td>
-            </ng-container>
-            <ng-container matColumnDef="datumRodjenja">
-              <th mat-header-cell *matHeaderCellDef>Datum rodjenja</th>
+
+            <ng-container matColumnDef="address">
+              <th mat-header-cell *matHeaderCellDef>Address</th>
               <td mat-cell *matCellDef="let client">
-                {{ client.datumRodjenja | date : "dd.MM.yyyy." }}
+                {{ client.address }}
               </td>
             </ng-container>
-            <ng-container matColumnDef="brojTelefona">
-              <th mat-header-cell *matHeaderCellDef>Telefon</th>
+
+            <ng-container matColumnDef="dateOfBirth">
+              <th mat-header-cell *matHeaderCellDef>Date of Birth</th>
               <td mat-cell *matCellDef="let client">
-                {{ client.brojTelefona }}
+                {{ client.dateOfBirth | date : "dd.MM.yyyy." }}
               </td>
             </ng-container>
-            <ng-container matColumnDef="jmbg">
-              <th mat-header-cell *matHeaderCellDef>JMBG</th>
+
+            <ng-container matColumnDef="phoneNumber">
+              <th mat-header-cell *matHeaderCellDef>Phone</th>
               <td mat-cell *matCellDef="let client">
-                {{ client.jmbg }}
+                {{ client.phoneNumber }}
               </td>
             </ng-container>
+
+            <ng-container matColumnDef="nationalId">
+              <th mat-header-cell *matHeaderCellDef>National ID</th>
+              <td mat-cell *matCellDef="let client">
+                {{ client.nationalId }}
+              </td>
+            </ng-container>
+
             <ng-container matColumnDef="email">
-              <th mat-header-cell *matHeaderCellDef>Mejl adresa</th>
+              <th mat-header-cell *matHeaderCellDef>Email Address</th>
               <td mat-cell *matCellDef="let client">
                 {{ client.email }}
               </td>
             </ng-container>
+
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef></th>
               <td mat-cell *matCellDef="let client">
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                  "
-                >
+                <div style="display: flex; align-items: center; justify-content: space-between;">
                   <mat-icon
                     class="pointer"
                     style="margin-right: 10px"
-                    aria-hidden="false"
                     fontIcon="edit"
-                    (click)="onEditClient(client)"
-                    >edit</mat-icon
-                  >
+                    (click)="onEditClient(client)">
+                    edit
+                  </mat-icon>
+
                   <mat-icon
                     class="pointer"
-                    aria-hidden="false"
                     fontIcon="delete"
-                    *ngIf="userService.isAdmin() || userService.isSefOdsjeka()"
-                    (click)="onDeleteClient(client)"
-                    >delete</mat-icon
-                  >
+                    *ngIf="userService.isAdmin() || userService.IsManager()"
+                    (click)="onDeleteClient(client)">
+                    delete
+                  </mat-icon>
                 </div>
               </td>
             </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
           </table>
         </ng-container>
+
         <ng-template #noClients>
           <app-empty-list></app-empty-list>
         </ng-template>
       </div>
     </mat-card-content>
   </mat-card>
-  <app-pagination [totalItems]="totalItems"
-                  [pageSize]="currentPageSize"
-                  (paginationChange)="onPaginationChange($event)"></app-pagination>
+
+  <app-pagination
+    [totalItems]="totalItems"
+    [pageSize]="currentPageSize"
+    (paginationChange)="onPaginationChange($event)">
+  </app-pagination>
+
 </div>

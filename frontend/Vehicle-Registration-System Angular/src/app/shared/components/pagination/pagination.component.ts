@@ -1,29 +1,31 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { getSrPaginatorIntl } from '../../utils/paginator-intl-sr';
-
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-pagination',
-  templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.css'],
-  imports: [MatPaginatorModule],
-  providers: [
-    { provide: MatPaginatorIntl, useFactory: getSrPaginatorIntl }
-  ],
+  standalone: true,
+  imports: [CommonModule, MatPaginatorModule],
+  template: `
+    <mat-paginator
+      [length]="totalItems"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5,10,20]"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  `
 })
 export class PaginationComponent {
-  @Input() totalItems: number;
-  @Input() pageSize: number;
-  @Input() pageIndex: number;
-  @Input() showFirstLastButtons: boolean = true;
-  @Input() disabled: boolean = false;
+
+  @Input() totalItems!: number;
+  @Input() pageSize!: number;
 
   @Output() paginationChange = new EventEmitter<{ pageNumber: number }>();
 
-  onPageChange(event: PageEvent): void {
-    const pageNumber = event.pageIndex + 1;
-
-    this.paginationChange.emit({ pageNumber });
+  onPageChange(event: PageEvent) {
+    this.paginationChange.emit({
+      pageNumber: event.pageIndex + 1
+    });
   }
+
 }

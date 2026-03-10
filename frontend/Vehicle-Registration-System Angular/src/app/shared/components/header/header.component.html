@@ -1,26 +1,31 @@
 <mat-toolbar color="primary" class="header-toolbar header">
-  <span class="pointer" [routerLink]="['/registration/list']">eRegistracija</span>
+  <span class="pointer" [routerLink]="['/registration/list']">eRegistration</span>
+
   <div class="header-links">
-    <button mat-button [routerLink]="['/vehicle/list']" routerLinkActive="router-link-active" >Vozila</button>
-    <button mat-button [routerLink]="['/client/list']" routerLinkActive="router-link-active">Klijenti</button>
-    <button mat-button [routerLink]="['/insurance/list']" routerLinkActive="router-link-active">Osiguranja</button>
-    <button mat-button [routerLink]="['/registration/list']" routerLinkActive="router-link-active">Registracije</button>
+    <button mat-button [routerLink]="['/vehicle/list']" routerLinkActive="router-link-active">Vehicles</button>
+    <button mat-button [routerLink]="['/client/list']" routerLinkActive="router-link-active">Clients</button>
+    <button mat-button [routerLink]="['/insurance/list']" routerLinkActive="router-link-active">Insurance</button>
+    <button mat-button [routerLink]="['/registration/list']" routerLinkActive="router-link-active">Registrations</button>
   </div>
-  <button style="margin-left: auto;" mat-icon-button aria-label="Profil" [matMenuTriggerFor]="profileMenu">
+
+  <button style="margin-left: auto;" mat-icon-button aria-label="Profile" [matMenuTriggerFor]="profileMenu">
     <mat-icon>account_circle</mat-icon>
   </button>
+
   <mat-menu #profileMenu="matMenu">
     <button mat-menu-item [routerLink]="'/user/profile'">
       <mat-icon>person</mat-icon>
-      <span>Moj profil</span>
+      <span>My Profile</span>
     </button>
-    <button mat-menu-item *ngIf="userService.isAdmin() || userService.isSefOdsjeka()" [routerLink]="'/user/list'">
+
+    <button mat-menu-item *ngIf="userService.isAdmin() || userService.IsManager()" [routerLink]="'/user/list'">
       <mat-icon>people</mat-icon>
-      <span>Lista korisnika</span>
+      <span>User List</span>
     </button>
+
     <button mat-menu-item (click)="logout()">
       <mat-icon>logout</mat-icon>
-      <span>Odjavite se</span>
+      <span>Logout</span>
     </button>
   </mat-menu>
 </mat-toolbar>

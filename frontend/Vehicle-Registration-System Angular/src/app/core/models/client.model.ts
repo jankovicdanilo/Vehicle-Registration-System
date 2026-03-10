@@ -1,23 +1,23 @@
 export class Client {
   id: string;
-  ime: string;
-  prezime: string;
-  jmbg: string;
-  adresa: string;
-  brojLicneKarte: string;
-  brojTelefona: string;
-  datumRodjenja: string;
+  firstName: string;
+  lastName: string;
+  nationalId: string;
+  idCardNumber: string;
   email: string;
+  phoneNumber: string;
+  address: string;
+  dateOfBirth: string;
 
-  constructor(client) {
+  constructor(client: any) {
     this.id = client.id || undefined;
-    this.ime = client.ime || undefined;
-    this.prezime = client.prezime || undefined;
-    this.jmbg = client.jmbg || undefined;
-    this.adresa = client.adresa || undefined;
-    this.brojLicneKarte = client.brojLicneKarte || undefined;
-    this.brojTelefona = client.brojTelefona || undefined;
-    this.datumRodjenja = client.datumRodjenja || undefined;
-    this.email = client.email || undefined;                           
+    this.firstName = client.firstName || undefined;
+    this.lastName = client.lastName || undefined;
+    this.nationalId = client.nationalId || undefined;
+    this.idCardNumber = client.idCardNumber || undefined;
+    this.email = client.email || undefined;
+    this.phoneNumber = client.phoneNumber || undefined;
+    this.address = client.address || undefined;
+    this.dateOfBirth = client.dateOfBirth || undefined;
   }
 }

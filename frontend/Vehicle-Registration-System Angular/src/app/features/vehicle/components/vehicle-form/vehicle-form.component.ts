@@ -8,11 +8,13 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
 import { CommonModule } from "@angular/common";
 import { VehicleService } from "../../../../core/services/vehicle.service";
-import { MessageService } from '../../../../core/services/message.service';
-import { Vehicle } from '../../../../core/models/vehicle.model';
+import { MessageService } from "../../../../core/services/message.service";
+import { Vehicle } from "../../../../core/models/vehicle.model";
 
 @Component({
   selector: "app-vehicle-form",
+  standalone: true,
+  templateUrl: "./vehicle-form.component.html",
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -23,75 +25,76 @@ import { Vehicle } from '../../../../core/models/vehicle.model';
     MatNativeDateModule,
     MatButtonModule,
   ],
-  templateUrl: "./vehicle-form.component.html",
 })
 export class VehicleFormComponent {
-  @Input() vehicle: Vehicle;
-  @Input() vehicleId: string;
-  vehicleForm: FormGroup;
-  vehicleTypes: Array<{ id: string; naziv: string; kategorija: string }> = []; // change type
-  vehicleBrands: Array<{ id: string; naziv: string; tipVozilaId: string }> = [];
-  vehicleBrandModels: Array<{ id: string; naziv: string; markaId: string }> =
-    [];
-  vehicleFuelTypes: Array<string> = [
-    "Benzin",
-    "Dizel",
-    "Električni pogon",
-    "Hibrid",
-    "Tečni naftni gas",
-    "Kompresovani prirodni gas",
+
+  @Input() vehicle!: Vehicle;
+  @Input() vehicleId!: string;
+
+  vehicleForm!: FormGroup;
+
+  vehicleTypes: { id: string; name: string; category: string }[] = [];
+  vehicleBrands: { id: string; name: string; vehicleTypeId: string }[] = [];
+  vehicleModels: { id: string; name: string; brandId: string }[] = [];
+
+  fuelTypes: string[] = [
+    "Petrol",
+    "Diesel",
+    "Electric",
+    "Hybrid",
+    "LPG",
+    "CNG"
   ];
-  @Output() vehicleAdded = new EventEmitter<void>();
-  @Output() vehicleChanged = new EventEmitter<void>();
+
+  @Output() vehicleAdded = new EventEmitter<any>();
+  @Output() vehicleChanged = new EventEmitter<any>();
 
   constructor(
     private fb: FormBuilder,
     private vehicleService: VehicleService,
-    private messageService: MessageService,
+    private messageService: MessageService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['vehicle'] && this.vehicleForm && this.vehicle) {
+    if (changes["vehicle"] && this.vehicleForm && this.vehicle) {
       this.vehicleForm.patchValue(this.vehicle);
     }
   }
 
   ngOnInit(): void {
+
     this.vehicleForm = this.fb.group({
-      brojSasije: ["", Validators.required],
-      datumPrveRegistracije: ["", Validators.required],
-      godinaProizvodnje: ["", Validators.required],
-      markaVozilaId: ["", Validators.required],
-      modelVozilaId: ["", Validators.required],
-      tipVozilaId: ["", Validators.required],
-      masa: ["", Validators.required],
-      snagaMotora: ["", Validators.required],
-      zapreminaMotora: ["", Validators.required],
-      vrstaGoriva: ["", Validators.required],
+      chassisNumber: ["", Validators.required],
+      firstRegistrationDate: ["", Validators.required],
+      productionYear: ["", Validators.required],
+      vehicleBrandId: ["", Validators.required],
+      vehicleModelId: ["", Validators.required],
+      vehicleTypeId: ["", Validators.required],
+      weight: ["", Validators.required],
+      enginePowerKw: ["", Validators.required],
+      engineCapacity: ["", Validators.required],
+      fuelType: ["", Validators.required],
     });
-    
+
     this.getVehicleTypes();
 
-    this.vehicleForm.get("tipVozilaId")?.valueChanges.subscribe((tip) => {
-      if (tip) {
-        this.getVehicleBrands(tip);
+    this.vehicleForm.get("vehicleTypeId")?.valueChanges.subscribe(typeId => {
+      if (typeId) {
+        this.getVehicleBrands(typeId);
       }
     });
 
-    this.vehicleForm.get("markaVozilaId")?.valueChanges.subscribe((marka) => {
-      if (marka) {
-        this.getVehicleModels(marka);
+    this.vehicleForm.get("vehicleBrandId")?.valueChanges.subscribe(brandId => {
+      if (brandId) {
+        this.getVehicleModels(brandId);
       }
     });
   }
 
   getVehicleTypes(): void {
-    this.vehicleTypes = [];
     this.vehicleService.getVehicleTypes().subscribe({
       next: (res) => {
-        res.data.forEach((vehicleType) => {
-          this.vehicleTypes.push(vehicleType);
-        });
+        this.vehicleTypes = res.data;
       },
       error: (err) => {
         this.messageService.error(err);
@@ -100,12 +103,9 @@ export class VehicleFormComponent {
   }
 
   getVehicleBrands(vehicleTypeId: string): void {
-    this.vehicleBrands = [];
     this.vehicleService.getVehicleBrands(vehicleTypeId).subscribe({
       next: (res) => {
-        res.data.forEach((vehicleBrand) => {
-          this.vehicleBrands.push(vehicleBrand);
-        });
+        this.vehicleBrands = res.data;
       },
       error: (err) => {
         this.messageService.error(err);
@@ -114,12 +114,9 @@ export class VehicleFormComponent {
   }
 
   getVehicleModels(brandId: string): void {
-    this.vehicleBrandModels = [];
     this.vehicleService.getVehicleModels(brandId).subscribe({
       next: (res) => {
-        res.data.forEach((vehicleBrandModel) => {
-          this.vehicleBrandModels.push(vehicleBrandModel);
-        });
+        this.vehicleModels = res.data;
       },
       error: (err) => {
         this.messageService.error(err);

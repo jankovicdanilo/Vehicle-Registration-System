@@ -17,9 +17,10 @@ import { MatInputModule } from "@angular/material/input";
   ],
 })
 export class SearchComponent {
-  @Input() placeholder: string;
-  @Input() label: string;
-  searchTerm: string;
+  @Input() placeholder: string = '';
+  @Input() label: string = '';
+  searchTerm: string = '';
+
   @Output() searchChange = new EventEmitter<string>();
 
   onChange(value: string): void {

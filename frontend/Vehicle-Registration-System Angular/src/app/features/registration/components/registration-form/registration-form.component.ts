@@ -12,12 +12,15 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { InsuranceService } from '../../../../core/services/insurance.service';
+
 import { Registration } from '../../../../core/models/registration.model';
 import { Vehicle } from '../../../../core/models/vehicle.model';
 import { Client } from '../../../../core/models/client.model';
+import { Insurance } from '../../../../core/models/insurance.model';
 
 @Component({
   selector: 'app-registration-form',
+  standalone: true,
   templateUrl: './registration-form.component.html',
   imports: [
     CommonModule,
@@ -32,51 +35,52 @@ import { Client } from '../../../../core/models/client.model';
   ],
 })
 export class RegistrationFormComponent {
-  @Input() registrationId: string;
-  @Input() registration: Registration;
-  registrationForm: FormGroup;
-  vehicles: Array<Vehicle> = [];
-  clients: Array<Client> = [];
-  insurances: Array<{ id: string; naziv: string }> = [];
 
-  @Output() registrationAdded = new EventEmitter<void>();
-  @Output() registrationChanged = new EventEmitter<void>();
+  @Input() registrationId!: string;
+  @Input() registration!: Registration;
 
-  constructor(private fb: FormBuilder,
-              private vehicleService: VehicleService,
-              private clientService: ClientService,
-              private messageService: MessageService,
-              private insuranceService: InsuranceService,
+  registrationForm!: FormGroup;
+
+  vehicles: Vehicle[] = [];
+  clients: Client[] = [];
+  insurances: Insurance[] = [];
+
+  @Output() registrationAdded = new EventEmitter<any>();
+  @Output() registrationChanged = new EventEmitter<any>();
+
+  constructor(
+    private fb: FormBuilder,
+    private vehicleService: VehicleService,
+    private clientService: ClientService,
+    private messageService: MessageService,
+    private insuranceService: InsuranceService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['registration'] && this.registrationForm && this.registration) {
-      const osiguranjeId = this.registration.osiguranje?.id || null;
-  
-      this.insurances = this.insurances.map(i => ({
-        ...i,
-        id: i.id.toLowerCase()
-      }));
-  
+
+      const insuranceId = this.registration.insurance?.id || null;
+
       this.registrationForm.patchValue({
-        voziloId: this.registration.voziloId,
-        klijentId: this.registration.klijentId,
-        datumRegistracije: this.registration.datumRegistracije,
-        privremenaRegistracija: this.registration.privremenaRegistracija,
-        osiguranjeId: osiguranjeId,
-        registarskaOznaka: this.registration.registarskaOznaka
+        vehicleId: this.registration.vehicleId,
+        clientId: this.registration.clientId,
+        registrationDate: this.registration.registrationDate,
+        isTemporary: this.registration.isTemporary,
+        insuranceId: insuranceId,
+        licensePlate: this.registration.licensePlate
       });
     }
-  }  
+  }
 
   ngOnInit(): void {
+
     this.registrationForm = this.fb.group({
-      voziloId: ["", Validators.required],
-      klijentId: ["", Validators.required],
-      datumRegistracije: [new Date(), Validators.required],
-      privremenaRegistracija: [false, Validators.required],
-      osiguranjeId: ["", [Validators.required]],
-      registarskaOznaka: ["", [Validators.required, this.validateRegistrarskaOznaka()]],
+      vehicleId: ["", Validators.required],
+      clientId: ["", Validators.required],
+      registrationDate: [new Date(), Validators.required],
+      isTemporary: [false, Validators.required],
+      insuranceId: ["", Validators.required],
+      licensePlate: ["", [Validators.required, this.validateLicensePlate()]],
     });
 
     this.getListOfVehicles();
@@ -84,77 +88,66 @@ export class RegistrationFormComponent {
     this.getListOfInsurances();
   }
 
-
   getListOfVehicles(): void {
     this.vehicleService.getAllVehicles().subscribe({
       next: (res) => {
-        this.vehicles = [];
-        res.data.items.forEach((vehicle) => {
-          this.vehicles.push(vehicle);
-        });
-
+        this.vehicles = res.data.items;
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 
   getListOfClients(): void {
     this.clientService.getAllClients().subscribe({
       next: (res) => {
-        this.clients = [];
-        res.data.items.forEach((vehicle) => {
-          this.clients.push(vehicle);
-        });
-
+        this.clients = res.data.items;
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 
   getListOfInsurances(): void {
     this.insuranceService.getAllInsurances().subscribe({
       next: (res) => {
-        res.data.forEach((insurance) => {
-          this.insurances.push(insurance);
-        })
+        this.insurances = res.data;
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 
-  onSave() {
+  onSave(): void {
     this.registrationId ? this.onEditRegistration() : this.onAddNewRegistration();
   }
 
-  onEditRegistration() {
+  onEditRegistration(): void {
     this.registrationChanged.emit(this.registrationForm.value);
   }
 
-
-  onAddNewRegistration() {
+  onAddNewRegistration(): void {
     if (this.registrationForm.valid) {
       this.registrationAdded.emit(this.registrationForm.value);
     }
   }
 
-  validateRegistrarskaOznaka(): ValidatorFn {
+  validateLicensePlate(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
+
       const value = control.value;
-  
+
       if (!value) {
         return null;
       }
-  
+
       const pattern = /^[A-Z]{2}\d{3,5}[A-Z]{2}$/;
       const valid = pattern.test(value);
-  
-      return valid ? null : { registarskaOznakaInvalid: true };
+
+      return valid ? null : { licensePlateInvalid: true };
     };
   }
 }

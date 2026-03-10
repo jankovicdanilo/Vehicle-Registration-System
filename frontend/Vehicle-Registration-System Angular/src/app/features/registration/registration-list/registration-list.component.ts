@@ -18,6 +18,7 @@ import { UserService } from '../../../core/services/user.service';
 
 @Component({
   selector: 'app-registration-list',
+  standalone: true,
   templateUrl: './registration-list.component.html',
   imports: [
     CommonModule,
@@ -31,29 +32,32 @@ import { UserService } from '../../../core/services/user.service';
     PaginationComponent
   ],
 })
-
 export class RegistrationListComponent {
+
   dialog = inject(MatDialog);
-  registrations: Array<Registration> = [];
+
+  registrations: Registration[] = [];
   searchTerm: string = '';
-  totalItems: number;
+
+  totalItems!: number;
   currentPageSize: number = 5;
   currentPage: number = 1;
 
   displayedColumns: string[] = [
-    'voziloMarkaModel',
-    'registarskaOznaka',
-    'vlasnik',
-    'datumRegistracije',
-    'datumIstekaRegistracije',
-    'cijenaRegistracije',
+    'vehicle',
+    'licensePlate',
+    'owner',
+    'registrationDate',
+    'expirationDate',
+    'registrationPrice',
     'actions'
   ];
 
-  constructor(private registrationService: RegistrationService,
-              private messageService: MessageService,
-              public userService: UserService,
-              private router: Router
+  constructor(
+    private registrationService: RegistrationService,
+    private messageService: MessageService,
+    public userService: UserService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -61,18 +65,17 @@ export class RegistrationListComponent {
   }
 
   getListOfRegistrations(): void {
-    this.registrationService.getAllRegistartions(this.searchTerm, this.currentPageSize, this.currentPage).subscribe({
-      next: (res) => {
-        this.registrations = [];
-        res.data.items.forEach((vehicle) => {
-          this.registrations.push(vehicle);
-        });
-        this.totalItems = res.data.totalCount;
-      },
-      error: (err) => {
-        this.messageService.error(err);
-      }
-    })
+    this.registrationService
+      .getAllRegistrations(this.searchTerm, this.currentPageSize, this.currentPage)
+      .subscribe({
+        next: (res) => {
+          this.registrations = res.data.items;
+          this.totalItems = res.data.totalCount;
+        },
+        error: (err) => {
+          this.messageService.error(err);
+        }
+      });
   }
 
   onSearchChange(value: string): void {
@@ -98,16 +101,16 @@ export class RegistrationListComponent {
     });
   }
 
-  deleteRegistration(registration: Registration): void {    
+  deleteRegistration(registration: Registration): void {
     this.registrationService.deleteRegistration(registration.id).subscribe({
       next: () => {
         this.getListOfRegistrations();
-        this.messageService.success('Uspješno ste obrisali registraciju.');
+        this.messageService.success('Registration deleted successfully.');
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 
   onPaginationChange(event: { pageNumber: number }): void {

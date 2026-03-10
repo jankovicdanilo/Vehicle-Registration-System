@@ -1,46 +1,61 @@
 <form [formGroup]="registrationForm" class="form">
+
   <mat-form-field appearance="outline" class="field">
-    <mat-label>Klijent</mat-label>
-    <mat-select formControlName="klijentId">
-      <mat-option *ngFor="let client of clients" [value]="client.id">{{ client.ime }} {{ client.prezime }}</mat-option>
+    <mat-label>Client</mat-label>
+    <mat-select formControlName="clientId">
+      <mat-option *ngFor="let client of clients" [value]="client.id">
+        {{ client.firstName }} {{ client.lastName }}
+      </mat-option>
     </mat-select>
   </mat-form-field>
 
   <mat-form-field appearance="outline">
-    <mat-label>Vozilo</mat-label>
-    <mat-select formControlName="voziloId">
-      <mat-option *ngFor="let vehicle of vehicles" [value]="vehicle.id">{{ vehicle.markaVozilaNaziv }} {{ vehicle.modelVozilaNaziv }}</mat-option>
+    <mat-label>Vehicle</mat-label>
+    <mat-select formControlName="vehicleId">
+      <mat-option *ngFor="let vehicle of vehicles" [value]="vehicle.id">
+        {{ vehicle.vehicleBrandName }} {{ vehicle.vehicleModelName }}
+      </mat-option>
     </mat-select>
   </mat-form-field>
 
   <mat-form-field appearance="outline">
-    <mat-label>Datum registracije</mat-label>
-    <input matInput [matDatepicker]="reg" formControlName="datumRegistracije" />
+    <mat-label>Registration Date</mat-label>
+    <input matInput [matDatepicker]="reg" formControlName="registrationDate" />
     <mat-datepicker-toggle matSuffix [for]="reg"></mat-datepicker-toggle>
     <mat-datepicker #reg></mat-datepicker>
   </mat-form-field>
 
   <mat-form-field appearance="outline">
-    <mat-label>Registarska oznaka</mat-label>
-    <input type="text" matInput formControlName="registarskaOznaka" />
-    <mat-error *ngIf="registrationForm.get('registarskaOznaka')?.hasError('registarskaOznakaInvalid')">
-      Oznaka mora biti u formatu 'DE8976OP'.
+    <mat-label>License Plate</mat-label>
+    <input type="text" matInput formControlName="licensePlate" />
+    <mat-error *ngIf="registrationForm.get('licensePlate')?.hasError('licensePlateInvalid')">
+      License plate must be in format "DE8976OP".
     </mat-error>
   </mat-form-field>
 
   <mat-form-field appearance="outline">
-    <mat-label>Odaberi osiguranje</mat-label>
-    <mat-select formControlName="osiguranjeId">
+    <mat-label>Select Insurance</mat-label>
+    <mat-select formControlName="insuranceId">
       <mat-option *ngFor="let insurance of insurances" [value]="insurance.id">
-        {{ insurance.naziv }}
+        {{ insurance.name }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 
-  <mat-slide-toggle formControlName="privremenaRegistracija">
-    Privremena registracija
+  <mat-slide-toggle formControlName="isTemporary">
+    Temporary Registration
   </mat-slide-toggle>
+
 </form>
+
 <div style="display: flex; justify-content: center; margin-bottom: 40px;">
-  <button mat-flat-button color="primary" type="button" [disabled]="registrationForm.invalid" (click)="onSave()">Sačuvajte</button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    [disabled]="registrationForm.invalid"
+    (click)="onSave()"
+  >
+    Save
+  </button>
 </div>

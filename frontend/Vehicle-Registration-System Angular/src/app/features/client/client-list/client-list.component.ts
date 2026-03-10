@@ -17,6 +17,9 @@ import { Client } from '../../../core/models/client.model';
 import { UserService } from '../../../core/services/user.service';
 
 @Component({
+  selector: 'app-client-list',
+  templateUrl: './client-list.component.html',
+  standalone: true,
   imports: [
     CommonModule,
     MatTableModule,
@@ -28,32 +31,34 @@ import { UserService } from '../../../core/services/user.service';
     SearchComponent,
     PaginationComponent
   ],
-  selector: 'app-client-list',
-  templateUrl: './client-list.component.html',
 })
 export class ClientListComponent {
+
   dialog = inject(MatDialog);
-  clients: Array<Client> = [];
+
+  clients: Client[] = [];
   searchTerm: string = '';
-  totalItems: number;
+
+  totalItems!: number;
   currentPageSize: number = 5;
   currentPage: number = 1;
 
   displayedColumns: string[] = [
-    'ime',
-    'prezime',
-    'adresa',
-    'jmbg',
-    'datumRodjenja',
-    'brojTelefona',
+    'firstName',
+    'lastName',
+    'address',
+    'nationalId',
+    'dateOfBirth',
+    'phoneNumber',
     'email',
     'actions'
   ];
 
-  constructor(private clientService: ClientService,
-              private messageService: MessageService,
-              public userService: UserService,
-              private router: Router
+  constructor(
+    private clientService: ClientService,
+    private messageService: MessageService,
+    public userService: UserService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -61,18 +66,17 @@ export class ClientListComponent {
   }
 
   getListOfClients(): void {
-    this.clientService.getAllClients(this.searchTerm,  this.currentPageSize, this.currentPage).subscribe({
-      next: (res) => {
-        this.clients = [];
-        res.data.items.forEach((client) => {
-          this.clients.push(client);
-        });
-        this.totalItems = res.data.totalCount;
-      },
-      error: (err) => {
-        this.messageService.error(err);
-      }
-    })
+    this.clientService
+      .getAllClients(this.searchTerm, this.currentPageSize, this.currentPage)
+      .subscribe({
+        next: (res) => {
+          this.clients = res.data.items;
+          this.totalItems = res.data.totalCount;
+        },
+        error: (err) => {
+          this.messageService.error(err);
+        }
+      });
   }
 
   onSearchChange(value: string): void {
@@ -89,25 +93,26 @@ export class ClientListComponent {
   }
 
   onDeleteClient(client: Client): void {
-    this.dialog.open(QuestionModalComponent, {
-      width: '400px',
-    }).afterClosed().subscribe((confirmed: boolean) => {
-      if (confirmed) {
-        this.deleteClient(client);
-      }
-    });
+    this.dialog
+      .open(QuestionModalComponent, { width: '400px' })
+      .afterClosed()
+      .subscribe((confirmed: boolean) => {
+        if (confirmed) {
+          this.deleteClient(client);
+        }
+      });
   }
 
   deleteClient(client: Client): void {
     this.clientService.deleteClient(client.id).subscribe({
       next: () => {
         this.getListOfClients();
-        this.messageService.success('Uspješno ste obrisali klijenta.');
+        this.messageService.success('Client deleted successfully.');
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 
   onPaginationChange(event: { pageNumber: number }): void {

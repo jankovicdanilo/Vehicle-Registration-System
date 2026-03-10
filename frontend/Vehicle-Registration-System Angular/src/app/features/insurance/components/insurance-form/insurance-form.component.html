@@ -1,9 +1,9 @@
 <form [formGroup]="insuranceForm" class="form">
   <mat-form-field appearance="outline" class="field">
-    <mat-label>Naziv</mat-label>
-    <input matInput formControlName="naziv" />
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" />
   </mat-form-field>
 </form>
 <div style="display: flex; justify-content: center; margin-bottom: 40px">
-  <button mat-flat-button color="primary" type="button" [disabled]="insuranceForm.invalid" (click)="onSave()">Sačuvajte</button>
+  <button mat-flat-button color="primary" type="button" [disabled]="insuranceForm.invalid" (click)="onSave()">Save</button>
 </div>

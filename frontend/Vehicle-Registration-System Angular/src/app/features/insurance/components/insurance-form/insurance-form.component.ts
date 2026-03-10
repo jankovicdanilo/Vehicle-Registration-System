@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-insurance-form',
+  standalone: true,
   templateUrl: './insurance-form.component.html',
   imports: [
     CommonModule,
@@ -16,17 +17,17 @@ import { MatInputModule } from '@angular/material/input';
     MatButtonModule,
   ],
 })
-
 export class InsuranceFormComponent {
-  @Input() insurance: { id: string; naziv: string };
-  @Input() insuranceId: string;
-  insuranceForm: FormGroup;
-  @Output() insuranceAdded = new EventEmitter<void>();
-  @Output() insuranceChanged = new EventEmitter<void>();
 
-  constructor(
-    private fb: FormBuilder
-  ) {}
+  @Input() insurance!: { id: string; name: string };
+  @Input() insuranceId!: string;
+
+  insuranceForm!: FormGroup;
+
+  @Output() insuranceAdded = new EventEmitter<any>();
+  @Output() insuranceChanged = new EventEmitter<any>();
+
+  constructor(private fb: FormBuilder) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['insurance'] && this.insuranceForm && this.insurance) {
@@ -36,19 +37,19 @@ export class InsuranceFormComponent {
 
   ngOnInit(): void {
     this.insuranceForm = this.fb.group({
-      naziv: ["", Validators.required],
+      name: ["", Validators.required],
     });
   }
 
-  onSave() {
+  onSave(): void {
     this.insuranceId ? this.onEditInsurance() : this.onAddNewInsurance();
   }
 
-  onEditInsurance() {
+  onEditInsurance(): void {
     this.insuranceChanged.emit(this.insuranceForm.value);
   }
 
-  onAddNewInsurance() {
+  onAddNewInsurance(): void {
     if (this.insuranceForm.valid) {
       this.insuranceAdded.emit(this.insuranceForm.value);
     }

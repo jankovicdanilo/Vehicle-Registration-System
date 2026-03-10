@@ -11,7 +11,7 @@ export class RegistrationService {
 
   constructor(private http: HttpClient) {}
 
-  getAllRegistartions(search?: string, pageSize?: number, pageNumber?: number): Observable<any> {
+  getAllRegistrations(search?: string, pageSize?: number, pageNumber?: number): Observable<any> {
     let params = new HttpParams();
 
     if (search) params = params.append('searchQuery', search);

@@ -8,16 +8,20 @@ import { Vehicle } from '../../../core/models/vehicle.model';
 
 @Component({
   selector: 'app-vehicle-details',
+  standalone: true,
   templateUrl: './vehicle-details.component.html',
   imports: [MatCardModule, VehicleFormComponent],
 })
 export class VehicleDetailsComponent {
-  vehicleId: string;
-  vehicle: Vehicle;
-  constructor(private route: ActivatedRoute,
-              private vehicleService: VehicleService,
-              private messageService: MessageService,
-              private router: Router
+
+  vehicleId!: string;
+  vehicle!: Vehicle;
+
+  constructor(
+    private route: ActivatedRoute,
+    private vehicleService: VehicleService,
+    private messageService: MessageService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -35,20 +39,20 @@ export class VehicleDetailsComponent {
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 
   editVehicle(vehicleData: any): void {
     if (vehicleData) {
-      this.vehicleService.editVehicle({...vehicleData, id: this.vehicleId}).subscribe({
-        next: (res) => {
-          this.messageService.success('Vozilo je uspješno izmijenjeno');
+      this.vehicleService.editVehicle({ ...vehicleData, id: this.vehicleId }).subscribe({
+        next: () => {
+          this.messageService.success('Vehicle updated successfully.');
           this.router.navigate(['/vehicle/list']);
         },
         error: (err) => {
           this.messageService.error(err);
         }
-      })
+      });
     }
   }
 }

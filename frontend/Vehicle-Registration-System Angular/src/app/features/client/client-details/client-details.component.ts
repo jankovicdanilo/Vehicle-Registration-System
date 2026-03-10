@@ -9,16 +9,19 @@ import { Client } from '../../../core/models/client.model';
 @Component({
   selector: 'app-client-details',
   templateUrl: './client-details.component.html',
+  standalone: true,
   imports: [MatCardModule, ClientFormComponent]
 })
-
 export class ClientDetailsComponent {
-  clientId: string;
-  client: Client;
-  constructor(private route: ActivatedRoute,
-              private clienService: ClientService,
-              private messageService: MessageService,
-              private router: Router
+
+  clientId!: string;
+  client!: Client;
+
+  constructor(
+    private route: ActivatedRoute,
+    private clientService: ClientService,
+    private messageService: MessageService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -29,27 +32,27 @@ export class ClientDetailsComponent {
   }
 
   getClientById(): void {
-    this.clienService.getClientById(this.clientId).subscribe({
+    this.clientService.getClientById(this.clientId).subscribe({
       next: (res) => {
         this.client = res.data;
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 
   editClient(clientData: any): void {
-    if (clientData) {
-      this.clienService.editClient({...clientData, id: this.clientId}).subscribe({
-        next: () => {
-          this.messageService.success('Klijent je uspješno izmijenjen');
-          this.router.navigate(['/client/list']);
-        },
-        error: (err) => {
-          this.messageService.error(err);
-        }
-      })
-    }
+    if (!clientData) return;
+
+    this.clientService.editClient({ ...clientData, id: this.clientId }).subscribe({
+      next: () => {
+        this.messageService.success('Client updated successfully');
+        this.router.navigate(['/client/list']);
+      },
+      error: (err) => {
+        this.messageService.error(err);
+      }
+    });
   }
 }

@@ -11,6 +11,7 @@ import { UserFormComponent } from "../../../shared/components/user-form/user-for
 @Component({
   selector: "app-register",
   templateUrl: "./register.component.html",
+  standalone: true,
   imports: [
     CommonModule,
     RouterModule,
@@ -21,42 +22,41 @@ import { UserFormComponent } from "../../../shared/components/user-form/user-for
   ],
 })
 export class RegisterComponent {
+
   constructor(
     private authService: AuthService,
     private messageService: MessageService,
     private router: Router
   ) {}
 
-    addUser(event: any): void {
-        if (event) {
-            let roles: string[] = ["Zaposleni"];
+  addUser(event: any): void {
+    if (!event) return;
 
-            if (event.role === "Admin") {
-                roles.unshift("Admin");
-            } else if (event.role === "SefOdsjeka") {
-                roles.unshift("SefOdsjeka");
-            }
+    let roles: string[] = ["Employee"];
 
-            const data = {
-                username: event.username || "",
-                email: event.email || "",
-                password: event.password || "",
-                roles: roles
-            };
-
-            console.log("Payload sent:", data); // debug
-
-            this.authService.register(data).subscribe({
-                next: () => {
-                    this.messageService.success("Uspješno ste registrovali novog korisnika");
-                    this.router.navigate(["/user/list"]);
-                },
-                error: (err) => {
-                    this.messageService.error(err);
-                },
-            });
-        }
+    if (event.role === "Admin") {
+      roles.unshift("Admin");
+    } else if (event.role === "Manager") {
+      roles.unshift("Manager");
     }
 
+    const data = {
+      username: event.username || "",
+      email: event.email || "",
+      password: event.password || "",
+      roles: roles
+    };
 
+    console.log("Payload sent:", data);
+
+    this.authService.register(data).subscribe({
+      next: () => {
+        this.messageService.success("User registered successfully");
+        this.router.navigate(["/user/list"]);
+      },
+      error: (err) => {
+        this.messageService.error(err);
+      },
+    });
+  }
 }

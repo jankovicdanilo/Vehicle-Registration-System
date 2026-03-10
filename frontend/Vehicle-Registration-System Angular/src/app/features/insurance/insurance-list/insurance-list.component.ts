@@ -12,9 +12,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { ToastrModule } from 'ngx-toastr';
 import { EmptyListComponent } from '../../../shared/components/empty-list/empty-list.component';
 import { UserService } from '../../../core/services/user.service';
+import { Insurance } from '../../../core/models/insurance.model';
 
 @Component({
   selector: 'app-insurance-list',
+  standalone: true,
   templateUrl: './insurance-list.component.html',
   imports: [
     CommonModule,
@@ -27,18 +29,21 @@ import { UserService } from '../../../core/services/user.service';
   ],
 })
 export class InsuranceListComponent {
+
   dialog = inject(MatDialog);
-  insurances: Array<{ id: string; naziv: string;}> = [];
+
+  insurances: Insurance[] = [];
 
   displayedColumns: string[] = [
-    'naziv',
+    'name',
     'actions'
   ];
 
-  constructor(private insuranceService: InsuranceService,
-              private messageService: MessageService,
-              public userService: UserService,
-              private router: Router
+  constructor(
+    private insuranceService: InsuranceService,
+    private messageService: MessageService,
+    public userService: UserService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -48,19 +53,15 @@ export class InsuranceListComponent {
   getListOfInsurances(): void {
     this.insuranceService.getAllInsurances().subscribe({
       next: (res) => {
-        this.insurances = [];
-        res.data.forEach((insurance) => {
-          this.insurances.push(insurance);
-        });
-
+        this.insurances = res.data;
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 
-  onEditInsurance(insurance: { id: string; naziv: string }): void {
+  onEditInsurance(insurance: Insurance): void {
     this.router.navigate(['/insurance', insurance.id]);
   }
 
@@ -68,7 +69,7 @@ export class InsuranceListComponent {
     this.router.navigate(['/insurance/add']);
   }
 
-  onDeleteInsurance(insurance: { id: string; naziv: string }): void {
+  onDeleteInsurance(insurance: Insurance): void {
     this.dialog.open(QuestionModalComponent, {
       width: '400px',
     }).afterClosed().subscribe((confirmed: boolean) => {
@@ -78,15 +79,15 @@ export class InsuranceListComponent {
     });
   }
 
-  deleteInsurance(insurance: { id: string; naziv: string }): void {    
+  deleteInsurance(insurance: Insurance): void {
     this.insuranceService.deleteInsurance(insurance.id).subscribe({
       next: () => {
         this.getListOfInsurances();
-        this.messageService.success('Uspješno ste obrisali osiguranje.');
+        this.messageService.success('Insurance deleted successfully.');
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 }

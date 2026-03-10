@@ -15,7 +15,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { UserService } from '../../../core/services/user.service';
 
 @Component({
-   imports: [
+  selector: 'app-user-list',
+  standalone: true,
+  templateUrl: './user-list.component.html',
+  imports: [
     CommonModule,
     MatTableModule,
     MatCardModule,
@@ -24,24 +27,25 @@ import { UserService } from '../../../core/services/user.service';
     ToastrModule,
     EmptyListComponent,
   ],
-  selector: 'app-user-list',
-  templateUrl: './user-list.component.html',
 })
 export class UserListComponent {
-   dialog = inject(MatDialog);
-  users: Array<any> = [];
+
+  dialog = inject(MatDialog);
+
+  users: User[] = [];
 
   displayedColumns: string[] = [
-    'Korisničko ime',
+    'username',
     'email',
     'role',
     'actions'
   ];
 
-  constructor(private authService: AuthService,
-              private messageService: MessageService,
-              public userService: UserService,
-              private router: Router
+  constructor(
+    private authService: AuthService,
+    private messageService: MessageService,
+    public userService: UserService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -51,24 +55,22 @@ export class UserListComponent {
   getListOfUsers(): void {
     this.authService.getUsers().subscribe({
       next: (res) => {
-        this.users = [];
-        res.forEach((user) => {
-          this.users.push(user);
-        });
+        this.users = res;
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 
-    formatRole(role: string): string {
-        if (role === 'SefOdsjeka') return 'Šef odsjeka';
-        return role;
-    }
+  formatRole(role: string): string {
+    if (role === 'Manager') return 'Manager';
+    if (role === 'Employee') return 'Employee';
+    if (role === 'Admin') return 'Admin';
+    return role;
+  }
 
-
-    onEditUser(user: User): void {
+  onEditUser(user: User): void {
     this.router.navigate(['auth/register', user.id]);
   }
 
@@ -90,11 +92,11 @@ export class UserListComponent {
     this.authService.deleteUser(user.id).subscribe({
       next: () => {
         this.getListOfUsers();
-        this.messageService.success('Uspješno ste obrisali korisnika.');
+        this.messageService.success('User deleted successfully.');
       },
       error: (err) => {
         this.messageService.error(err);
       }
-    })
+    });
   }
 }

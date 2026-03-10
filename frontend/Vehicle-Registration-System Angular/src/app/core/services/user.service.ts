@@ -48,8 +48,8 @@ export class UserService {
     return user?.role?.includes('Admin');
   }
 
-  isSefOdsjeka(): boolean {
+  IsManager(): boolean {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    return user?.role?.includes('SefOdsjeka');
+    return user?.role?.includes('Manager');
   }
 }

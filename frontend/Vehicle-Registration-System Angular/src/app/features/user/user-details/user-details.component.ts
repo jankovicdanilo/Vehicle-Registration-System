@@ -10,6 +10,7 @@ import { User } from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-user-details',
+  standalone: true,
   templateUrl: './user-details.component.html',
   imports: [
     UserSidebarComponent,
@@ -20,21 +21,24 @@ import { User } from '../../../core/models/user.model';
     MatButtonModule
   ]
 })
-
 export class UserDetailsComponent {
-  currentUser: User;
-  userForm: FormGroup;
 
-  constructor(private userService: UserService,
-              private fb: FormBuilder,
+  currentUser!: User;
+  userForm!: FormGroup;
+
+  constructor(
+    private userService: UserService,
+    private fb: FormBuilder
   ) {}
+
   ngOnInit(): void {
+
     this.userForm = this.fb.group({
       username: [{ value: '', disabled: true }, Validators.required],
       email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
     });
 
-    this.currentUser = JSON.parse(this.userService.getCurrentUser());
+    this.currentUser = JSON.parse(this.userService.getCurrentUser() || '{}');
 
     this.userForm.patchValue({
       username: this.currentUser.name,
