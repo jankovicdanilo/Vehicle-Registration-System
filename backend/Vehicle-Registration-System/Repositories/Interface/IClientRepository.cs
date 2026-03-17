@@ -1,18 +1,13 @@
 ﻿using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Common;
 
 namespace VehicleRegistrationSystem.Repositories.Interface
 {
-    public interface IClientRepository
+    public interface IClientRepository : IRepositoryBase<Client>
     {
-        Task<Client> AddClientAsync(Client client);
-
         Task<(List<Client> Items, int TotalCount)> GetAllAsync
             (string? searchQuery = null, int pageNumber = 1, int pageSize = 1000);
 
-        Task<Client?> GetClientByIdAsync(Guid id);
-
         Task<Client?> UpdateClientAsync(Client client);
-
-        Task<Client?> DeleteClientAsync(Guid id);
     }
 }

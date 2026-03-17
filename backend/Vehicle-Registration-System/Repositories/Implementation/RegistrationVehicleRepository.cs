@@ -3,25 +3,18 @@ using VehicleRegistrationSystem.Models.Domain;
 using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Services.Interface;
 using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Repositories.Common;
+using System.Formats.Tar;
 
 namespace VehicleRegistrationSystem.Repositories.Implementation
 {
-    public class RegistrationVehicleRepository : IRegistrationVehicleRepository
+    public class RegistrationVehicleRepository : RepositoryBase<Registration>, IRegistrationVehicleRepository
     {
-        private readonly VehicleRegistrationDbContext appDbContext;
 
-        public RegistrationVehicleRepository(VehicleRegistrationDbContext appDbContext, 
-            IRegistrationCalculatorService registrationCalculatorService)
-        {
-            this.appDbContext = appDbContext;
-        }
-
-        public async Task<Registration> AddRegistrationAsync(Registration request)
-        {
-            await appDbContext.Registrations.AddAsync(request);
-            await appDbContext.SaveChangesAsync();
-            return request;
-        }
+        public RegistrationVehicleRepository
+            (VehicleRegistrationDbContext appDbContext, 
+            IRegistrationCalculatorService registrationCalculatorService) : base(appDbContext) { }
+        
 
         public async Task<(List<Registration> Items, int TotalCount)> GetAllAsync(string? searchQuery = null, 
             int pageNumber = 1, int pageSize = 1000)
@@ -54,37 +47,6 @@ namespace VehicleRegistrationSystem.Repositories.Implementation
             var totalCount = await query.CountAsync();
 
             return (items, totalCount);
-        }
-
-        public async Task<Registration?> GetByIdAsync(Guid id)
-        {
-            return await appDbContext.Registrations
-                .Include(x => x.Client)
-                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleType)
-                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleBrand)
-                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleModel)
-                .Include(x => x.Insurance)
-                .FirstOrDefaultAsync(x => x.Id == id);
-        }
-
-        public async Task<Registration?> DeleteAsync(Guid id)
-        {
-            var existingRegistration = await appDbContext.Registrations
-                .Include(x => x.Client)
-                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleType)
-                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleBrand)
-                .Include(x => x.Vehicle).ThenInclude(v => v.VehicleModel)
-                .Include(x => x.Insurance)
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (existingRegistration == null)
-                return null;
-
-            appDbContext.Registrations.Remove(existingRegistration);
-
-            await appDbContext.SaveChangesAsync();
-
-            return existingRegistration;
         }
 
         public async Task<Registration?> UpdateAsync(Registration request)

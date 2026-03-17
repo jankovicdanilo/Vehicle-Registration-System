@@ -12,8 +12,17 @@ using VehicleRegistrationSystem.Repositories.Implementation;
 using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Services.Implementation;
 using VehicleRegistrationSystem.Services.Interface;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.text", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 
@@ -161,6 +170,8 @@ builder.Services.AddControllers(options =>
 
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

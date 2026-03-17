@@ -1,4 +1,5 @@
-﻿using VehicleRegistrationSystem.Models.DTO;
+﻿using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Models.DTO;
 using VehicleRegistrationSystem.Results;
 
 namespace VehicleRegistrationSystem.Services.Interface
@@ -6,7 +7,8 @@ namespace VehicleRegistrationSystem.Services.Interface
     public interface IRegistrationVehicleService
     {
         Task<RepositoryResult<bool>> 
-            ValidateRegistrationCreateRequestAsync(CreateRegistrationVehicleRequestDto request);
+            ValidateRegistrationCreateRequestAsync(CreateRegistrationVehicleRequestDto request,
+            Vehicle vehicle, InsurancePrice? insurancePrice);
 
         Task<RepositoryResult<bool>?> ValidateRegistrationDeleteRequestAsync(Guid id);
 

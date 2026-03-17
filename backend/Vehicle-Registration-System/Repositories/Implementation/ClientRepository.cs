@@ -2,35 +2,13 @@
 using VehicleRegistrationSystem.Models.Domain;
 using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Repositories.Common;
 
 namespace VehicleRegistrationSystem.Repositories.Implementation
 {
-    public class ClientRepository : IClientRepository
+    public class ClientRepository : RepositoryBase<Client>, IClientRepository
     {
-        private readonly VehicleRegistrationDbContext appDbContext;
-
-        public ClientRepository(VehicleRegistrationDbContext appDbContext)
-        {
-            this.appDbContext = appDbContext;
-        }
-
-        public async Task<Client> AddClientAsync(Client client)
-        {
-            await appDbContext.Clients.AddAsync(client);
-            await appDbContext.SaveChangesAsync();
-            return client;
-        }
-
-        public async Task<Client?> DeleteClientAsync(Guid id)
-        {
-            var clientDelete = await appDbContext.Clients.FirstOrDefaultAsync(x => x.Id == id);
-
-
-            appDbContext.Clients.Remove(clientDelete);
-            await appDbContext.SaveChangesAsync();
-            return clientDelete;
-
-        }
+        public ClientRepository(VehicleRegistrationDbContext appDbContext) : base(appDbContext) { }
 
         public async Task<(List<Client> Items, int TotalCount)> GetAllAsync
             (string? searchQuery = null, int pageNumber = 1, int pageSize = 1000)
@@ -55,11 +33,6 @@ namespace VehicleRegistrationSystem.Repositories.Implementation
             var totalCount = await query.CountAsync();
 
             return (items, totalCount);
-        }
-
-        public async Task<Client?> GetClientByIdAsync(Guid id)
-        {
-            return await appDbContext.Clients.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Client?> UpdateClientAsync(Client client)

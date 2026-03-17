@@ -69,6 +69,16 @@ namespace VehicleRegistrationSystem.Data
                 .Property(r => r.RegistrationPrice)
                 .HasPrecision(18, 2);
 
+            modelBuilder.Entity<Registration>()
+                .HasIndex(r => r.VehicleId)
+                .IsUnique().
+                HasDatabaseName("UQ_Registration_VehicleId");
+
+            modelBuilder.Entity<Registration>()
+                .HasIndex(r => r.LicensePlate)
+                .IsUnique()
+                .HasDatabaseName("UQ_Registration_LicensePlate");
+
             var carTypeId = Guid.Parse("11111111-1111-1111-1111-111111111111");
             var truckTypeId = Guid.Parse("22222222-2222-2222-2222-222222222222");
             var motorcycleTypeId = Guid.Parse("33333333-3333-3333-3333-333333333333");
@@ -111,9 +121,9 @@ namespace VehicleRegistrationSystem.Data
                     VehicleBrandId = yamahaId,
                     VehicleModelId = r1Id,
                     ProductionYear = 2022,
-                    EngineCapacity = 1000,
+                    EngineCapacity = 150,
                     Weight = 300,
-                    EnginePowerKw = 250,
+                    EnginePowerKw = 15,
                     ChassisNumber = "WBAXX12345678901",
                     FirstRegistrationDate = new DateTime(2023, 3, 10),
                     FuelType = "Petrol"
@@ -127,7 +137,7 @@ namespace VehicleRegistrationSystem.Data
                     ProductionYear = 2020,
                     EngineCapacity = 1800,
                     Weight = 1400,
-                    EnginePowerKw = 103,
+                    EnginePowerKw = 45,
                     ChassisNumber = "JTDBR32E720123456",
                     FirstRegistrationDate = new DateTime(2022, 6, 1),
                     FuelType = "Diesel"

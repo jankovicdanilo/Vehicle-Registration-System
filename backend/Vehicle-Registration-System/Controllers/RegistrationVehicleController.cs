@@ -36,10 +36,10 @@ namespace VehicleRegistrationSystem.Controllers
                 });
             }
 
-            var confirmationData = await registrationVehicleService.GenerateConfirmation(result.Data.Id);
-            var document = new RegistrationConfirmationDocument(confirmationData.Data);
-            var pdfBytes = document.GeneratePdf();
-            await emailService.SendConfirmationEmailAsync(confirmationData.Data.Client.Email, pdfBytes);
+            //var confirmationData = await registrationVehicleService.GenerateConfirmation(result.Data.Id);
+            //var document = new RegistrationConfirmationDocument(confirmationData.Data);
+            //var pdfBytes = document.GeneratePdf();
+            //await emailService.SendConfirmationEmailAsync(confirmationData.Data.Client.Email, pdfBytes);
 
             return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
         }

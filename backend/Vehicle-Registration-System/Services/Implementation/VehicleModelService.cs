@@ -11,22 +11,23 @@ namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class VehicleModelService : IVehicleModelService
     {
-        private readonly VehicleRegistrationDbContext appDbContext;
         private readonly IMapper mapper;
         private readonly IVehicleModelRepository vehicleModelRepository;
+        private readonly IVehicleBrandRepository vehicleBrandRepository;
+        private readonly IVehicleRepository vehicleRepository;
 
-        public VehicleModelService(VehicleRegistrationDbContext appDbContext, IMapper mapper,
-            IVehicleModelRepository vehicleModelRepository)
+        public VehicleModelService(IMapper mapper,IVehicleModelRepository vehicleModelRepository, 
+            IVehicleBrandRepository vehicleBrandRepository, IVehicleRepository vehicleRepository)
         {
-            this.appDbContext = appDbContext;
             this.mapper = mapper;
             this.vehicleModelRepository = vehicleModelRepository;
+            this.vehicleBrandRepository = vehicleBrandRepository;
         }
 
         public async Task<RepositoryResult<bool>> 
             ValidateVehicleModelCreateRequestAsync(CreateVehicleModelRequestDto request)
         {
-            var existingModel = await appDbContext.VehicleModels.AnyAsync
+            var existingModel = await vehicleModelRepository.ExistsAsync
                 (x=>x.Name.ToLower() == request.Name.ToLower() && 
                 x.VehicleBrandId == request.VehicleBrandId);
 
@@ -36,7 +37,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     "Model already exists for the given vehicle brand");
             }
 
-            if(!await appDbContext.VehicleBrands.AnyAsync(x=>x.Id == request.VehicleBrandId))
+            if(!await vehicleBrandRepository.ExistsAsync(x=>x.Id == request.VehicleBrandId))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_BRAND_NOT_FOUND: Vehicle brand with the id " +
                     $"{request.VehicleBrandId} doesnt exist");
@@ -67,13 +68,13 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>?> ValidateVehicleModelDeleteRequestAsync(Guid id)
         {
-            if(!await appDbContext.VehicleModels.AnyAsync(x=>x.Id==id))
+            if(!await vehicleModelRepository.ExistsAsync(x=>x.Id==id))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_MODEL_NOT_FOUND: Vehicle MODEL with the id " +
                     $"{id} doesnt exist");
             }
 
-            if(await appDbContext.Vehicles.AnyAsync(x => x.VehicleModelId == id))
+            if(await vehicleRepository.ExistsAsync(x => x.VehicleModelId == id))
             {
                 return RepositoryResult<bool>.Fail("VEHICLE_MODEL_IN_USE: " +
                     "Cannot delete model because it's assigned to existing vehicles");
@@ -101,15 +102,15 @@ namespace VehicleRegistrationSystem.Services.Implementation
         public async Task<RepositoryResult<bool>?> 
             ValidateVehicleModelUpdateRequestAsync(UpdateVehicleModelRequestDto request)
         {
-            if(!await appDbContext.VehicleModels.AnyAsync(x=>x.Id == request.Id))
+            if(!await vehicleModelRepository.ExistsAsync(x=>x.Id == request.Id))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_MODEL_NOT_FOUND: Vehicle model with the id " +
                     $"{request.Id} doesnt exist");
             }
 
-            var existingModel = await appDbContext.VehicleModels.AnyAsync
+            var existingModel = await vehicleModelRepository.ExistsAsync
                 (x => x.Name.ToLower() == request.Name.ToLower() &&
-                x.VehicleBrandId == request.VehicleBrandId && x.Id!=request.Id);
+                x.VehicleBrandId == request.VehicleBrandId && x.Id != request.Id);
 
             if (existingModel)
             {
@@ -117,7 +118,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     "Model already exists for the given vehicle brand");
             }
 
-            if (!await appDbContext.VehicleBrands.AnyAsync(x => x.Id == request.VehicleBrandId))
+            if (!await vehicleBrandRepository.ExistsAsync(x => x.Id == request.VehicleBrandId))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_BRAND_NOT_FOUND: Vehicle brand with the id " +
                     $"{request.VehicleBrandId} not found");
@@ -148,7 +149,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>?> ValidateVehicleModelGetByIdAsync(Guid id)
         {
-            if(!await appDbContext.VehicleModels.AnyAsync(x=>x.Id == id))
+            if(!await vehicleModelRepository.ExistsAsync(x=>x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_MODEL_NOT_FOUND: Vehicle MODEL with the id " +
                     $"{id} not found");
@@ -175,7 +176,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>?> ValidateVehicleModelGetByBrandIdAsync(Guid id)
         {
-            if(!await appDbContext.VehicleModels.AnyAsync(x=>x.VehicleBrandId == id))
+            if(!await vehicleModelRepository.ExistsAsync(x=>x.VehicleBrandId == id))
             {
                 return RepositoryResult<bool>.Fail($"VEHICLE_BRAND_NOT_FOUND: Vehicle brand with the id " +
                     $"{id} not found");

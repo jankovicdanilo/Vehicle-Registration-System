@@ -13,21 +13,18 @@ namespace VehicleRegistrationSystem.Services.Implementation
     {
         private readonly IInsuranceRepository insuranceRepository;
         private readonly IMapper mapper;
-        private readonly VehicleRegistrationDbContext appDbContext;
 
-        public InsuranceService(IInsuranceRepository insuranceRepository, IMapper mapper,
-            VehicleRegistrationDbContext appDbContext)
+        public InsuranceService(IInsuranceRepository insuranceRepository, IMapper mapper)
         {
             this.insuranceRepository = insuranceRepository;
             this.mapper = mapper;
-            this.appDbContext = appDbContext;
         }
 
         public async Task<RepositoryResult<InsuranceDto>> CreateInsuranceAsync(CreateInsuranceRequestDto request)
         {
             var insuranceDomain = mapper.Map<Insurance>(request);
 
-            insuranceDomain = await insuranceRepository.CreateInsuranceAsync(insuranceDomain);
+            insuranceDomain = await insuranceRepository.AddAsync(insuranceDomain);
 
             var response = mapper.Map<InsuranceDto>(insuranceDomain);
 
@@ -45,7 +42,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateGetInsuranceByIdAsync(Guid id)
         {
-            if(!await appDbContext.Insurances.AnyAsync(x=>x.Id == id))
+            if(!await insuranceRepository.ExistsAsync(x=>x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"INVALID_INSURANCE_ID: Insurance with the" +
                     $" id {id} not found");
@@ -63,7 +60,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 return RepositoryResult<InsuranceDto>.Fail(validationResult.Message);
             }
 
-            var insuranceDomain = await insuranceRepository.GetInsuranceByIdAsync(id);
+            var insuranceDomain = await insuranceRepository.GetByIdAsync(id);
 
             var response = mapper.Map<InsuranceDto>(insuranceDomain);
 
@@ -72,7 +69,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateDeleteAsync(Guid id)
         {
-            if (!await appDbContext.Insurances.AnyAsync(x => x.Id == id))
+            if (!await insuranceRepository.ExistsAsync(x => x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"INVALID_INSURANCE_ID: Insurance with the" +
                     $" id {id} not found");
@@ -99,7 +96,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateUpdateAsync(UpdateInsuranceRequestDto request)
         {
-            if (!await appDbContext.Insurances.AnyAsync(x => x.Id == request.Id))
+            if (!await insuranceRepository.ExistsAsync(x => x.Id == request.Id))
             {
                 return RepositoryResult<bool>.Fail($"INVALID_INSURANCE_ID: Insurance with the" +
                     $" id {request.Id} not found");

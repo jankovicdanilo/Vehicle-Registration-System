@@ -6,65 +6,88 @@ using VehicleRegistrationSystem.Results;
 using VehicleRegistrationSystem.Services.Interface;
 using VehicleRegistrationSystem.Data;
 using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Implementation;
 
 namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class RegistrationVehicleService : IRegistrationVehicleService
     {
-        private readonly VehicleRegistrationDbContext appDbContext;
         private readonly IMapper mapper;
         private readonly IRegistrationVehicleRepository registrationVehicleRepository;
         private readonly IRegistrationCalculatorService registrationCalculatorService;
         private readonly IVehicleRepository vehicleRepository;
         private readonly IInsurancePricingRepository insurancePricingRepository;
+        private readonly IClientRepository clientRepository;
+        private readonly IInsuranceRepository insuranceRepository;
 
-        public RegistrationVehicleService(VehicleRegistrationDbContext appDbContext,
-            IMapper mapper, IRegistrationVehicleRepository registrationVehicleRepository, 
+        public RegistrationVehicleService(IMapper mapper,
+            IRegistrationVehicleRepository registrationVehicleRepository,
             IRegistrationCalculatorService registrationCalculatorService,
             IVehicleRepository vehicleRepository,
-            IInsurancePricingRepository insurancePricingRepository)
+            IInsurancePricingRepository insurancePricingRepository,
+            IClientRepository clientRepository,
+            IInsuranceRepository insuranceRepository)
         {
-            this.appDbContext = appDbContext;
             this.mapper = mapper;
             this.registrationVehicleRepository = registrationVehicleRepository;
             this.registrationCalculatorService = registrationCalculatorService;
             this.vehicleRepository = vehicleRepository;
             this.insurancePricingRepository = insurancePricingRepository;
+            this.clientRepository = clientRepository;
+            this.insuranceRepository = insuranceRepository;
         }
 
         public async Task<RepositoryResult<bool>>
-            ValidateRegistrationCreateRequestAsync(CreateRegistrationVehicleRequestDto request)
+            ValidateRegistrationCreateRequestAsync(CreateRegistrationVehicleRequestDto request,
+            Vehicle vehicle, InsurancePrice? insurancePrice)
         {
 
-
-            if (await appDbContext.Registrations.AnyAsync(x => x.VehicleId == request.VehicleId))
+            if(await registrationVehicleRepository.ExistsAsync(x => x.VehicleId == request.VehicleId))
             {
                 return RepositoryResult<bool>.Fail("VEHICLE_ALREADY_REGISTERED: " +
                     "Registration cannot be done because vehicle is already registered");
             }
 
-            if(await appDbContext.Registrations.AnyAsync(x=>x.LicensePlate == request.LicensePlate))
+            if(await registrationVehicleRepository.ExistsAsync(x=>x.LicensePlate == request.LicensePlate))
             {
                 return RepositoryResult<bool>.Fail("PLATE_NUMBER_EXISTS: " +
                     "Registration cannot be done because vehicle plate already exists");
             }
 
-            if (request.RegistrationDate > DateTime.Now)
+            if (request.RegistrationDate > DateTime.UtcNow)
             {
                 return RepositoryResult<bool>.Fail("REGISTRATION_INVALID_DATE: " +
                     "Date of registration cannot be in the future");
             }
 
-            if (!await appDbContext.Vehicles.AnyAsync(x => x.Id == request.VehicleId))
+            if (!await vehicleRepository.ExistsAsync(x => x.Id == request.VehicleId))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_VEHICLE_INVALID_ID: " +
                     $"Vehicle with the id {request.VehicleId} doesnt exist");
             }
 
-            if(!await appDbContext.Clients.AnyAsync(x=> x.Id == request.ClientId))
+            if(!await clientRepository.ExistsAsync(x=> x.Id == request.ClientId))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_CLIENT_INVALID_ID: " +
-                    $"Client with the id {request.ClientId} doesnt exist");
+                    $"Client with the id {request.ClientId} doesn't exist");
+            }
+
+            if(!await insuranceRepository.ExistsAsync(x => x.Id == request.InsuranceId))
+            {
+                return RepositoryResult<bool>.Fail($"REGISTRATION_INSURANCE_INVALID_ID: " +
+                    $"Insurance with the id {request.InsuranceId} doesn't exist");
+            }
+
+            if (vehicle == null)
+            {
+                return RepositoryResult<bool>.Fail($"REGISTRATION_VEHICLE_INVALID_ID: " +
+                    $"Vehicle with the id {request.VehicleId} doesnt exist");
+            }
+
+            if (insurancePrice == null)
+            {
+                return RepositoryResult<bool>.Fail($"REGISTRATION_INSURANCE_PRICE_INVALID_ID: " +
+                    $"Insurance price for the given insurance isn't established yet");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -73,7 +96,19 @@ namespace VehicleRegistrationSystem.Services.Implementation
         public async Task<RepositoryResult<RegistrationVehicleDto>>
             CreateRegistrationAsync(CreateRegistrationVehicleRequestDto request)
         {
-            var validationResult = await ValidateRegistrationCreateRequestAsync(request);
+            var vehicle = await vehicleRepository.GetByIdAsync(request.VehicleId);
+
+            if(vehicle == null)
+            {
+                return RepositoryResult<RegistrationVehicleDto>.Fail(
+                    $"REGISTRATION_VEHICLE_INVALID_ID: Vehicle doesn't exist");
+            }
+
+            var insurancePrice = await insurancePricingRepository.GetByInsuranceIdAsync
+                (request.InsuranceId, vehicle.EnginePowerKw);
+
+            var validationResult = await ValidateRegistrationCreateRequestAsync
+                (request, vehicle, insurancePrice);
 
             if (!validationResult.Success)
             {
@@ -81,11 +116,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
             }
 
             var domainRegistration = mapper.Map<Registration>(request);
-
-            var vehicle = await vehicleRepository.GetVehicleByIdAsync(request.VehicleId);
-            int vehicleAge = DateTime.Now.Year - vehicle.ProductionYear;
-            var insurancePrice = 
-                await insurancePricingRepository.GetByInsuranceIdAsync(request.InsuranceId, vehicle.EnginePowerKw);
+            int vehicleAge = DateTime.UtcNow.Year - vehicle.ProductionYear;
 
             domainRegistration.ExpirationDate = domainRegistration.RegistrationDate.AddMonths(12);
 
@@ -95,8 +126,25 @@ namespace VehicleRegistrationSystem.Services.Implementation
                  vehicleAge,
                  vehicle.FuelType);
 
-            domainRegistration = await registrationVehicleRepository.AddRegistrationAsync(domainRegistration);
+            try
+            {
+                domainRegistration = await registrationVehicleRepository.AddAsync(domainRegistration);
+            }
+            catch(DbUpdateException ex)
+            {
+                if(ex.InnerException?.Message.Contains("UQ_Registration_VehicleId") == true)
+                {
+                    return RepositoryResult<RegistrationVehicleDto>.Fail("Vehicle already registered");
+                }
 
+                if(ex.InnerException?.Message.Contains("UQ_Registration_LicensePlate") == true)
+                {
+                    return RepositoryResult<RegistrationVehicleDto>.Fail("License plate already exists");
+                }
+
+                throw;
+            }
+            
             var registration = await registrationVehicleRepository.GetByIdAsync(domainRegistration.Id);
 
             var response = mapper.Map<RegistrationVehicleDto>(registration);
@@ -107,7 +155,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>?> ValidateRegistrationDeleteRequestAsync(Guid id)
         {
-            if (!await appDbContext.Registrations.AnyAsync(x => x.Id == id))
+            if (!await registrationVehicleRepository.ExistsAsync(x => x.Id == id))
             {
                 return RepositoryResult<bool>.Fail
                     ($"REGISTRATION_INVALID_ID: Registration with the id {id} doesnt exist");
@@ -137,13 +185,13 @@ namespace VehicleRegistrationSystem.Services.Implementation
             ValidateRegistrationUpdateRequestAsync(UpdateRegistrationVehicleRequestDto request)
         {
 
-            if (!await appDbContext.Registrations.AnyAsync(x => x.Id == request.Id))
+            if (!await registrationVehicleRepository.ExistsAsync(x => x.Id == request.Id))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_INVALID_ID: " +
                     $"Registration with the id {request.Id} not found");
             }
 
-            if (await appDbContext.Registrations.AnyAsync
+            if (await registrationVehicleRepository.ExistsAsync
                 (x => x.VehicleId == request.VehicleId && x.Id!=request.Id))
             {
                 return RepositoryResult<bool>.Fail("VEHICLE_ALREADY_REGISTERED: " +
@@ -155,13 +203,13 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 return RepositoryResult<bool>.Fail("REGISTRATION_INVALID_DATE: Date of registration cannot be in the future");
             }
 
-            if (!await appDbContext.Vehicles.AnyAsync(x => x.Id == request.VehicleId))
+            if (!await vehicleRepository.ExistsAsync(x => x.Id == request.VehicleId))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_VEHICLE_INVALID_ID: " +
                     $"Vehicle with the id {request.VehicleId} doesnt exist");
             }
 
-            if (!await appDbContext.Clients.AnyAsync(x => x.Id == request.ClientId))
+            if (!await clientRepository.ExistsAsync(x => x.Id == request.ClientId))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_CLIENT_INVALID_ID: " +
                     $"Client with the id {request.ClientId} doesnt exist");
@@ -207,7 +255,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>?> ValidateGetByIdAsync(Guid id)
         {
-            if(!await appDbContext.Registrations.AnyAsync(x=>x.Id == id))
+            if(!await registrationVehicleRepository.ExistsAsync(x=>x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"REGISTRATION_INVALID_ID: " +
                     $"Registration with the id {id} not found");

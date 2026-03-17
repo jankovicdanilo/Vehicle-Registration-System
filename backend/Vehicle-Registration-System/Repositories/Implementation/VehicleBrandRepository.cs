@@ -2,58 +2,13 @@
 using VehicleRegistrationSystem.Models.Domain;
 using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Repositories.Common;
 
 namespace VehicleRegistrationSystem.Repositories.Implementation
 {
-    public class VehicleBrandRepository: IVehicleBrandRepository
+    public class VehicleBrandRepository: RepositoryBase<VehicleBrand>, IVehicleBrandRepository
     {
-        private readonly VehicleRegistrationDbContext appDbContext;
-
-        public VehicleBrandRepository(VehicleRegistrationDbContext appDbContext)
-        {
-            this.appDbContext = appDbContext;
-        }
-
-        public async Task<VehicleBrand> AddAsync(VehicleBrand vehicleBrand)
-        {
-            await appDbContext.VehicleBrands.AddAsync(vehicleBrand);
-            await appDbContext.SaveChangesAsync();
-
-            await appDbContext.Entry(vehicleBrand).Reference(m => m.VehicleType).LoadAsync();
-
-            return vehicleBrand;
-
-        }
-
-        public async Task<VehicleBrand?> DeleteAsync(Guid id)
-        {
-            var vehicleBrand = await appDbContext.VehicleBrands.
-                Include(x=>x.VehicleType).FirstOrDefaultAsync(x => x.Id == id);
-
-            if(vehicleBrand == null)
-            {
-                return null;
-            }
-
-            appDbContext.VehicleBrands.Remove(vehicleBrand);
-            await appDbContext.SaveChangesAsync();
-
-            return vehicleBrand;
-        }
-
-        public async Task<VehicleBrand?> GetByIdAsync(Guid id)
-        {
-            var vehicleBrand = await appDbContext.VehicleBrands.FirstOrDefaultAsync(x=>x.Id==id);
-
-            if (vehicleBrand == null)
-            {
-                return null;
-            }
-
-            await appDbContext.Entry(vehicleBrand).Reference(m => m.VehicleType).LoadAsync();
-
-            return vehicleBrand;
-        }
+        public VehicleBrandRepository(VehicleRegistrationDbContext appDbContext) : base(appDbContext) { }
 
         public async Task<List<VehicleBrand>> ListByTypeId(Guid id)
         {

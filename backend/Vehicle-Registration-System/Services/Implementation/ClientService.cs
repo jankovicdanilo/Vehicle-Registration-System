@@ -6,40 +6,50 @@ using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Results;
 using VehicleRegistrationSystem.Services.Interface;
 using VehicleRegistrationSystem.Data;
-using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Repositories.Implementation;
 
 namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class ClientService : IClientService
     {
-        private readonly VehicleRegistrationDbContext appDbContext;
         private readonly IMapper mapper;
         private readonly IClientRepository clientRepository;
+        private readonly ILogger<ClientService> logger;
+        private readonly IRegistrationVehicleRepository registrationVehicleRepository;
 
-        public ClientService(VehicleRegistrationDbContext appDbContext, 
-            IMapper mapper, IClientRepository clientRepository)
+        public ClientService(IMapper mapper, IClientRepository clientRepository,
+            ILogger<ClientService> logger, IRegistrationVehicleRepository registrationVehicleRepository)
         {
-            this.appDbContext = appDbContext;
             this.mapper = mapper;
             this.clientRepository = clientRepository;
+            this.logger = logger;
+            this.registrationVehicleRepository = registrationVehicleRepository;
         }
 
         public async Task<RepositoryResult<bool>> ValidateClientCreateRequestAsync(CreateClientRequestDto request)
         {
-            if (await appDbContext.Clients.AnyAsync(x => x.NationalId == request.NationalId))
+            if (await clientRepository.ExistsAsync(x => x.NationalId == request.NationalId))
             {
+                logger.LogWarning
+                    ("Client creation failed: NationalId {NationalId} already exists", request.NationalId);
+
                 return RepositoryResult<bool>.Fail
                     ("JMBG_EXISTS: A client with this social security number already exists");
             }
 
-            if (await appDbContext.Clients.AnyAsync(x => x.IdCardNumber == request.IdCardNumber))
+            if (await clientRepository.ExistsAsync(x => x.IdCardNumber == request.IdCardNumber))
             {
+                logger.LogWarning
+                    ("Client creation failed: IdCardNumber {IdCardNumber} already exists", request.IdCardNumber);
+
                 return RepositoryResult<bool>.Fail
                     ("ID_CARD_EXISTS: A client with this ID card number already exists");
             }
 
-            if (await appDbContext.Clients.AnyAsync(x => x.Email == request.Email))
+            if (await clientRepository.ExistsAsync(x => x.Email == request.Email))
             {
+                logger.LogWarning("Client creation failed: Email {Email} already exists", request.Email);
+
                 return RepositoryResult<bool>.Fail
                     ("EMAIL_EXISTS: A client with this email adress already exists");
             }
@@ -49,37 +59,45 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<ClientDto>> CreateClientAsync(CreateClientRequestDto request)
         {
+            logger.LogInformation("Starting client creation for email {Email}", request.Email);
+
             var validationResult = await ValidateClientCreateRequestAsync(request);
 
             if (!validationResult.Success)
             {
+                logger.LogWarning("Client creation validation failed for email {Email}: {Message}",
+                    request.Email, validationResult.Message);
+
                 return RepositoryResult<ClientDto>.Fail(validationResult.Message);
             }
 
             var clientDomain = mapper.Map<Client>(request);
 
-            clientDomain = await clientRepository.AddClientAsync(clientDomain);
+            clientDomain = await clientRepository.AddAsync(clientDomain);
 
             var response = mapper.Map<ClientDto>(clientDomain);
+
+            logger.LogInformation("Client successfully created with ID {ClientId}", response.Id);
 
             return RepositoryResult<ClientDto>.Ok(response, "Client successfully created!");
         }
 
         public async Task<RepositoryResult<bool>> ValidateClientDeleteRequestAsync(Guid id)
         {
-            var exists = await appDbContext.Clients.AnyAsync(x=>x.Id == id);
+            var exists = await clientRepository.ExistsAsync(x => x.Id == id);
 
             if(!exists)
             {
                 return RepositoryResult<bool>.Fail($"CLIENT_NOT_FOUND: Client with the Id {id} was not found");
             }
 
-            var isOwner = await appDbContext.Registrations.AnyAsync(x=>x.ClientId == id);
+            var isOwner = await registrationVehicleRepository.ExistsAsync(x => x.ClientId == id);
 
             if (isOwner)
             {
                 return RepositoryResult<bool>.Fail
-                    ("CLIENT_REGISTRATION_EXISTS: Client can't be deleted because his registration still exists");
+                    ("CLIENT_REGISTRATION_EXISTS: Client can't be deleted because vehicles are " +
+                    "still registered under this client.");
             }
 
             return RepositoryResult<bool>.Ok(true);
@@ -94,7 +112,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 return RepositoryResult<ClientDto>.Fail(validationResult.Message);
             }
 
-            var existingClient = await clientRepository.DeleteClientAsync(id);
+            var existingClient = await clientRepository.DeleteAsync(id);
 
             var response = mapper.Map<ClientDto>(existingClient);
 
@@ -103,7 +121,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateClientUpdateRequestAsync(UpdateClientRequestDto request)
         {
-            var exists = await appDbContext.Clients.AnyAsync(x => x.Id == request.Id);
+            var exists = await clientRepository.ExistsAsync(x => x.Id == request.Id);
 
             if (!exists)
             {
@@ -111,20 +129,20 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     ($"CLIENT_NOT_FOUND: Client with the Id {request.Id} was not found");
             }
 
-            if (await appDbContext.Clients.AnyAsync(x => x.NationalId == request.NationalId && x.Id!=request.Id))
+            if (await clientRepository.ExistsAsync(x => x.NationalId == request.NationalId && x.Id!=request.Id))
             {
                 return RepositoryResult<bool>.Fail
                     ("NationalId_EXISTS: A client with this social security number already exists");
             }
 
-            if (await appDbContext.Clients.AnyAsync
+            if (await clientRepository.ExistsAsync
                 (x => x.IdCardNumber == request.IdCardNumber && x.Id != request.Id))
             {
                 return RepositoryResult<bool>.Fail
                     ("ID_CARD_EXISTS: A client with this ID card number already exists");
             }
 
-            if (await appDbContext.Clients.AnyAsync(x => x.Email == request.Email && x.Id != request.Id))
+            if (await clientRepository.ExistsAsync(x => x.Email == request.Email && x.Id != request.Id))
             {
                 return RepositoryResult<bool>.Fail
                     ("EMAIL_EXISTS: A client with this email adress already exists");
@@ -168,7 +186,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateClientId(Guid id)
         {
-            if (!await appDbContext.Clients.AnyAsync(x => x.Id == id))
+            if (!await clientRepository.ExistsAsync(x => x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"CLIENT_NOT_FOUND, Client with the Id {id} was not found");
             }
@@ -185,7 +203,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 return RepositoryResult<ClientDto>.Fail(validationResult.Message);
             }
 
-            var clientDomain = await clientRepository.GetClientByIdAsync(id);
+            var clientDomain = await clientRepository.GetByIdAsync(id);
 
             var response = mapper.Map<ClientDto>(clientDomain);
 

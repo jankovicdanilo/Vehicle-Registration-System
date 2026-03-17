@@ -11,23 +11,23 @@ namespace VehicleRegistrationSystem.Services.Implementation
 {
     public class VehicleTypeService : IVehicleTypeService
     {
-        private readonly VehicleRegistrationDbContext appDbContext;
         private readonly IMapper mapper;
         private readonly IVehicleTypeRepository vehicleTypeRepository;
+        private readonly IVehicleBrandRepository vehicleBrandRepository;
 
-        public VehicleTypeService(VehicleRegistrationDbContext appDbContext, IMapper mapper, 
-            IVehicleTypeRepository vehicleTypeRepository)
+        public VehicleTypeService(IMapper mapper, IVehicleTypeRepository vehicleTypeRepository,
+            IVehicleBrandRepository vehicleBrandRepository)
         {
-            this.appDbContext = appDbContext;
             this.mapper = mapper;
             this.vehicleTypeRepository = vehicleTypeRepository;
+            this.vehicleBrandRepository = vehicleBrandRepository;
         }
 
         public async Task<RepositoryResult<bool>> 
             ValidateVehicleTypeCreateRequestAsync(CreateVehicleTypeRequestDto request)
         {
 
-            var existingCategory = await appDbContext.VehicleTypes.AnyAsync(x =>
+            var existingCategory = await vehicleTypeRepository.ExistsAsync(x =>
                 x.Category == request.Category);
 
 
@@ -37,7 +37,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     "The type of category already exists");
             }
 
-            var existingName = await appDbContext.VehicleTypes.AnyAsync(x => x.Name == request.Name);
+            var existingName = await vehicleTypeRepository.ExistsAsync(x => x.Name == request.Name);
 
             if (existingName)
             {
@@ -71,7 +71,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateVehicleTypeDeleteRequestAsync(Guid id)
         {
-            var hasBrands = await appDbContext.VehicleBrands.AnyAsync(x => x.VehicleTypeId == id);
+            var hasBrands = await vehicleBrandRepository.ExistsAsync(x => x.VehicleTypeId == id);
 
             if (hasBrands)
             {
@@ -79,7 +79,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     ("TYPE_HAS_BRANDS: Vehicle type cannot be deleted because it has associated brands.");
             }
 
-            var exists = await appDbContext.VehicleTypes.AnyAsync(x => x.Id == id);
+            var exists = await vehicleTypeRepository.ExistsAsync(x => x.Id == id);
 
             if (!exists)
             {
@@ -109,7 +109,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
         public async Task<RepositoryResult<bool>> 
             ValidateVehicleTypeUpdateRequestAsync(UpdateVehicleTypeRequestDto request)
         {
-            var exists = await appDbContext.VehicleTypes.AnyAsync(x => x.Id == request.Id);
+            var exists = await vehicleTypeRepository.ExistsAsync(x => x.Id == request.Id);
 
             if (!exists)
             {
@@ -117,7 +117,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     ($"VEHICLE_TYPE_NOT_FOUND: Vehicle with the id {request.Id} doesnt exist");
             }
 
-            var existingCategory = await appDbContext.VehicleTypes.AnyAsync(x =>
+            var existingCategory = await vehicleTypeRepository.ExistsAsync(x =>
                 x.Category == request.Category && x.Id!=request.Id);
 
 
@@ -127,7 +127,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     ("VEHICLE_TYPE_CATEGORY_EXISTS: The type of category already exists");
             }
 
-            var existingName = await appDbContext.VehicleTypes.AnyAsync
+            var existingName = await vehicleTypeRepository.ExistsAsync
                 (x => x.Name == request.Name && x.Id!=request.Id);
 
             if (existingName)
@@ -168,7 +168,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateVehicleTypeGetByIdAsync(Guid id)
         {
-            if(!await appDbContext.VehicleTypes.AnyAsync(x=>x.Id == id))
+            if(!await vehicleTypeRepository.ExistsAsync(x=>x.Id == id))
             {
                 return RepositoryResult<bool>.Fail
                     ($"VEHICLE_TYPE_NOT_FOUND: Vehicle type with the Id {id} was not found");

@@ -2,48 +2,13 @@
 using VehicleRegistrationSystem.Models.Domain;
 using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Repositories.Common;
 
 namespace VehicleRegistrationSystem.Repositories.Implementation
 {
-    public class VehicleRepository : IVehicleRepository
+    public class VehicleRepository : RepositoryBase<Vehicle>, IVehicleRepository
     {
-        private readonly VehicleRegistrationDbContext appDbContext;
-
-        public VehicleRepository(VehicleRegistrationDbContext appDbContext)
-        {
-            this.appDbContext = appDbContext;
-        }
-
-        public async Task<Vehicle> AddAsync(Vehicle vehicle)
-        {
-            await appDbContext.Vehicles.AddAsync(vehicle);
-            await appDbContext.SaveChangesAsync();
-
-            return await appDbContext.Vehicles.
-                Include(v => v.VehicleType).
-                Include(v => v.VehicleBrand).
-                Include(v => v.VehicleModel).
-                FirstOrDefaultAsync(v => v.Id == vehicle.Id);
-        }
-
-        public async Task<Vehicle?> DeleteVehicleAsync(Guid id)
-        {
-            var existingVehicle = await appDbContext.Vehicles.
-                Include(v=>v.VehicleType).
-                Include(v=>v.VehicleBrand).
-                Include(v=>v.VehicleModel).FirstOrDefaultAsync(x => x.Id == id);
-
-            if(existingVehicle ==  null)
-            {
-                return null;
-            }
-
-            appDbContext.Vehicles.Remove(existingVehicle);
-            await appDbContext.SaveChangesAsync();
-
-            return existingVehicle;
-            
-        }
+        public VehicleRepository(VehicleRegistrationDbContext appDbContext) : base(appDbContext) { }
 
         public async Task<(List<Vehicle> Items, int TotalCount)> GetAllAsync(string? searchQuery = null,
             int pageSize = 1000, int pageNumber = 1)
@@ -70,12 +35,12 @@ namespace VehicleRegistrationSystem.Repositories.Implementation
             return (items, totalCount); 
         }
 
-        public async Task<Vehicle?> GetVehicleByIdAsync(Guid id)
+        public async Task<bool> IsVehicleModelValidAsync(Guid modelId, Guid brandId, Guid typeId)
         {
-            return await appDbContext.Vehicles.Include(x => x.VehicleType).Include(x => x.VehicleBrand).
-                Include(x => x.VehicleModel).FirstOrDefaultAsync(x => x.Id == id);
-
-            
+            return await appDbContext.VehicleModels.Include(m => m.VehicleBrand)
+                .AnyAsync(m => m.Id == modelId &&
+                               m.VehicleBrandId == brandId &&
+                               m.VehicleBrand.VehicleTypeId == typeId);
         }
 
         public async Task<Vehicle?> UpdateVehicleAsync(Vehicle vehicle)

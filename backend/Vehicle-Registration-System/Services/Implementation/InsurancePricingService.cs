@@ -6,6 +6,7 @@ using VehicleRegistrationSystem.Results;
 using VehicleRegistrationSystem.Services.Interface;
 using VehicleRegistrationSystem.Data;
 using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Implementation;
 
 namespace VehicleRegistrationSystem.Services.Implementation
 {
@@ -13,19 +14,20 @@ namespace VehicleRegistrationSystem.Services.Implementation
     {
         private readonly IInsurancePricingRepository insurancePricingRepository;
         private readonly IMapper mapper;
-        private readonly VehicleRegistrationDbContext appDbContext;
+        private readonly IInsuranceRepository insuranceRepository;
 
-        public InsurancePricingService(IInsurancePricingRepository insurancePricingRepository, 
-            IMapper mapper, VehicleRegistrationDbContext appDbContext)
+        public InsurancePricingService(IInsurancePricingRepository insurancePricingRepository,
+            IMapper mapper,
+            IInsuranceRepository insuranceRepository)
         {
             this.insurancePricingRepository = insurancePricingRepository;
             this.mapper = mapper;
-            this.appDbContext = appDbContext;
+            this.insuranceRepository = insuranceRepository;
         }
 
         public async Task<RepositoryResult<bool>> ValidateCreateAsync(CreateInsurancePriceRequestDto request)
         {
-            if(!await appDbContext.Insurances.AnyAsync(x=>x.Id == request.InsuranceId))
+            if(!await insuranceRepository.ExistsAsync(x=>x.Id == request.InsuranceId))
             {
                 return RepositoryResult<bool>.Fail($"INVALID_Insurance_ID: Insurance" +
                     $" with the id {request.InsuranceId} not found");
@@ -45,7 +47,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             var insurancePriceDomain = mapper.Map<InsurancePrice>(request);
 
-            insurancePriceDomain = await insurancePricingRepository.CreateAsync(insurancePriceDomain);
+            insurancePriceDomain = await insurancePricingRepository.AddAsync(insurancePriceDomain);
 
             var response = mapper.Map<InsurancePriceDto>(insurancePriceDomain);
 
@@ -68,7 +70,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateGetByIdAsync(Guid id)
         {
-            if(!await appDbContext.InsurancePrices.AnyAsync(x=>x.Id == id))
+            if(!await insurancePricingRepository.ExistsAsync(x=>x.Id == id))
             {
                 return RepositoryResult<bool>.Fail($"INSURANCE_PRICE_ID_INVALID: Insurance price with the" +
                     $" id {id} not found");
@@ -95,7 +97,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<RepositoryResult<bool>> ValidateGetByInsuranceIdAsync(Guid id)
         {
-            if (!await appDbContext.InsurancePrices.AnyAsync(x => x.InsuranceId == id))
+            if (!await insurancePricingRepository.ExistsAsync(x => x.InsuranceId == id))
             {
                 return RepositoryResult<bool>.Fail
                     ($"INSURANCE_PRICE_INSURANCEID_INVALID: Insurance price with the" +

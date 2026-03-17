@@ -1,19 +1,16 @@
 ﻿using VehicleRegistrationSystem.Models.Domain;
 using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Common;
 
 namespace VehicleRegistrationSystem.Repositories.Interface
 {
-    public interface IVehicleRepository
+    public interface IVehicleRepository : IRepositoryBase<Vehicle>
     {
-        Task<Vehicle> AddAsync(Vehicle vehicle);
-
         Task<(List<Vehicle> Items, int TotalCount)> GetAllAsync
             (string? searchQuery = null, int pageSize = 1000, int pageNumber = 1);
 
-        Task<Vehicle?> GetVehicleByIdAsync(Guid id);
-
-        Task<Vehicle?> DeleteVehicleAsync(Guid id);
-
         Task<Vehicle?> UpdateVehicleAsync(Vehicle vehicle);
+
+        Task<bool> IsVehicleModelValidAsync(Guid modelId, Guid brandId, Guid typeId);
     }
 }

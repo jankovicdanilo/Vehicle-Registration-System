@@ -1,17 +1,12 @@
 ﻿using VehicleRegistrationSystem.Models.Domain;
 using VehicleRegistrationSystem.Models.Domain;
+using VehicleRegistrationSystem.Repositories.Common;
 
 namespace VehicleRegistrationSystem.Repositories.Interface
 {
-    public interface IInsuranceRepository
+    public interface IInsuranceRepository : IRepositoryBase<Insurance>
     {
-        Task<Insurance> CreateInsuranceAsync(Insurance insurance);
-
         Task<List<Insurance>> GetAllAsync();
-
-        Task<Insurance?> GetInsuranceByIdAsync(Guid id);
-
-        Task<Insurance?> DeleteAsync(Guid id);
 
         Task<Insurance?> UpdateAsync(Insurance request);
     }

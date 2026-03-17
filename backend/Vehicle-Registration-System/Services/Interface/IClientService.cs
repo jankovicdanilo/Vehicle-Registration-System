@@ -1,6 +1,5 @@
 ﻿using VehicleRegistrationSystem.Models.DTO;
 using VehicleRegistrationSystem.Results;
-using VehicleRegistrationSystem.Models.DTO;
 
 namespace VehicleRegistrationSystem.Services.Interface
 {

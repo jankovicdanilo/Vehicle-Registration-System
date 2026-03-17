@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VehicleRegistrationSystem.Data;
 
@@ -11,9 +12,11 @@ using VehicleRegistrationSystem.Data;
 namespace VehicleRegistrationSystem.Migrations
 {
     [DbContext(typeof(VehicleRegistrationDbContext))]
-    partial class VehicleRegistrationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260317144202_AddUniqueConstraintsToRegistration")]
+    partial class AddUniqueConstraintsToRegistration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -200,12 +203,10 @@ namespace VehicleRegistrationSystem.Migrations
                     b.HasIndex("InsuranceId");
 
                     b.HasIndex("LicensePlate")
-                        .IsUnique()
-                        .HasDatabaseName("UQ_Registration_LicensePlate");
+                        .IsUnique();
 
                     b.HasIndex("VehicleId")
-                        .IsUnique()
-                        .HasDatabaseName("UQ_Registration_VehicleId");
+                        .IsUnique();
 
                     b.ToTable("Registrations");
 

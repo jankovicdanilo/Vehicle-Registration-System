@@ -47,7 +47,8 @@ namespace VehicleRegistrationSystem.Services.Implementation
             return kw * pricePerKw;
         }
 
-        public decimal CalculateRegistrationPrice(int kw,decimal pricePerKw, decimal cm3, int vehicleAge, string ecoClass)
+        public decimal CalculateRegistrationPrice(int kw,decimal pricePerKw, decimal cm3,
+            int vehicleAge, string ecoClass)
         {
             return CalculateInspection + 
                    CalculateAdminFee + 
