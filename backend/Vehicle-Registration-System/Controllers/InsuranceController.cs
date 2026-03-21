@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Models.DTO.Common;
 using VehicleRegistrationSystem.Models.DTO.Insurance;
 using VehicleRegistrationSystem.Services.Interface;
 
@@ -41,7 +42,7 @@ namespace VehicleRegistrationSystem.Controllers
             {
                 var parts = result.Message.Split(":", 2);
 
-                return BadRequest(new ApiError
+                return BadRequest(new Models.DTO.Common.ApiError
                 {
                     ErrorCode = parts?[0],
                     Message = parts?[1].Length > 1 ? parts[1] : result.Message

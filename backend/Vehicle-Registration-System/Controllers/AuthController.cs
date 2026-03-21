@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VehicleRegistrationSystem.Models.DTO;
 using VehicleRegistrationSystem.Models.DTO.Auth;
+using VehicleRegistrationSystem.Models.DTO.Common;
 using VehicleRegistrationSystem.Services.Interface;
 
 namespace VehicleRegistrationSystem.Controllers

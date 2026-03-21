@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Models.DTO.Common;
 using VehicleRegistrationSystem.Models.DTO.Vehicle;
 using VehicleRegistrationSystem.Services.Interface;
 

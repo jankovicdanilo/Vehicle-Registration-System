@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuestPDF.Fluent;
 using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Models.DTO.Common;
 using VehicleRegistrationSystem.Models.DTO.Registration;
 using VehicleRegistrationSystem.Services.Interface;
 
