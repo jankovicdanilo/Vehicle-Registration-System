@@ -7,12 +7,12 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using VehicleRegistrationSystem.Data;
 using VehicleRegistrationSystem.Mappings;
-using VehicleRegistrationSystem.Models.DTO;
 using VehicleRegistrationSystem.Repositories.Implementation;
 using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Services.Implementation;
 using VehicleRegistrationSystem.Services.Interface;
 using Serilog;
+using VehicleRegistrationSystem.Models.DTO.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 

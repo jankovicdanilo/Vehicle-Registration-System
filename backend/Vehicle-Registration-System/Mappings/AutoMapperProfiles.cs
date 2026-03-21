@@ -1,9 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using VehicleRegistrationSystem.Models.Domain;
-using VehicleRegistrationSystem.Models.DTO;
 using VehicleRegistrationSystem.Models.Domain;
-using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Models.DTO.Vehicle;
+using VehicleRegistrationSystem.Models.DTO.Client;
+using VehicleRegistrationSystem.Models.DTO.VehicleBrand;
+using VehicleRegistrationSystem.Models.DTO.VehicleModel;
+using VehicleRegistrationSystem.Models.DTO.VehicleType;
+using VehicleRegistrationSystem.Models.DTO.Insurance;
+using VehicleRegistrationSystem.Models.DTO.InsurancePricing;
+using VehicleRegistrationSystem.Models.DTO.Registration;
+using VehicleRegistrationSystem.Models.DTO.Auth;
 
 namespace VehicleRegistrationSystem.Mappings
 {

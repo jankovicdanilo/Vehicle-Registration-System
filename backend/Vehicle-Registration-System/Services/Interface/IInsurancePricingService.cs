@@ -1,4 +1,4 @@
-﻿using VehicleRegistrationSystem.Models.DTO;
+﻿using VehicleRegistrationSystem.Models.DTO.InsurancePricing;
 using VehicleRegistrationSystem.Results;
 
 namespace VehicleRegistrationSystem.Services.Interface

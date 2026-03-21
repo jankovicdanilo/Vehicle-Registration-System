@@ -1,4 +1,4 @@
-﻿using VehicleRegistrationSystem.Models.DTO;
+﻿using VehicleRegistrationSystem.Models.DTO.VehicleType;
 using VehicleRegistrationSystem.Results;
 
 namespace VehicleRegistrationSystem.Services.Interface

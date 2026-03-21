@@ -1,5 +1,5 @@
 ﻿using VehicleRegistrationSystem.Models.Domain;
-using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Models.DTO.Registration;
 using VehicleRegistrationSystem.Results;
 
 namespace VehicleRegistrationSystem.Services.Interface

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Models.DTO.Insurance;
 using VehicleRegistrationSystem.Services.Interface;
 
 namespace VehicleRegistrationSystem.Controllers

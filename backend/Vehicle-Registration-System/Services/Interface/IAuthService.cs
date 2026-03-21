@@ -1,6 +1,6 @@
-﻿using VehicleRegistrationSystem.Models.DTO;
-using VehicleRegistrationSystem.Results;
+﻿using VehicleRegistrationSystem.Results;
 using System.Security.Claims;
+using VehicleRegistrationSystem.Models.DTO.Auth;
 
 namespace VehicleRegistrationSystem.Services.Interface
 {

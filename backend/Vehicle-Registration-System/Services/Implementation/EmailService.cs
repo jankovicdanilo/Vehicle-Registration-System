@@ -2,8 +2,8 @@
 using MimeKit;
 using VehicleRegistrationSystem.Services.Interface;
 using MailKit.Net.Smtp;
-using VehicleRegistrationSystem.Models.DTO;
 using Microsoft.Extensions.Options;
+using VehicleRegistrationSystem.Models.DTO.Common;
 
 namespace VehicleRegistrationSystem.Services.Implementation
 {

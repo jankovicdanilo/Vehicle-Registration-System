@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using VehicleRegistrationSystem.Models.Domain;
-using VehicleRegistrationSystem.Models.DTO;
 using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Results;
 using VehicleRegistrationSystem.Services.Interface;
 using VehicleRegistrationSystem.Data;
 using VehicleRegistrationSystem.Repositories.Implementation;
+using VehicleRegistrationSystem.Models.DTO.Client;
 
 namespace VehicleRegistrationSystem.Services.Implementation
 {

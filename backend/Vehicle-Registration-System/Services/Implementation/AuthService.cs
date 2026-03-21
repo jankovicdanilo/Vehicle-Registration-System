@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using VehicleRegistrationSystem.Models.DTO;
 using VehicleRegistrationSystem.Results;
 using VehicleRegistrationSystem.Services.Interface;
 using System.Security.Claims;
 using VehicleRegistrationSystem.Data;
+using VehicleRegistrationSystem.Models.DTO.Auth;
 
 namespace VehicleRegistrationSystem.Services.Implementation
 {

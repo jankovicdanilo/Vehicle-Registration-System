@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using VehicleRegistrationSystem.Models.DTO;
+using VehicleRegistrationSystem.Models.DTO.Client;
 using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Services.Interface;
 
