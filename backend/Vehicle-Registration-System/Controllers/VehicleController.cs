@@ -18,7 +18,7 @@ namespace VehicleRegistrationSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List([FromQuery] string? searchQuery, [FromQuery] int pageSize = 1000,
+        public async Task<IActionResult> List([FromQuery] string? searchQuery, [FromQuery] int pageSize = 10,
             [FromQuery] int pageNumber = 1)
         {
             var result = await vehicleService.GetAllAsync(searchQuery, pageSize, pageNumber);

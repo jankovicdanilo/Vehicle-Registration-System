@@ -3,36 +3,91 @@ using VehicleRegistrationSystem.Models.Domain;
 using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Data;
 using VehicleRegistrationSystem.Repositories.Common;
+using VehicleRegistrationSystem.Models.DTO.Vehicle;
+using Microsoft.Data.SqlClient;
+using Dapper;
 
 namespace VehicleRegistrationSystem.Repositories.Implementation
 {
     public class VehicleRepository : RepositoryBase<Vehicle>, IVehicleRepository
     {
-        public VehicleRepository(VehicleRegistrationDbContext appDbContext) : base(appDbContext) { }
+        private readonly string? connectionString;
 
-        public async Task<(List<Vehicle> Items, int TotalCount)> GetAllAsync(string? searchQuery = null,
-            int pageSize = 1000, int pageNumber = 1)
+        public VehicleRepository(VehicleRegistrationDbContext appDbContext,
+            IConfiguration configuration) : base(appDbContext) 
         {
-            var query = appDbContext.Vehicles
-                .Include(x => x.VehicleType)
-                .Include(x => x.VehicleBrand)
-                .Include(x => x.VehicleModel)
-                .AsQueryable();
+            connectionString = configuration.GetConnectionString("VehicleRegistrationDbConnectionString");
+        }
 
+        public async Task<(List<VehicleListItemDto> Items, int TotalCount)> GetAllAsync(
+        string? searchQuery = null,
+        int pageNumber = 1,
+        int pageSize = 10)
+        {
+            using var connection = new SqlConnection(connectionString);
 
-            if (string.IsNullOrWhiteSpace(searchQuery) == false)
+            var offset = (pageNumber - 1) * pageSize;
+
+            var sql = @"
+    WITH Filtered AS (
+        SELECT 
+            v.Id, 
+            v.ProductionYear, 
+            v.EngineCapacity,
+            v.EnginePowerKw,
+            v.ChassisNumber, 
+            vt.Name AS VehicleTypeName,
+            vb.Name AS VehicleBrandName, 
+            vm.Name AS VehicleModelName
+        FROM Vehicles v 
+        JOIN VehicleTypes vt ON v.VehicleTypeId = vt.Id
+        JOIN VehicleBrands vb ON vb.Id = v.VehicleBrandId
+        JOIN VehicleModels vm ON vm.Id = v.VehicleModelId
+        WHERE (@search IS NULL OR
+               vt.Name LIKE '%' + @search + '%' OR
+               vb.Name LIKE '%' + @search + '%' OR
+               vm.Name LIKE '%' + @search + '%')
+    )
+
+    SELECT 
+        Id,
+        ProductionYear,
+        EngineCapacity,
+        EnginePowerKw,
+        ChassisNumber,
+        VehicleTypeName,
+        VehicleBrandName,
+        VehicleModelName
+    FROM Filtered
+    ORDER BY Id
+    OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
+
+    WITH Filtered AS (
+        SELECT v.Id
+        FROM Vehicles v 
+        JOIN VehicleTypes vt ON v.VehicleTypeId = vt.Id
+        JOIN VehicleBrands vb ON vb.Id = v.VehicleBrandId
+        JOIN VehicleModels vm ON vm.Id = v.VehicleModelId
+        WHERE (@search IS NULL OR
+               vt.Name LIKE '%' + @search + '%' OR
+               vb.Name LIKE '%' + @search + '%' OR
+               vm.Name LIKE '%' + @search + '%')
+    )
+
+    SELECT COUNT(*) FROM Filtered;
+";
+
+            using var multi = await connection.QueryMultipleAsync(sql, new
             {
-                query = query.Where(x => x.VehicleType.Name.Contains(searchQuery) ||
-                x.VehicleBrand.Name.Contains(searchQuery) ||
-                x.VehicleModel.Name.Contains(searchQuery) ||
-                x.VehicleType.Name.Contains(searchQuery));
-            }
+                search = searchQuery,
+                offset,
+                pageSize
+            });
 
-            
-            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
-            var totalCount = await query.CountAsync();
+            var items = (await multi.ReadAsync<VehicleListItemDto>()).ToList();
+            var totalCount = await multi.ReadFirstAsync<int>();
 
-            return (items, totalCount); 
+            return (items, totalCount);
         }
 
         public async Task<bool> IsVehicleModelValidAsync(Guid modelId, Guid brandId, Guid typeId)
