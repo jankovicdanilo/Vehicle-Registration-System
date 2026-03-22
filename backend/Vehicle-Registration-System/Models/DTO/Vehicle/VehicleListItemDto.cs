@@ -12,6 +12,8 @@
 
         public string ChassisNumber { get; set; }
 
+        public string FuelType { get; set; }
+
         public string VehicleTypeName { get; set; }
 
         public string VehicleBrandName { get; set; }

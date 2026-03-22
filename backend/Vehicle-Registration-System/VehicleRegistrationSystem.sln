@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36915.13 d17.14
+VisualStudioVersion = 17.14.36915.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRegistrationSystem", "VehicleRegistrationSystem.csproj", "{B5B9D8E5-BC17-3A81-85AC-6FE790E8F85F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRegistrationSystem.Tests", "..\VehicleRegistrationSystem.Tests\VehicleRegistrationSystem.Tests.csproj", "{DC6E6CE5-E2A4-47AC-9CD4-B78A9C37E8ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{B5B9D8E5-BC17-3A81-85AC-6FE790E8F85F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5B9D8E5-BC17-3A81-85AC-6FE790E8F85F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5B9D8E5-BC17-3A81-85AC-6FE790E8F85F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC6E6CE5-E2A4-47AC-9CD4-B78A9C37E8ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC6E6CE5-E2A4-47AC-9CD4-B78A9C37E8ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC6E6CE5-E2A4-47AC-9CD4-B78A9C37E8ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC6E6CE5-E2A4-47AC-9CD4-B78A9C37E8ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -169,19 +169,19 @@ namespace VehicleRegistrationSystem.Services.Implementation
             return RepositoryResult<ClientDto>.Ok(response, "Client successfully updated!");
         }
 
-        public async Task<RepositoryResult<PagedResult<ClientDto>>> GetClientsAsync
-            (string? searchQuery = null, int pageNumber = 1, int pageSize = 1000)
+        public async Task<RepositoryResult<PagedResult<ClientListItemDto>>> GetClientsAsync
+            (string? searchQuery = null, int pageNumber = 1, int pageSize = 10)
         {
             var (clients, totalCount) = await clientRepository.GetAllAsync(searchQuery, pageNumber, pageSize);
 
-            var response = new PagedResult<ClientDto>
+            var response = new PagedResult<ClientListItemDto>
             {
-                Items = mapper.Map<List<ClientDto>>(clients),
+                Items = clients,
                 TotalCount = totalCount
             };
 
 
-            return RepositoryResult<PagedResult<ClientDto>>.Ok(response, "Clients loaded successfully");
+            return RepositoryResult<PagedResult<ClientListItemDto>>.Ok(response, "Clients loaded successfully");
         }
 
         public async Task<RepositoryResult<bool>> ValidateClientId(Guid id)

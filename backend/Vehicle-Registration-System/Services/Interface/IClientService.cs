@@ -19,8 +19,8 @@ namespace VehicleRegistrationSystem.Services.Interface
 
         Task<RepositoryResult<ClientDto>> UpdateClientAsync(UpdateClientRequestDto request);
 
-        Task<RepositoryResult<PagedResult<ClientDto>>> GetClientsAsync
-            (string? searchQuery = null, int pageNumber = 1, int pageSize = 1000);
+        Task<RepositoryResult<PagedResult<ClientListItemDto>>> GetClientsAsync
+            (string? searchQuery = null, int pageNumber = 1, int pageSize = 10);
 
         Task<RepositoryResult<ClientDto>> GetClientByIdAsync(Guid id);
 

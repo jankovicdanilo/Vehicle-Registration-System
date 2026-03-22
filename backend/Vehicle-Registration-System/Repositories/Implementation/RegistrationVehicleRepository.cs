@@ -5,48 +5,105 @@ using VehicleRegistrationSystem.Services.Interface;
 using VehicleRegistrationSystem.Data;
 using VehicleRegistrationSystem.Repositories.Common;
 using System.Formats.Tar;
+using VehicleRegistrationSystem.Models.DTO.Registration;
+using Microsoft.Data.SqlClient;
+using Dapper;
 
 namespace VehicleRegistrationSystem.Repositories.Implementation
 {
     public class RegistrationVehicleRepository : RepositoryBase<Registration>, IRegistrationVehicleRepository
     {
+        private readonly string connectionString;
 
         public RegistrationVehicleRepository
             (VehicleRegistrationDbContext appDbContext, 
-            IRegistrationCalculatorService registrationCalculatorService) : base(appDbContext) { }
+            IRegistrationCalculatorService registrationCalculatorService,
+            IConfiguration configuration) : base(appDbContext)
+        {
+            connectionString = configuration.GetConnectionString("VehicleRegistrationDbConnectionString");
+        }
         
 
-        public async Task<(List<Registration> Items, int TotalCount)> GetAllAsync(string? searchQuery = null, 
-            int pageNumber = 1, int pageSize = 1000)
+        public async Task<(List<RegistrationVehicleListItemDto> Items, int TotalCount)> GetAllAsync(string? searchQuery = null, 
+            int pageNumber = 1, int pageSize = 10)
         {
-            var query = appDbContext.Registrations
-                .Include(x => x.Client)
-                .Include(x => x.Vehicle)
-                .Include(x => x.Vehicle.VehicleType)
-                .Include(x => x.Vehicle.VehicleBrand)
-                .Include(x=>x.Insurance)
-                .Include(x => x.Vehicle.VehicleModel).AsQueryable();
+            using var connection = new SqlConnection(connectionString);
 
-            if (!string.IsNullOrWhiteSpace(searchQuery))
+            var offset = (pageNumber - 1) * pageSize;
+
+            var sql = @"
+                with Filtered as (
+                    select 
+                        r.Id,
+                        r.RegistrationDate,
+                        r.ExpirationDate,
+                        r.RegistrationPrice,
+                        r.LicensePlate,
+                        r.IsTemporary,
+                        i.Name as Insurance,
+                        vb.Name + ' ' + vm.Name as Vehicle,
+                        c.FirstName + ' ' + c.LastName as Owner
+                    from Registrations r
+                        join Vehicles v on v.Id = r.VehicleId
+                        join VehicleModels vm on vm.Id = v.VehicleModelId
+                        join VehicleBrands vb on vb.Id = v.VehicleBrandId
+                        join Clients c on c.Id = r.ClientId
+                        join Insurances i on i.Id = r.InsuranceId
+                    where (@search is null or
+	                           vb.Name like '%' + @search + '%' or
+	                           vm.Name like '%' + @search + '%' or
+	                           c.FirstName like '%' + @search + '%' or
+	                           c.LastName like '%' + @search + '%' or
+	                           r.LicensePlate like '%' + @search + '%' or
+                               i.Name like '%' + @search + '%')
+                    )
+
+                    select 
+                        Id,
+                        RegistrationDate,
+                        ExpirationDate,
+                        RegistrationPrice,
+                        LicensePlate,
+                        IsTemporary,
+                        Insurance,
+                        Vehicle,
+                        Owner
+                    from Filtered
+                    order by Id
+                    offset @offset rows fetch next @pageSize rows only;
+
+                    with Filtered as(
+                        select
+                          r.Id
+                    from Registrations r
+                        join Vehicles v on v.Id = r.VehicleId
+                        join VehicleModels vm on vm.Id = v.VehicleModelId
+                        join VehicleBrands vb on vb.Id = v.VehicleBrandId
+                        join Clients c on c.Id = r.ClientId
+                        join Insurances i on i.Id = r.InsuranceId
+                    where (@search is null or
+	                           vb.Name like '%' + @search + '%' or
+	                           vm.Name like '%' + @search + '%' or
+	                           c.FirstName like '%' + @search + '%' or
+	                           c.LastName like '%' + @search + '%' or
+	                           r.LicensePlate like '%' + @search + '%' or
+                               i.Name like '%' + @search + '%')
+                    )
+
+                    select count(*) from Filtered;
+            ";
+
+            using var multi = await connection.QueryMultipleAsync(sql, new
             {
-                query = query.Where(x =>
-                    x.Client.FirstName.Contains(searchQuery) ||
-                    x.Client.IdCardNumber.Contains(searchQuery) ||
-                    x.Client.Email.Contains(searchQuery) ||
-                    x.Client.NationalId.Contains(searchQuery) ||
-                    x.Client.LastName.Contains(searchQuery) ||
-                    x.Vehicle.VehicleBrand.Name.Contains(searchQuery) ||
-                    x.Vehicle.VehicleModel.Name.Contains(searchQuery) ||
-                    x.Vehicle.VehicleType.Name.Contains(searchQuery) ||
-                    x.Insurance.Name.Contains(searchQuery) ||
-                    x.LicensePlate.Contains(searchQuery)
-                );
-            }
+                search = searchQuery,
+                offset,
+                pageSize
+            });
 
-            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
-            var totalCount = await query.CountAsync();
+            var items = (await multi.ReadAsync<RegistrationVehicleListItemDto>()).ToList();
+            var count = await multi.ReadFirstAsync<int>();
 
-            return (items, totalCount);
+            return (items, count);
         }
 
         public async Task<Registration?> UpdateAsync(Registration request)

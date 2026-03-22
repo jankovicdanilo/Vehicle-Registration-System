@@ -3,34 +3,87 @@ using VehicleRegistrationSystem.Models.Domain;
 using VehicleRegistrationSystem.Repositories.Interface;
 using VehicleRegistrationSystem.Data;
 using VehicleRegistrationSystem.Repositories.Common;
+using Microsoft.Data.SqlClient;
+using Dapper;
+using VehicleRegistrationSystem.Models.DTO.Client;
 
 namespace VehicleRegistrationSystem.Repositories.Implementation
 {
     public class ClientRepository : RepositoryBase<Client>, IClientRepository
     {
-        public ClientRepository(VehicleRegistrationDbContext appDbContext) : base(appDbContext) { }
+        private readonly string connectionString;
 
-        public async Task<(List<Client> Items, int TotalCount)> GetAllAsync
-            (string? searchQuery = null, int pageNumber = 1, int pageSize = 1000)
+        public ClientRepository(VehicleRegistrationDbContext appDbContext,
+            IConfiguration configuration) : base(appDbContext) 
         {
-            var query = appDbContext.Clients.AsQueryable();
+            connectionString = configuration.GetConnectionString("VehicleRegistrationDbConnectionString");
+        }
 
-            if (string.IsNullOrWhiteSpace(searchQuery) == false)
+        public async Task<(List<ClientListItemDto> Items, int TotalCount)> GetAllAsync
+            (string? searchQuery = null, int pageNumber = 1, int pageSize = 10)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var offset = (pageNumber - 1) * pageSize;
+
+            var sql = @"
+                with filtered as
+                    (select
+                        c.Id,
+                        c.FirstName,
+                        c.LastName,
+                        c.NationalId,
+                        c.IdCardNumber,
+                        c.Email,
+                        c.PhoneNumber,
+                        c.Address,
+                        c.DateOfBirth
+                    from Clients c
+                    where (@search is null or
+                            c.FirstName like '%' + @search + '%' or
+                            c.LastName like '%' + @search + '%' or
+                            c.NationalId like '%' + @search + '%' or
+                            c.IdCardNumber like '%' + @search + '%' or
+                            c.Email like '%' + @search + '%')
+                    )
+
+                select 
+                    Id,
+                    FirstName,
+                    LastName,
+                    NationalId,
+                    IdCardNumber,
+                    Email,
+                    PhoneNumber,
+                    Address,
+                    DateOfBirth
+                from Filtered
+                order by Id
+                offset @offset rows fetch next @pageSize rows only;
+
+                with Filtered as(
+                    select c.Id
+                from Clients c
+                where (@search is null or
+                            c.FirstName like '%' + @search + '%' or
+                            c.LastName like '%' + @search + '%' or
+                            c.NationalId like '%' + @search + '%' or
+                            c.IdCardNumber like '%' + @search + '%' or
+                            c.Email like '%' + @search + '%')
+                )
+
+                select count(*) from Filtered;
+            ";
+
+            using var multi = await connection.QueryMultipleAsync(sql, new
             {
-                query = query.Where(
-                x => x.FirstName.Contains(searchQuery) ||
-                x.LastName.Contains(searchQuery) ||
-                x.Email.Contains(searchQuery) ||
-                x.IdCardNumber.Contains(searchQuery) ||
-                x.NationalId.Contains(searchQuery));
-            }
+                search = searchQuery,
+                offset,
+                pageSize
+            });
 
-            var items = await query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            var totalCount = await query.CountAsync();
+            var items = (await multi.ReadAsync<ClientListItemDto>()).ToList();
+            var totalCount = await multi.ReadFirstAsync<int>();
 
             return (items, totalCount);
         }

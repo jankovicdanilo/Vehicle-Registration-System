@@ -15,6 +15,7 @@ import { SearchComponent } from '../../../shared/components/search/search.compon
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { Registration } from '../../../core/models/registration.model';
 import { UserService } from '../../../core/services/user.service';
+import { RegistrationListItem } from '../../../core/models/registration-list.model';
 
 @Component({
   selector: 'app-registration-list',
@@ -36,7 +37,7 @@ export class RegistrationListComponent {
 
   dialog = inject(MatDialog);
 
-  registrations: Registration[] = [];
+  registrations: RegistrationListItem[] = [];
   searchTerm: string = '';
 
   totalItems!: number;
@@ -50,6 +51,7 @@ export class RegistrationListComponent {
     'registrationDate',
     'expirationDate',
     'registrationPrice',
+    'insurance',
     'actions'
   ];
 

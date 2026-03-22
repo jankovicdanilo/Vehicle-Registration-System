@@ -41,7 +41,7 @@ namespace VehicleRegistrationSystem.Controllers
 
         [HttpGet]
         public async Task<IActionResult> List([FromQuery] string? searchQuery,[FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 1000)
+            [FromQuery] int pageSize = 10)
         {
             var response = await clientService.GetClientsAsync(searchQuery, pageNumber, pageSize);
             
