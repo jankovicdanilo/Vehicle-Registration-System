@@ -19,7 +19,6 @@ The application follows a layered architecture:
 Additional architectural patterns:
 
 * Repository Pattern with generic `RepositoryBase`
-* Separation of read/write responsibilities (foundation for CQRS)
 * DTO-based data transfer
 * Centralized validation logic
 
