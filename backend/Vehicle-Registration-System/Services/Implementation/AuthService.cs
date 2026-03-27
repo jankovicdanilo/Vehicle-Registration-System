@@ -87,7 +87,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<Result<LoginResponseDto>> LoginAsync(LoginRequestDto request)
         {
-            var identityUser = await userManager.FindByNameAsync(request.Username);
+            var identityUser = await userManager.FindByEmailAsync(request.Email);
 
             if (identityUser == null)
             {
@@ -95,7 +95,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     ($"INVALID_USERNAME", "Username {request.Username} not found");
             }
 
-            if (!string.Equals( identityUser.Email, request.Email, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(identityUser.Email, request.Email, StringComparison.OrdinalIgnoreCase))
             {
                 return Result<LoginResponseDto>.Fail($"INVALID_EMAIL", "Email {request.Email} not found");
             }
@@ -124,10 +124,10 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             if (user == null)
             {
-                return Result<UserDto>.Fail($"USER_NOT_FOUND", "User with id {id} not found");
+                return Result<UserDto>.Fail("USER_NOT_FOUND", $"User with id {id} not found");
             }
 
-            if(user.Email == "danilo@gmail.com")
+            if(user.Email == "admin@test.com")
             {
                 return Result<UserDto>.Fail($"MAIN_ADMIN", "User can't be deleted");
             }
@@ -151,7 +151,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 return Result<UserDto>.Fail($"USER_NOT_FOUND", "User with id {request.Id} not found");
             }
 
-            if (user.Email.Equals("danilo@gmail.com", StringComparison.OrdinalIgnoreCase))
+            if (user.Email.Equals("admin@test.com", StringComparison.OrdinalIgnoreCase))
             {
                 user.Email = request.Email?.Trim();
                 user.UserName = request.Username?.Trim();
@@ -183,7 +183,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
                 if (!await roleManager.RoleExistsAsync(role))
                 {
-                    return Result<UserDto>.Fail($"INVALID_ROLE" , "Requested role {role} does not exist.");
+                    return Result<UserDto>.Fail("INVALID_ROLE" , $"Requested role {role} does not exist.");
                 }
             }
 
@@ -231,7 +231,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             if (user == null)
             {
-                return Result<UserDto>.Fail($"USER_NOT_FOUND" ,"User with id {userId} not found");
+                return Result<UserDto>.Fail("USER_NOT_FOUND" ,$"User with id {userId} not found");
             }
 
             var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
@@ -257,7 +257,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             if (user == null)
             {
-                return Result<UserDto>.Fail($"USER_NOT_FOUND", "User with id {userId} not found");
+                return Result<UserDto>.Fail("USER_NOT_FOUND", $"User with id {userId} not found");
             }
 
             var resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
@@ -267,7 +267,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
             if (!result.Succeeded)
             {
                 var errorMessage = string.Join("; ", result.Errors.Select(e => e.Description));
-                return Result<UserDto>.Fail($"RESET_PASSWORD_FAILED", errorMessage);
+                return Result<UserDto>.Fail("RESET_PASSWORD_FAILED", errorMessage);
             }
 
             await userManager.UpdateSecurityStampAsync(user);
@@ -322,7 +322,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             if (user == null)
             {
-                return Result<UserDto>.Fail($"USER_NOT_FOUND", "User with id {id} not found");
+                return Result<UserDto>.Fail("USER_NOT_FOUND", $"User with id {id} not found");
             }
 
             var role = await userManager.GetRolesAsync(user);

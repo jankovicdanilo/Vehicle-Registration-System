@@ -36,7 +36,6 @@ export class LoginComponent {
   ) {}
 
   loginForm = this.fb.group({
-    username: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
   });
@@ -45,7 +44,6 @@ export class LoginComponent {
     if (this.loginForm.invalid) return;
 
     const data = {
-      username: this.loginForm.value.username || '',
       email: this.loginForm.value.email || '',
       password: this.loginForm.value.password || '',
     };

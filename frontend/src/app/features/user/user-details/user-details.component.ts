@@ -41,7 +41,6 @@ export class UserDetailsComponent {
     this.currentUser = JSON.parse(this.userService.getCurrentUser() || '{}');
 
     this.userForm.patchValue({
-      username: this.currentUser.name,
       email: this.currentUser.email,
     });
   }
