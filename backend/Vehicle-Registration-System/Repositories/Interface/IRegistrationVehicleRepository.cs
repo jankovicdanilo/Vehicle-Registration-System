@@ -10,5 +10,7 @@ namespace VehicleRegistrationSystem.Repositories.Interface
             (string? searchQuery = null,int pageNumber =1, int pageSize = 10);
 
         Task<Registration?> UpdateAsync(Registration request);
+
+        Task<Registration> GetDetailedRegistrationAsync(Guid id);
     }
 }

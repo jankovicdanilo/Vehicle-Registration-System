@@ -12,5 +12,7 @@ namespace VehicleRegistrationSystem.Repositories.Interface
         Task<Vehicle?> UpdateVehicleAsync(Vehicle vehicle);
 
         Task<bool> IsVehicleModelValidAsync(Guid modelId, Guid brandId, Guid typeId);
+
+        Task<VehicleDto> GetVehicleByIdAsync(Guid id);
     }
 }

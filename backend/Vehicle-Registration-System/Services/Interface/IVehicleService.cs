@@ -5,23 +5,23 @@ namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface IVehicleService
     {
-        Task<RepositoryResult<bool>> ValidateVehicleCreateRequestAsync(CreateVehicleRequestDto request);
+        Task<Result<bool>> ValidateVehicleCreateRequestAsync(CreateVehicleRequestDto request);
 
-        Task<RepositoryResult<bool>?> ValidateVehicleDeleteRequestAsync(Guid id);
+        Task<Result<bool>?> ValidateVehicleDeleteRequestAsync(Guid id);
 
-        Task<RepositoryResult<bool>?> ValidateGetVehicleByIdRequestAsync(Guid id);
+        Task<Result<bool>?> ValidateGetVehicleByIdRequestAsync(Guid id);
 
-        Task<RepositoryResult<bool>?> ValidateVehicleUpdateRequestAsync(UpdateVehicleDto request);
+        Task<Result<bool>?> ValidateVehicleUpdateRequestAsync(UpdateVehicleDto request);
 
-        Task<RepositoryResult<VehicleDto>> CreateVehicleAsync(CreateVehicleRequestDto request);
+        Task<Result<VehicleDto>> CreateVehicleAsync(CreateVehicleRequestDto request);
 
-        Task<RepositoryResult<VehicleDto>> DeleteVehicleAsync(Guid id);
+        Task<Result<VehicleDto>> DeleteVehicleAsync(Guid id);
 
-        Task<RepositoryResult<VehicleDto>> UpdateVehicleAsync(UpdateVehicleDto request);
+        Task<Result<VehicleDto>> UpdateVehicleAsync(UpdateVehicleDto request);
 
-        Task<RepositoryResult<PagedResult<VehicleListItemDto>>>  GetAllAsync
+        Task<Result<PagedResult<VehicleListItemDto>>>  GetAllAsync
             (string? searchQuery = null, int pageSize = 10, int pageNumber = 1);
 
-        Task<RepositoryResult<VehicleDto>> GetVehicleByIdAsync(Guid id);
+        Task<Result<VehicleDto>> GetVehicleByIdAsync(Guid id);
     }
 }

@@ -6,22 +6,22 @@ namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface IAuthService
     {
-        Task<RepositoryResult<IEnumerable<UserDto>>> GetAll(string callerRole);
+        Task<Result<IEnumerable<UserDto>>> GetAll(string callerRole);
 
-        Task<RepositoryResult<UserDto>> RegisterAsync(RegisterRequestDto request, ClaimsPrincipal currentUser);
+        Task<Result<UserDto>> RegisterAsync(RegisterRequestDto request, ClaimsPrincipal currentUser);
 
-        Task<RepositoryResult<LoginResponseDto>> LoginAsync(LoginRequestDto request);
+        Task<Result<LoginResponseDto>> LoginAsync(LoginRequestDto request);
 
-        Task<RepositoryResult<UserDto>> DeleteAsync(string id);
+        Task<Result<UserDto>> DeleteAsync(string id);
 
-        Task<RepositoryResult<UserDto>> UpdateUserAsync
+        Task<Result<UserDto>> UpdateUserAsync
             (UpdateUserRequestDto request, ClaimsPrincipal currentUser);
 
-        Task<RepositoryResult<UserDto>> ChangePasswordAsync
+        Task<Result<UserDto>> ChangePasswordAsync
             (string userId, string currentPassword, string newPassword);
 
-        Task<RepositoryResult<UserDto>> ResetPasswordAsync(string userId, string newPassword);
+        Task<Result<UserDto>> ResetPasswordAsync(string userId, string newPassword);
 
-        Task<RepositoryResult<UserDto>> GetUserAsync(string id);
+        Task<Result<UserDto>> GetUserAsync(string id);
     }
 }

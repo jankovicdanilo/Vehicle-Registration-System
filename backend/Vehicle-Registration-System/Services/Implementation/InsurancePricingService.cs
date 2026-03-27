@@ -25,24 +25,24 @@ namespace VehicleRegistrationSystem.Services.Implementation
             this.insuranceRepository = insuranceRepository;
         }
 
-        public async Task<RepositoryResult<bool>> ValidateCreateAsync(CreateInsurancePriceRequestDto request)
+        public async Task<Result<bool>> ValidateCreateAsync(CreateInsurancePriceRequestDto request)
         {
             if(!await insuranceRepository.ExistsAsync(x=>x.Id == request.InsuranceId))
             {
-                return RepositoryResult<bool>.Fail($"INVALID_Insurance_ID: Insurance" +
+                return Result<bool>.Fail($"INVALID_Insurance_ID","Insurance" +
                     $" with the id {request.InsuranceId} not found");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<InsurancePriceDto>> CreateAsync(CreateInsurancePriceRequestDto request)
+        public async Task<Result<InsurancePriceDto>> CreateAsync(CreateInsurancePriceRequestDto request)
         {
             var validationResult = await ValidateCreateAsync(request);
 
             if(!validationResult.Success)
             {
-                return RepositoryResult<InsurancePriceDto>.Fail(validationResult.Message);
+                return Result<InsurancePriceDto>.Fail(validationResult.ErrorCode,validationResult.Message);
             }
 
             var insurancePriceDomain = mapper.Map<InsurancePrice>(request);
@@ -51,76 +51,76 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             var response = mapper.Map<InsurancePriceDto>(insurancePriceDomain);
 
-            return RepositoryResult<InsurancePriceDto>.Ok(response, "New insurance price has been created!");
+            return Result<InsurancePriceDto>.Ok(response, "New insurance price has been created!");
         }
 
-        public Task<RepositoryResult<bool>> ValidateGetAllAsync()
+        public Task<Result<bool>> ValidateGetAllAsync()
         {
             throw new NotImplementedException();
         }
 
-        public async Task<RepositoryResult<List<InsurancePriceDto>>> GetAllAsync()
+        public async Task<Result<List<InsurancePriceDto>>> GetAllAsync()
         {
             var insurancePricesDomainList = await insurancePricingRepository.GetAllAsync();
 
             var response = mapper.Map<List<InsurancePriceDto>>(insurancePricesDomainList);
 
-            return RepositoryResult<List<InsurancePriceDto>>.Ok(response);
+            return Result<List<InsurancePriceDto>>.Ok(response);
         }
 
-        public async Task<RepositoryResult<bool>> ValidateGetByIdAsync(Guid id)
+        public async Task<Result<bool>> ValidateGetByIdAsync(Guid id)
         {
             if(!await insurancePricingRepository.ExistsAsync(x=>x.Id == id))
             {
-                return RepositoryResult<bool>.Fail($"INSURANCE_PRICE_ID_INVALID: Insurance price with the" +
+                return Result<bool>.Fail($"INSURANCE_PRICE_ID_INVALID","Insurance price with the" +
                     $" id {id} not found");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<InsurancePriceDto>> GetByIdAsync(Guid id)
+        public async Task<Result<InsurancePriceDto>> GetByIdAsync(Guid id)
         {
             var validationResult = await ValidateGetByIdAsync(id);
 
             if (!validationResult.Success)
             {
-                return RepositoryResult<InsurancePriceDto>.Fail(validationResult.Message);
+                return Result<InsurancePriceDto>.Fail(validationResult.ErrorCode,validationResult.Message);
             }
 
             var insurancePriceDomain = await insurancePricingRepository.GetByIdAsync(id);
 
             var response = mapper.Map<InsurancePriceDto>(insurancePriceDomain);
 
-            return RepositoryResult<InsurancePriceDto>.Ok(response);
+            return Result<InsurancePriceDto>.Ok(response);
         }
 
-        public async Task<RepositoryResult<bool>> ValidateGetByInsuranceIdAsync(Guid id)
+        public async Task<Result<bool>> ValidateGetByInsuranceIdAsync(Guid id)
         {
             if (!await insurancePricingRepository.ExistsAsync(x => x.InsuranceId == id))
             {
-                return RepositoryResult<bool>.Fail
-                    ($"INSURANCE_PRICE_INSURANCEID_INVALID: Insurance price with the" +
+                return Result<bool>.Fail
+                    ("INSURANCE_PRICE_INSURANCEID_INVALID","Insurance price with the" +
                     $" insurance id {id} not found");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<InsurancePriceDto>> GetByInsuranceIdAsync(Guid id)
+        public async Task<Result<InsurancePriceDto>> GetByInsuranceIdAsync(Guid id)
         {
             var validationResult = await ValidateGetByInsuranceIdAsync(id);
 
             if (!validationResult.Success)
             {
-                return RepositoryResult<InsurancePriceDto>.Fail(validationResult.Message);
+                return Result<InsurancePriceDto>.Fail(validationResult.ErrorCode,validationResult.Message);
             }
 
             var insurancePriceDomain = await insurancePricingRepository.GetByInsuranceIdAsync(id, 10);
 
             var response = mapper.Map<InsurancePriceDto>(insurancePriceDomain);
 
-            return RepositoryResult<InsurancePriceDto>.Ok(response);
+            return Result<InsurancePriceDto>.Ok(response);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
             this.roleManager = roleManager;
         }
 
-        public async Task<RepositoryResult<UserDto>> RegisterAsync
+        public async Task<Result<UserDto>> RegisterAsync
             (RegisterRequestDto request, ClaimsPrincipal currentUser)
         {
             var user = new IdentityUser
@@ -41,7 +41,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
             if (!identityResult.Succeeded)
             {
                 var errors = identityResult.Errors.Select(e => e.Description).ToList();
-                return RepositoryResult<UserDto>.Fail(string.Join(" | ", errors));
+                return Result<UserDto>.Fail(errors);
             }
 
             await userManager.AddToRoleAsync(user, "Employee");
@@ -56,12 +56,12 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     {
                         if (!currentUser.IsInRole("Admin"))
                         {
-                            return RepositoryResult<UserDto>.Fail("ADMIN_ONLY: Only admins can assign roles.");
+                            return Result<UserDto>.Fail("ADMIN_ONLY", "Only admins can assign roles.");
                         }
 
                         if (!await roleManager.RoleExistsAsync(role))
                         {
-                            return RepositoryResult<UserDto>.Fail($"INVALID_ROLE: {role} role does not exist.");
+                            return Result<UserDto>.Fail($"INVALID_ROLE", $"{role} role does not exist.");
                         }
 
                         await userManager.AddToRoleAsync(user, role);
@@ -81,30 +81,30 @@ namespace VehicleRegistrationSystem.Services.Implementation
             var response = mapper.Map<UserDto>(user);
             response.Roles = await userManager.GetRolesAsync(user);
 
-            return RepositoryResult<UserDto>.Ok(response, "New user has successfully been created");
+            return Result<UserDto>.Ok(response, "New user has successfully been created");
         }
 
 
-        public async Task<RepositoryResult<LoginResponseDto>> LoginAsync(LoginRequestDto request)
+        public async Task<Result<LoginResponseDto>> LoginAsync(LoginRequestDto request)
         {
             var identityUser = await userManager.FindByNameAsync(request.Username);
 
             if (identityUser == null)
             {
-                return RepositoryResult<LoginResponseDto>.Fail
-                    ($"INVALID_USERNAME: Username {request.Username} not found");
+                return Result<LoginResponseDto>.Fail
+                    ($"INVALID_USERNAME", "Username {request.Username} not found");
             }
 
             if (!string.Equals( identityUser.Email, request.Email, StringComparison.OrdinalIgnoreCase))
             {
-                return RepositoryResult<LoginResponseDto>.Fail($"INVALID_EMAIL: Email {request.Email} not found");
+                return Result<LoginResponseDto>.Fail($"INVALID_EMAIL", "Email {request.Email} not found");
             }
 
             var passwordValid = await userManager.CheckPasswordAsync(identityUser, request.Password);
 
             if (!passwordValid)
             {
-                return RepositoryResult<LoginResponseDto>.Fail("INVALID_PASSWORD: Incorrect password");
+                return Result<LoginResponseDto>.Fail("INVALID_PASSWORD", "Incorrect password");
             }
 
             var token = await tokenService.GenerateJwtTokenAsync(identityUser);
@@ -115,21 +115,21 @@ namespace VehicleRegistrationSystem.Services.Implementation
             response.Roles = roles.ToList();
 
 
-            return RepositoryResult<LoginResponseDto>.Ok(response, "Login successfull");
+            return Result<LoginResponseDto>.Ok(response, "Login successfull");
         }
 
-        public async Task<RepositoryResult<UserDto>> DeleteAsync(string id)
+        public async Task<Result<UserDto>> DeleteAsync(string id)
         {
             var user = await userManager.FindByIdAsync(id);
 
             if (user == null)
             {
-                return RepositoryResult<UserDto>.Fail($"USER_NOT_FOUND: User with id {id} not found");
+                return Result<UserDto>.Fail($"USER_NOT_FOUND", "User with id {id} not found");
             }
 
             if(user.Email == "danilo@gmail.com")
             {
-                return RepositoryResult<UserDto>.Fail($"MAIN_ADMIN: User can't be deleted");
+                return Result<UserDto>.Fail($"MAIN_ADMIN", "User can't be deleted");
             }
 
             authDbContext.Users.Remove(user);
@@ -138,17 +138,17 @@ namespace VehicleRegistrationSystem.Services.Implementation
             var response = mapper.Map<UserDto>(user);
             response.Roles = await userManager.GetRolesAsync(user);
 
-            return RepositoryResult<UserDto>.Ok(response, "User has successfully been deleted");
+            return Result<UserDto>.Ok(response, "User has successfully been deleted");
         }
 
-        public async Task<RepositoryResult<UserDto>> UpdateUserAsync
+        public async Task<Result<UserDto>> UpdateUserAsync
                         (UpdateUserRequestDto request, ClaimsPrincipal currentUser)
         {
             var user = await userManager.FindByIdAsync(request.Id);
 
             if (user == null)
             {
-                return RepositoryResult<UserDto>.Fail($"USER_NOT_FOUND: User with id {request.Id} not found");
+                return Result<UserDto>.Fail($"USER_NOT_FOUND", "User with id {request.Id} not found");
             }
 
             if (user.Email.Equals("danilo@gmail.com", StringComparison.OrdinalIgnoreCase))
@@ -159,13 +159,13 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 var resultProtected = await userManager.UpdateAsync(user);
                 if (!resultProtected.Succeeded)
                 {
-                    return RepositoryResult<UserDto>.Fail($"UPDATE_FAILED: Really, you just did that?");
+                    return Result<UserDto>.Fail($"UPDATE_FAILED", "Really, you just did that?");
                 }
 
                 var responseProtected = mapper.Map<UserDto>(user);
                 responseProtected.Roles = await userManager.GetRolesAsync(user);
 
-                return RepositoryResult<UserDto>.Ok(responseProtected, 
+                return Result<UserDto>.Ok(responseProtected, 
                     "Protected Admin user updated (roles unchanged)");
             }
 
@@ -178,12 +178,12 @@ namespace VehicleRegistrationSystem.Services.Implementation
             {
                 if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase) && !currentUser.IsInRole("Admin"))
                 {
-                    return RepositoryResult<UserDto>.Fail("ADMIN_ONLY: Only admins can assign the Admin role.");
+                    return Result<UserDto>.Fail("ADMIN_ONLY", "Only admins can assign the Admin role.");
                 }
 
                 if (!await roleManager.RoleExistsAsync(role))
                 {
-                    return RepositoryResult<UserDto>.Fail($"INVALID_ROLE: Requested role {role} does not exist.");
+                    return Result<UserDto>.Fail($"INVALID_ROLE" , "Requested role {role} does not exist.");
                 }
             }
 
@@ -214,24 +214,24 @@ namespace VehicleRegistrationSystem.Services.Implementation
             if (!result.Succeeded)
             {
                 var errorMessage = string.Join("; ", result.Errors.Select(e => e.Description));
-                return RepositoryResult<UserDto>.Fail($"UPDATE_FAILED: {errorMessage}");
+                return Result<UserDto>.Fail("UPDATE_FAILED", errorMessage);
             }
 
             var response = mapper.Map<UserDto>(user);
             response.Roles = finalRoles;
 
-            return RepositoryResult<UserDto>.Ok(response, "User data has successfully been updated");
+            return Result<UserDto>.Ok(response, "User data has successfully been updated");
         }
 
 
-        public async Task<RepositoryResult<UserDto>> ChangePasswordAsync
+        public async Task<Result<UserDto>> ChangePasswordAsync
             (string userId, string currentPassword, string newPassword)
         {
             var user = await userManager.FindByIdAsync(userId);
 
             if (user == null)
             {
-                return RepositoryResult<UserDto>.Fail($"USER_NOT_FOUND: User with id {userId} not found");
+                return Result<UserDto>.Fail($"USER_NOT_FOUND" ,"User with id {userId} not found");
             }
 
             var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
@@ -239,7 +239,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
             if (!result.Succeeded)
             {
                 var errorMessage = string.Join("; ", result.Errors.Select(e => e.Description));
-                return RepositoryResult<UserDto>.Fail($"CHANGE_PASSWORD_FAILED: {errorMessage}");
+                return Result<UserDto>.Fail($"CHANGE_PASSWORD_FAILED", errorMessage);
             }
 
             await userManager.UpdateSecurityStampAsync(user);
@@ -247,17 +247,17 @@ namespace VehicleRegistrationSystem.Services.Implementation
             var response = mapper.Map<UserDto>(user);
             response.Roles = await userManager.GetRolesAsync(user);
 
-            return RepositoryResult<UserDto>.Ok(response, "Password has successfully been updated");
+            return Result<UserDto>.Ok(response, "Password has successfully been updated");
 
         }
 
-        public async Task<RepositoryResult<UserDto>> ResetPasswordAsync(string userId, string newPassword)
+        public async Task<Result<UserDto>> ResetPasswordAsync(string userId, string newPassword)
         {
             var user = await userManager.FindByIdAsync(userId);
 
             if (user == null)
             {
-                return RepositoryResult<UserDto>.Fail($"USER_NOT_FOUND: User with id {userId} not found");
+                return Result<UserDto>.Fail($"USER_NOT_FOUND", "User with id {userId} not found");
             }
 
             var resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
@@ -267,7 +267,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
             if (!result.Succeeded)
             {
                 var errorMessage = string.Join("; ", result.Errors.Select(e => e.Description));
-                return RepositoryResult<UserDto>.Fail($"RESET_PASSWORD_FAILED: {errorMessage}");
+                return Result<UserDto>.Fail($"RESET_PASSWORD_FAILED", errorMessage);
             }
 
             await userManager.UpdateSecurityStampAsync(user);
@@ -275,10 +275,10 @@ namespace VehicleRegistrationSystem.Services.Implementation
             var response = mapper.Map<UserDto>(user);
             response.Roles = await userManager.GetRolesAsync(user);
 
-            return RepositoryResult<UserDto>.Ok(response, "Password has successfully been reset");
+            return Result<UserDto>.Ok(response, "Password has successfully been reset");
         }
 
-        public async Task<RepositoryResult<IEnumerable<UserDto>>> GetAll(string callerRole)
+        public async Task<Result<IEnumerable<UserDto>>> GetAll(string callerRole)
         {
             var users = await userManager.Users.ToListAsync();
             var results = new List<UserDto>();
@@ -312,17 +312,17 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     .ToList();
             }
 
-            return RepositoryResult<IEnumerable<UserDto>>.Ok(results);
+            return Result<IEnumerable<UserDto>>.Ok(results);
         }
 
 
-        public async Task<RepositoryResult<UserDto>> GetUserAsync(string id)
+        public async Task<Result<UserDto>> GetUserAsync(string id)
         {
             var user = await userManager.FindByIdAsync(id);
 
             if (user == null)
             {
-                return RepositoryResult<UserDto>.Fail($"USER_NOT_FOUND: User with id {id} not found");
+                return Result<UserDto>.Fail($"USER_NOT_FOUND", "User with id {id} not found");
             }
 
             var role = await userManager.GetRolesAsync(user);
@@ -335,7 +335,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 Roles = role
             };
             
-            return RepositoryResult<UserDto>.Ok(response);
+            return Result<UserDto>.Ok(response);
         }
     }
 }

@@ -24,7 +24,8 @@ namespace VehicleRegistrationSystem.Repositories.Implementation
         }
         
 
-        public async Task<(List<RegistrationVehicleListItemDto> Items, int TotalCount)> GetAllAsync(string? searchQuery = null, 
+        public async Task<(List<RegistrationVehicleListItemDto> Items, int TotalCount)> 
+            GetAllAsync(string? searchQuery = null, 
             int pageNumber = 1, int pageSize = 10)
         {
             using var connection = new SqlConnection(connectionString);
@@ -104,6 +105,19 @@ namespace VehicleRegistrationSystem.Repositories.Implementation
             var count = await multi.ReadFirstAsync<int>();
 
             return (items, count);
+        }
+
+        public async Task<Registration> GetDetailedRegistrationAsync(Guid id)
+        {
+            return await appDbContext.Registrations
+                .Include(c => c.Client)
+                .Include(v => v.Vehicle)
+                .ThenInclude(vt => vt.VehicleType)
+                .Include(v => v.Vehicle)
+                .ThenInclude(vm => vm.VehicleBrand)
+                .Include(v => v.Vehicle)
+                .ThenInclude(v => v.VehicleModel)
+                .Include(i => i.Insurance).FirstOrDefaultAsync();
         }
 
         public async Task<Registration?> UpdateAsync(Registration request)

@@ -4,6 +4,7 @@ using VehicleRegistrationSystem.Models.DTO;
 using VehicleRegistrationSystem.Models.DTO.Common;
 using VehicleRegistrationSystem.Models.DTO.VehicleBrand;
 using VehicleRegistrationSystem.Repositories.Interface;
+using VehicleRegistrationSystem.Results;
 using VehicleRegistrationSystem.Services.Interface;
 
 namespace VehicleRegistrationSystem.Controllers
@@ -27,20 +28,18 @@ namespace VehicleRegistrationSystem.Controllers
         [HttpGet("ListById/{id:guid}")]
         public async Task<IActionResult> List(Guid id)
         {
-            var response = await vehicleBrandService.GetListByType(id);
+            var result = await vehicleBrandService.GetListByType(id);
 
-            if (!response.Success)
+            if (!result.Success)
             {
-                var parts = response.Message?.Split(":", 2);
-
                 return BadRequest(new ApiError
                 {
-                    ErrorCode = parts?[0],
-                    Message = parts?[1].Length > 1 ? parts[1] : response.Message
+                    ErrorCode = result.ErrorCode,
+                    Message = result.Message
                 });
             }
 
-            return Ok(response);
+            return Ok(result);
         }
 
         [HttpPost]
@@ -50,12 +49,10 @@ namespace VehicleRegistrationSystem.Controllers
 
             if (!result.Success)
             {
-                var parts = result.Message?.Split(":", 2);
-
                 return BadRequest(new ApiError
                 {
-                    ErrorCode = parts?[0],
-                    Message = parts?[1].Length > 1 ? parts[1] : result.Message
+                    ErrorCode = result.ErrorCode,
+                    Message = result.Message
                 });
             }
 
@@ -65,20 +62,18 @@ namespace VehicleRegistrationSystem.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var response = await vehicleBrandService.GetById(id);
+            var result = await vehicleBrandService.GetById(id);
 
-            if (!response.Success)
+            if (!result.Success)
             {
-                var parts = response.Message?.Split(":", 2);
-
                 return BadRequest(new ApiError
                 {
-                    ErrorCode = parts?[0],
-                    Message = parts?[1].Length > 1 ? parts[1] : response.Message
+                    ErrorCode = result.ErrorCode,
+                    Message = result.Message
                 });
             }
 
-            return Ok(response);
+            return Ok(result);
         }
 
         [HttpDelete]
@@ -88,12 +83,10 @@ namespace VehicleRegistrationSystem.Controllers
 
             if (!result.Success)
             {
-                var parts = result.Message?.Split(":", 2);
-
                 return BadRequest(new ApiError
                 {
-                    ErrorCode = parts?[0],
-                    Message = parts?[1].Length > 1 ? parts[1] : result.Message
+                    ErrorCode = result.ErrorCode,
+                    Message = result.Message
                 });
             }
 
@@ -107,12 +100,10 @@ namespace VehicleRegistrationSystem.Controllers
 
             if (!result.Success)
             {
-                var parts = result.Message?.Split(":", 2);
-
                 return BadRequest(new ApiError
                 {
-                    ErrorCode = parts?[0],
-                    Message = parts?[1].Length > 1 ? parts[1] : result.Message
+                    ErrorCode = result.ErrorCode,
+                    Message = result.Message
                 });
             }
 

@@ -6,21 +6,21 @@ namespace VehicleRegistrationSystem.Services.Interface
     public interface IInsuranceService
     {
 
-        Task<RepositoryResult<bool>> ValidateGetInsuranceByIdAsync(Guid id);
+        Task<Result<bool>> ValidateGetInsuranceByIdAsync(Guid id);
 
-        Task<RepositoryResult<bool>> ValidateDeleteAsync(Guid id);
+        Task<Result<bool>> ValidateDeleteAsync(Guid id);
 
-        Task<RepositoryResult<bool>> ValidateUpdateAsync(UpdateInsuranceRequestDto request);
+        Task<Result<bool>> ValidateUpdateAsync(UpdateInsuranceRequestDto request);
 
-        Task<RepositoryResult<InsuranceDto>> CreateInsuranceAsync(CreateInsuranceRequestDto request);
+        Task<Result<InsuranceDto>> CreateInsuranceAsync(CreateInsuranceRequestDto request);
 
-        Task<RepositoryResult<List<InsuranceDto>>> GetAllAsync();
+        Task<Result<List<InsuranceDto>>> GetAllAsync();
 
-        Task<RepositoryResult<InsuranceDto>> GetInsuranceByIdAsync(Guid id);
+        Task<Result<InsuranceDto>> GetInsuranceByIdAsync(Guid id);
 
-        Task<RepositoryResult<InsuranceDto>> DeleteAsync(Guid id);
+        Task<Result<InsuranceDto>> DeleteAsync(Guid id);
 
-        Task<RepositoryResult<InsuranceDto>> UpdateAsync(UpdateInsuranceRequestDto request);
+        Task<Result<InsuranceDto>> UpdateAsync(UpdateInsuranceRequestDto request);
     }
 }
 

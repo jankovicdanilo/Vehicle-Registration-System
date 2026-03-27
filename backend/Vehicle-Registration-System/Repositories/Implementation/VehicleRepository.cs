@@ -92,6 +92,29 @@ namespace VehicleRegistrationSystem.Repositories.Implementation
             return (items, totalCount);
         }
 
+        public async Task<VehicleDto> GetVehicleByIdAsync(Guid id)
+        {
+            return await appDbContext.Vehicles
+                .Where(x => x.Id == id)
+                .Select(x => new VehicleDto
+                {
+                    Id = x.Id,
+                    VehicleBrandId = x.VehicleBrandId,
+                    VehicleModelId = x.VehicleModelId,
+                    VehicleTypeId = x.VehicleTypeId,
+                    VehicleBrandName = x.VehicleBrand.Name,
+                    VehicleModelName = x.VehicleModel.Name,
+                    VehicleTypeName = x.VehicleType.Name,
+                    ProductionYear = x.ProductionYear,
+                    EngineCapacity = x.EngineCapacity,
+                    FuelType = x.FuelType,
+                    Weight = x.Weight,
+                    EnginePowerKw = x.EnginePowerKw,
+                    ChassisNumber = x.ChassisNumber,
+                    FirstRegistrationDate = x.FirstRegistrationDate,
+                }).FirstOrDefaultAsync();
+        }
+
         public async Task<bool> IsVehicleModelValidAsync(Guid modelId, Guid brandId, Guid typeId)
         {
             return await appDbContext.VehicleModels.Include(m => m.VehicleBrand)
@@ -123,5 +146,7 @@ namespace VehicleRegistrationSystem.Repositories.Implementation
             return existingVehicle;
 
         }
+
+
     }
 }

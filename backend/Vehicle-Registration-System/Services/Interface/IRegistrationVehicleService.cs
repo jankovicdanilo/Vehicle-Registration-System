@@ -6,30 +6,30 @@ namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface IRegistrationVehicleService
     {
-        Task<RepositoryResult<bool>> 
+        Task<Result<bool>> 
             ValidateRegistrationCreateRequestAsync(CreateRegistrationVehicleRequestDto request,
             Vehicle vehicle, InsurancePrice? insurancePrice);
 
-        Task<RepositoryResult<bool>?> ValidateRegistrationDeleteRequestAsync(Guid id);
+        Task<Result<bool>?> ValidateRegistrationDeleteRequestAsync(Guid id);
 
-        Task<RepositoryResult<bool>?> ValidateGetByIdAsync(Guid id);
+        Task<Result<bool>?> ValidateGetByIdAsync(Guid id);
 
-        Task<RepositoryResult<bool>?> 
+        Task<Result<bool>?> 
             ValidateRegistrationUpdateRequestAsync(UpdateRegistrationVehicleRequestDto request);
 
-        Task<RepositoryResult<RegistrationVehicleDto>> 
+        Task<Result<RegistrationVehicleDto>> 
             CreateRegistrationAsync(CreateRegistrationVehicleRequestDto request);
 
-        Task<RepositoryResult<RegistrationVehicleDto>> DeleteRegistrationAsync(Guid id);
+        Task<Result<RegistrationVehicleDto>> DeleteRegistrationAsync(Guid id);
 
-        Task<RepositoryResult<RegistrationVehicleDto>> 
+        Task<Result<RegistrationVehicleDto>> 
             UpdateRegistrationAsync(UpdateRegistrationVehicleRequestDto request);
 
-        Task<RepositoryResult<PagedResult<RegistrationVehicleListItemDto>>> GetAllAsync
+        Task<Result<PagedResult<RegistrationVehicleListItemDto>>> GetAllAsync
             (string? searchQuery = null, int pageNumber = 1, int pageSize = 10);
 
-        Task<RepositoryResult<RegistrationVehicleDto>> GetByIdAsync(Guid id);
+        Task<Result<RegistrationDetailsDto>> GetByIdAsync(Guid id);
 
-        Task<RepositoryResult<RegistrationVehicleDto>> GenerateConfirmation(Guid id);
+        Task<Result<RegistrationVehicleDto>> GenerateConfirmation(Guid id);
     }
 }

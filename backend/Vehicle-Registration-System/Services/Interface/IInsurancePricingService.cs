@@ -5,20 +5,20 @@ namespace VehicleRegistrationSystem.Services.Interface
 {
     public interface IInsurancePricingService
     {
-        Task<RepositoryResult<bool>> ValidateCreateAsync(CreateInsurancePriceRequestDto request);
+        Task<Result<bool>> ValidateCreateAsync(CreateInsurancePriceRequestDto request);
 
-        Task<RepositoryResult<bool>> ValidateGetAllAsync();
+        Task<Result<bool>> ValidateGetAllAsync();
 
-        Task<RepositoryResult<bool>> ValidateGetByIdAsync(Guid id);
+        Task<Result<bool>> ValidateGetByIdAsync(Guid id);
 
-        Task<RepositoryResult<bool>> ValidateGetByInsuranceIdAsync(Guid id);
+        Task<Result<bool>> ValidateGetByInsuranceIdAsync(Guid id);
 
-        Task<RepositoryResult<InsurancePriceDto>> CreateAsync(CreateInsurancePriceRequestDto request);
+        Task<Result<InsurancePriceDto>> CreateAsync(CreateInsurancePriceRequestDto request);
 
-        Task<RepositoryResult<List<InsurancePriceDto>>> GetAllAsync();
+        Task<Result<List<InsurancePriceDto>>> GetAllAsync();
 
-        Task<RepositoryResult<InsurancePriceDto>> GetByIdAsync(Guid id);
+        Task<Result<InsurancePriceDto>> GetByIdAsync(Guid id);
 
-        Task<RepositoryResult<InsurancePriceDto>> GetByInsuranceIdAsync(Guid id);
+        Task<Result<InsurancePriceDto>> GetByInsuranceIdAsync(Guid id);
     }
 }

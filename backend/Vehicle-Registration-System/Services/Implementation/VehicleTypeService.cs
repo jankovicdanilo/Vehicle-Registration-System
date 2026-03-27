@@ -23,7 +23,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
             this.vehicleBrandRepository = vehicleBrandRepository;
         }
 
-        public async Task<RepositoryResult<bool>> 
+        public async Task<Result<bool>> 
             ValidateVehicleTypeCreateRequestAsync(CreateVehicleTypeRequestDto request)
         {
 
@@ -33,7 +33,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             if (existingCategory)
             {
-                return RepositoryResult<bool>.Fail("VEHICLE_TYPE_CATEGORY_EXISTS: " +
+                return Result<bool>.Fail("VEHICLE_TYPE_CATEGORY_EXISTS",
                     "The type of category already exists");
             }
 
@@ -41,22 +41,22 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             if (existingName)
             {
-                return RepositoryResult<bool>.Fail("VEHICLE_TYPE_NAME_EXISTS: Vehicle type already exists");
+                return Result<bool>.Fail("VEHICLE_TYPE_NAME_EXISTS", "Vehicle type already exists");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
 
 
-        public async Task<RepositoryResult<VehicleTypeDto>> 
+        public async Task<Result<VehicleTypeDto>> 
             CreateVehicleTypeAsync(CreateVehicleTypeRequestDto request)
         {
             var validationResult = await ValidateVehicleTypeCreateRequestAsync(request);
 
             if (!validationResult.Success)
             {
-                return RepositoryResult<VehicleTypeDto>.Fail(validationResult.Message);
+                return Result<VehicleTypeDto>.Fail(validationResult.ErrorCode,validationResult.Message);
             }
 
             var vehicleDomain = mapper.Map<VehicleType>(request);
@@ -65,56 +65,56 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             var response = mapper.Map<VehicleTypeDto>(vehicleDomain);
 
-            return RepositoryResult<VehicleTypeDto>.Ok
+            return Result<VehicleTypeDto>.Ok
                 (response, "New type of vehicle has successfully been created!");
         }
 
-        public async Task<RepositoryResult<bool>> ValidateVehicleTypeDeleteRequestAsync(Guid id)
+        public async Task<Result<bool>> ValidateVehicleTypeDeleteRequestAsync(Guid id)
         {
             var hasBrands = await vehicleBrandRepository.ExistsAsync(x => x.VehicleTypeId == id);
 
             if (hasBrands)
             {
-                return RepositoryResult<bool>.Fail
-                    ("TYPE_HAS_BRANDS: Vehicle type cannot be deleted because it has associated brands.");
+                return Result<bool>.Fail
+                    ("TYPE_HAS_BRANDS", "Vehicle type cannot be deleted because it has associated brands.");
             }
 
             var exists = await vehicleTypeRepository.ExistsAsync(x => x.Id == id);
 
             if (!exists)
             {
-                return RepositoryResult<bool>.Fail
-                    ($"VEHICLE_TYPE_NOT_FOUND: Vehicle type with the id {id} doesnt exist");
+                return Result<bool>.Fail
+                    ($"VEHICLE_TYPE_NOT_FOUND", $"Vehicle type with the id {id} doesnt exist");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<VehicleTypeDto>> DeleteVehicleTypeAsync(Guid id)
+        public async Task<Result<VehicleTypeDto>> DeleteVehicleTypeAsync(Guid id)
         {
             var validationResult = await ValidateVehicleTypeDeleteRequestAsync(id);
 
             if (!validationResult.Success)
             {
-                return RepositoryResult<VehicleTypeDto>.Fail(validationResult.Message);
+                return Result<VehicleTypeDto>.Fail(validationResult.ErrorCode, validationResult.Message);
             }
 
             var vehicleTypeDomain = await vehicleTypeRepository.DeleteAsync(id);
 
             var reponse = mapper.Map<VehicleTypeDto>(vehicleTypeDomain);
 
-            return RepositoryResult<VehicleTypeDto>.Ok(reponse, "Vehicle type has successfully been deleted!");
+            return Result<VehicleTypeDto>.Ok(reponse, "Vehicle type has successfully been deleted!");
         }
 
-        public async Task<RepositoryResult<bool>> 
+        public async Task<Result<bool>> 
             ValidateVehicleTypeUpdateRequestAsync(UpdateVehicleTypeRequestDto request)
         {
             var exists = await vehicleTypeRepository.ExistsAsync(x => x.Id == request.Id);
 
             if (!exists)
             {
-                return RepositoryResult<bool>.Fail
-                    ($"VEHICLE_TYPE_NOT_FOUND: Vehicle with the id {request.Id} doesnt exist");
+                return Result<bool>.Fail
+                    ("VEHICLE_TYPE_NOT_FOUND", $"Vehicle with the id {request.Id} doesnt exist");
             }
 
             var existingCategory = await vehicleTypeRepository.ExistsAsync(x =>
@@ -123,8 +123,8 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             if (existingCategory)
             {
-                return RepositoryResult<bool>.Fail
-                    ("VEHICLE_TYPE_CATEGORY_EXISTS: The type of category already exists");
+                return Result<bool>.Fail
+                    ("VEHICLE_TYPE_CATEGORY_EXISTS", "The type of category already exists");
             }
 
             var existingName = await vehicleTypeRepository.ExistsAsync
@@ -132,20 +132,20 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             if (existingName)
             {
-                return RepositoryResult<bool>.Fail("VEHICLE_TYPE_NAME_EXISTS: Vehicle type already exists");
+                return Result<bool>.Fail("VEHICLE_TYPE_NAME_EXISTS", "Vehicle type already exists");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<VehicleTypeDto>> 
+        public async Task<Result<VehicleTypeDto>> 
             UpdateVehicleTypeAsync(UpdateVehicleTypeRequestDto request)
         {
             var validationResult = await ValidateVehicleTypeUpdateRequestAsync(request);
 
             if (!validationResult.Success)
             {
-                return RepositoryResult<VehicleTypeDto>.Fail(validationResult.Message);
+                return Result<VehicleTypeDto>.Fail(validationResult.ErrorCode,validationResult.Message);
             }
 
             var vehicleTypeDomain = mapper.Map<VehicleType>(request);
@@ -154,43 +154,43 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             var response = mapper.Map<VehicleTypeDto>(vehicleTypeDomain);
 
-            return RepositoryResult<VehicleTypeDto>.Ok(response, "Vehicle type has successfully been updated!");
+            return Result<VehicleTypeDto>.Ok(response, "Vehicle type has successfully been updated!");
         }
 
-        public async Task<RepositoryResult<List<VehicleTypeDto>>> GetAllAsync()
+        public async Task<Result<List<VehicleTypeDto>>> GetAllAsync()
         {
             var vehicleTypesDomain = await vehicleTypeRepository.GetAllAsync();
 
             var response = mapper.Map<List<VehicleTypeDto>>(vehicleTypesDomain);
 
-            return RepositoryResult<List<VehicleTypeDto>>.Ok(response);
+            return Result<List<VehicleTypeDto>>.Ok(response);
         }
 
-        public async Task<RepositoryResult<bool>> ValidateVehicleTypeGetByIdAsync(Guid id)
+        public async Task<Result<bool>> ValidateVehicleTypeGetByIdAsync(Guid id)
         {
             if(!await vehicleTypeRepository.ExistsAsync(x=>x.Id == id))
             {
-                return RepositoryResult<bool>.Fail
-                    ($"VEHICLE_TYPE_NOT_FOUND: Vehicle type with the Id {id} was not found");
+                return Result<bool>.Fail
+                    ("VEHICLE_TYPE_NOT_FOUND", $"Vehicle type with the Id {id} was not found");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<VehicleTypeDto>> GetById(Guid id)
+        public async Task<Result<VehicleTypeDto>> GetById(Guid id)
         {
             var validationResult = await ValidateVehicleTypeGetByIdAsync(id);
 
             if (!validationResult.Success)
             {
-                return RepositoryResult<VehicleTypeDto>.Fail(validationResult.Message);
+                return Result<VehicleTypeDto>.Fail(validationResult.ErrorCode,validationResult.Message);
             }
 
             var vehicleTypeDomain = await vehicleTypeRepository.GetByIdAsync(id);
 
             var response = mapper.Map<VehicleTypeDto>(vehicleTypeDomain);
 
-            return RepositoryResult<VehicleTypeDto>.Ok(response);
+            return Result<VehicleTypeDto>.Ok(response);
         }
 
     }

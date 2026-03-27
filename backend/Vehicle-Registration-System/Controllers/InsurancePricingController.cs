@@ -24,12 +24,10 @@ namespace VehicleRegistrationSystem.Controllers
 
             if (!result.Success)
             {
-                var parts = result.Message.Split(":", 2);
-
                 return BadRequest(new ApiError
                 {
-                    ErrorCode = parts?[0],
-                    Message = parts?[1].Length > 1 ? parts?[1] : result.Message
+                    ErrorCode = result.ErrorCode,
+                    Message = result.Message
                 });
             }
 
@@ -43,12 +41,10 @@ namespace VehicleRegistrationSystem.Controllers
 
             if (!result.Success)
             {
-                var parts = result.Message.Split(":", 2);
-
                 return BadRequest(new ApiError
                 {
-                    ErrorCode = parts?[0],
-                    Message = parts?[1].Length > 1 ? parts?[1] : result.Message
+                    ErrorCode = result.ErrorCode,
+                    Message = result.Message
                 });
             }
 
@@ -62,12 +58,10 @@ namespace VehicleRegistrationSystem.Controllers
 
             if (!result.Success)
             {
-                var parts = result.Message?.Split(":", 2);
-
                 return BadRequest(new ApiError
                 {
-                    ErrorCode = parts?[0],
-                    Message = parts?[1].Length > 1 ? parts[1] : result.Message
+                    ErrorCode = result.ErrorCode,
+                    Message = result.Message
                 });
             }
 

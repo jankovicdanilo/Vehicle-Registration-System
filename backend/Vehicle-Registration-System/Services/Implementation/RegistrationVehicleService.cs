@@ -37,71 +37,71 @@ namespace VehicleRegistrationSystem.Services.Implementation
             this.insuranceRepository = insuranceRepository;
         }
 
-        public async Task<RepositoryResult<bool>>
+        public async Task<Result<bool>>
             ValidateRegistrationCreateRequestAsync(CreateRegistrationVehicleRequestDto request,
             Vehicle vehicle, InsurancePrice? insurancePrice)
         {
 
             if(await registrationVehicleRepository.ExistsAsync(x => x.VehicleId == request.VehicleId))
             {
-                return RepositoryResult<bool>.Fail("VEHICLE_ALREADY_REGISTERED: " +
+                return Result<bool>.Fail("VEHICLE_ALREADY_REGISTERED",
                     "Registration cannot be done because vehicle is already registered");
             }
 
             if(await registrationVehicleRepository.ExistsAsync(x=>x.LicensePlate == request.LicensePlate))
             {
-                return RepositoryResult<bool>.Fail("PLATE_NUMBER_EXISTS: " +
+                return Result<bool>.Fail("PLATE_NUMBER_EXISTS",
                     "Registration cannot be done because vehicle plate already exists");
             }
 
             if (request.RegistrationDate > DateTime.UtcNow)
             {
-                return RepositoryResult<bool>.Fail("REGISTRATION_INVALID_DATE: " +
+                return Result<bool>.Fail("REGISTRATION_INVALID_DATE",
                     "Date of registration cannot be in the future");
             }
 
             if (!await vehicleRepository.ExistsAsync(x => x.Id == request.VehicleId))
             {
-                return RepositoryResult<bool>.Fail($"REGISTRATION_VEHICLE_INVALID_ID: " +
+                return Result<bool>.Fail("REGISTRATION_VEHICLE_INVALID_ID",
                     $"Vehicle with the id {request.VehicleId} doesnt exist");
             }
 
             if(!await clientRepository.ExistsAsync(x=> x.Id == request.ClientId))
             {
-                return RepositoryResult<bool>.Fail($"REGISTRATION_CLIENT_INVALID_ID: " +
+                return Result<bool>.Fail("REGISTRATION_CLIENT_INVALID_ID",
                     $"Client with the id {request.ClientId} doesn't exist");
             }
 
             if(!await insuranceRepository.ExistsAsync(x => x.Id == request.InsuranceId))
             {
-                return RepositoryResult<bool>.Fail($"REGISTRATION_INSURANCE_INVALID_ID: " +
+                return Result<bool>.Fail("REGISTRATION_INSURANCE_INVALID_ID",
                     $"Insurance with the id {request.InsuranceId} doesn't exist");
             }
 
             if (vehicle == null)
             {
-                return RepositoryResult<bool>.Fail($"REGISTRATION_VEHICLE_INVALID_ID: " +
+                return Result<bool>.Fail("REGISTRATION_VEHICLE_INVALID_ID",
                     $"Vehicle with the id {request.VehicleId} doesnt exist");
             }
 
             if (insurancePrice == null)
             {
-                return RepositoryResult<bool>.Fail($"REGISTRATION_INSURANCE_PRICE_INVALID_ID: " +
+                return Result<bool>.Fail("REGISTRATION_INSURANCE_PRICE_INVALID_ID",
                     $"Insurance price for the given insurance isn't established yet");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<RegistrationVehicleDto>>
+        public async Task<Result<RegistrationVehicleDto>>
             CreateRegistrationAsync(CreateRegistrationVehicleRequestDto request)
         {
             var vehicle = await vehicleRepository.GetByIdAsync(request.VehicleId);
 
             if(vehicle == null)
             {
-                return RepositoryResult<RegistrationVehicleDto>.Fail(
-                    $"REGISTRATION_VEHICLE_INVALID_ID: Vehicle doesn't exist");
+                return Result<RegistrationVehicleDto>.Fail(
+                    "REGISTRATION_VEHICLE_INVALID_ID","Vehicle doesn't exist");
             }
 
             var insurancePrice = await insurancePricingRepository.GetByInsuranceIdAsync
@@ -112,7 +112,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             if (!validationResult.Success)
             {
-                return RepositoryResult<RegistrationVehicleDto>.Fail(validationResult.Message);
+                return Result<RegistrationVehicleDto>.Fail(validationResult.ErrorCode,validationResult.Message);
             }
 
             var domainRegistration = mapper.Map<Registration>(request);
@@ -134,12 +134,13 @@ namespace VehicleRegistrationSystem.Services.Implementation
             {
                 if(ex.InnerException?.Message.Contains("UQ_Registration_VehicleId") == true)
                 {
-                    return RepositoryResult<RegistrationVehicleDto>.Fail("Vehicle already registered");
+                    return Result<RegistrationVehicleDto>.Fail("VEHICLE_REGISTERED","Vehicle already registered");
                 }
 
                 if(ex.InnerException?.Message.Contains("UQ_Registration_LicensePlate") == true)
                 {
-                    return RepositoryResult<RegistrationVehicleDto>.Fail("License plate already exists");
+                    return Result<RegistrationVehicleDto>.Fail("LICENSE_PLATE_EXISTS", 
+                        "License plate already exists");
                 }
 
                 throw;
@@ -149,83 +150,83 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             var response = mapper.Map<RegistrationVehicleDto>(registration);
 
-            return RepositoryResult<RegistrationVehicleDto>.Ok
+            return Result<RegistrationVehicleDto>.Ok
                 (response, "New vehicle registration has successfully been created!");
         }
 
-        public async Task<RepositoryResult<bool>?> ValidateRegistrationDeleteRequestAsync(Guid id)
+        public async Task<Result<bool>?> ValidateRegistrationDeleteRequestAsync(Guid id)
         {
             if (!await registrationVehicleRepository.ExistsAsync(x => x.Id == id))
             {
-                return RepositoryResult<bool>.Fail
-                    ($"REGISTRATION_INVALID_ID: Registration with the id {id} doesnt exist");
+                return Result<bool>.Fail
+                    ($"REGISTRATION_INVALID_ID","Registration with the id {id} doesnt exist");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<RegistrationVehicleDto>> DeleteRegistrationAsync(Guid id)
+        public async Task<Result<RegistrationVehicleDto>> DeleteRegistrationAsync(Guid id)
         {
             var validationResult = await ValidateRegistrationDeleteRequestAsync(id);
 
             if (!validationResult.Success)
             {
-                return RepositoryResult<RegistrationVehicleDto>.Fail(validationResult.Message);
+                return Result<RegistrationVehicleDto>.Fail(validationResult.ErrorCode,validationResult.Message);
             }
 
             var deletedRegistrationDomain = await registrationVehicleRepository.DeleteAsync(id);
 
             var response = mapper.Map<RegistrationVehicleDto>(deletedRegistrationDomain);
 
-            return RepositoryResult<RegistrationVehicleDto>.Ok
+            return Result<RegistrationVehicleDto>.Ok
                 (response, "Registration of the vehicle has been successfully deleted!");
         }
 
-        public async Task<RepositoryResult<bool>?>
+        public async Task<Result<bool>?>
             ValidateRegistrationUpdateRequestAsync(UpdateRegistrationVehicleRequestDto request)
         {
 
             if (!await registrationVehicleRepository.ExistsAsync(x => x.Id == request.Id))
             {
-                return RepositoryResult<bool>.Fail($"REGISTRATION_INVALID_ID: " +
+                return Result<bool>.Fail("REGISTRATION_INVALID_ID" ,
                     $"Registration with the id {request.Id} not found");
             }
 
             if (await registrationVehicleRepository.ExistsAsync
                 (x => x.VehicleId == request.VehicleId && x.Id!=request.Id))
             {
-                return RepositoryResult<bool>.Fail("VEHICLE_ALREADY_REGISTERED: " +
+                return Result<bool>.Fail("VEHICLE_ALREADY_REGISTERED",
                     "Registration cannot be done because vehicle is already registered");
             }
 
             if (request.RegistrationDate > DateTime.Now)
             {
-                return RepositoryResult<bool>.Fail("REGISTRATION_INVALID_DATE: Date of registration cannot be in the future");
+                return Result<bool>.Fail("REGISTRATION_INVALID_DATE","Date of registration cannot be in the future");
             }
 
             if (!await vehicleRepository.ExistsAsync(x => x.Id == request.VehicleId))
             {
-                return RepositoryResult<bool>.Fail($"REGISTRATION_VEHICLE_INVALID_ID: " +
+                return Result<bool>.Fail("REGISTRATION_VEHICLE_INVALID_ID",
                     $"Vehicle with the id {request.VehicleId} doesnt exist");
             }
 
             if (!await clientRepository.ExistsAsync(x => x.Id == request.ClientId))
             {
-                return RepositoryResult<bool>.Fail($"REGISTRATION_CLIENT_INVALID_ID: " +
+                return Result<bool>.Fail("REGISTRATION_CLIENT_INVALID_ID",
                     $"Client with the id {request.ClientId} doesnt exist");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<RegistrationVehicleDto>>
+        public async Task<Result<RegistrationVehicleDto>>
             UpdateRegistrationAsync(UpdateRegistrationVehicleRequestDto request)
         {
             var validationResult = await ValidateRegistrationUpdateRequestAsync(request);
 
             if (!validationResult.Success)
             {
-                return RepositoryResult<RegistrationVehicleDto>.Fail(validationResult.Message);
+                return Result<RegistrationVehicleDto>.Fail(validationResult.ErrorCode,validationResult.Message);
             }
 
             var registrationDomain = mapper.Map<Registration>(request);
@@ -234,11 +235,11 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
             var response = mapper.Map<RegistrationVehicleDto>(result);
 
-            return RepositoryResult<RegistrationVehicleDto>.Ok
+            return Result<RegistrationVehicleDto>.Ok
                 (response, "Registration of the vehicle has been successfully updated!");
         }
 
-        public async Task<RepositoryResult<PagedResult<RegistrationVehicleListItemDto>>> GetAllAsync
+        public async Task<Result<PagedResult<RegistrationVehicleListItemDto>>> GetAllAsync
             (string? searchQuery = null, int pageNumber = 1, int pageSize = 10)
         {
             var (registrations, totalCount) = await registrationVehicleRepository.GetAllAsync
@@ -250,43 +251,43 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 TotalCount = totalCount
             };
 
-            return RepositoryResult<PagedResult<RegistrationVehicleListItemDto>>.Ok(response);
+            return Result<PagedResult<RegistrationVehicleListItemDto>>.Ok(response);
         }
 
-        public async Task<RepositoryResult<bool>?> ValidateGetByIdAsync(Guid id)
+        public async Task<Result<bool>?> ValidateGetByIdAsync(Guid id)
         {
             if(!await registrationVehicleRepository.ExistsAsync(x=>x.Id == id))
             {
-                return RepositoryResult<bool>.Fail($"REGISTRATION_INVALID_ID: " +
+                return Result<bool>.Fail("REGISTRATION_INVALID_ID",
                     $"Registration with the id {id} not found");
             }
 
-            return RepositoryResult<bool>.Ok(true);
+            return Result<bool>.Ok(true);
         }
 
-        public async Task<RepositoryResult<RegistrationVehicleDto>> GetByIdAsync(Guid id)
+        public async Task<Result<RegistrationDetailsDto>> GetByIdAsync(Guid id)
         {
             var validationResult = await ValidateGetByIdAsync(id);
 
             if(!validationResult.Success)
             {
-                return RepositoryResult<RegistrationVehicleDto>.Fail(validationResult.Message);
+                return Result<RegistrationDetailsDto>.Fail(validationResult.ErrorCode,validationResult.Message);
             }
 
-            var registrationDomain = await registrationVehicleRepository.GetByIdAsync(id);
+            var registrationDomain = await registrationVehicleRepository.GetDetailedRegistrationAsync(id);
 
-            var response = mapper.Map<RegistrationVehicleDto>(registrationDomain);
+            var response = mapper.Map<RegistrationDetailsDto>(registrationDomain);
 
-            return RepositoryResult<RegistrationVehicleDto>.Ok(response);
+            return Result<RegistrationDetailsDto>.Ok(response);
         }
 
-        public async Task<RepositoryResult<RegistrationVehicleDto>> GenerateConfirmation(Guid id)
+        public async Task<Result<RegistrationVehicleDto>> GenerateConfirmation(Guid id)
         {
             var registration = await registrationVehicleRepository.GetByIdAsync(id);
 
             var response = mapper.Map<RegistrationVehicleDto> (registration);
 
-            return RepositoryResult<RegistrationVehicleDto>.Ok(response);
+            return Result<RegistrationVehicleDto>.Ok(response);
         }
     }
 }
