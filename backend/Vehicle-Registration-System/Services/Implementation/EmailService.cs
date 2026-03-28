@@ -19,7 +19,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
         public async Task SendConfirmationEmailAsync(string toEmail, byte[] pdfBytes)
         {
             var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse("jankovic.danilo23@gmail.com"));
+            email.From.Add(MailboxAddress.Parse(emailSettings.Email));
             email.To.Add(MailboxAddress.Parse(toEmail));
             email.Subject = "Vehicle Registration Confirmation";
 
