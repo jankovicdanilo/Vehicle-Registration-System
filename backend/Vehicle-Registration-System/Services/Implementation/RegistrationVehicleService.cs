@@ -41,7 +41,6 @@ namespace VehicleRegistrationSystem.Services.Implementation
             ValidateRegistrationCreateRequestAsync(CreateRegistrationVehicleRequestDto request,
             Vehicle vehicle, InsurancePrice? insurancePrice)
         {
-
             if(await registrationVehicleRepository.ExistsAsync(x => x.VehicleId == request.VehicleId))
             {
                 return Result<bool>.Fail("VEHICLE_ALREADY_REGISTERED",

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace VehicleRegistrationSystem.Data
 {
@@ -112,10 +111,10 @@ namespace VehicleRegistrationSystem.Data
             builder.Entity<IdentityUserRole<string>>().HasData(adminRoles);
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.ConfigureWarnings(warnings =>
-                warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.ConfigureWarnings(warnings =>
+        //        warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+        //}
     }
 }

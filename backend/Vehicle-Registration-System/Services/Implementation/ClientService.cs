@@ -34,7 +34,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     ("Client creation failed: NationalId {NationalId} already exists", request.NationalId);
 
                 return Result<bool>.Fail
-                    ("JMBG_EXISTS","A client with this social security number already exists");
+                    ("NATIONAL_ID_EXISTS",$"A client with this social security number already exists");
             }
 
             if (await clientRepository.ExistsAsync(x => x.IdCardNumber == request.IdCardNumber))
@@ -132,7 +132,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
             if (await clientRepository.ExistsAsync(x => x.NationalId == request.NationalId && x.Id!=request.Id))
             {
                 return Result<bool>.Fail
-                    ("NationalId_EXISTS","A client with this social security number already exists");
+                    ("NATIONAL_ID_EXISTS","A client with this social security number already exists");
             }
 
             if (await clientRepository.ExistsAsync

@@ -123,7 +123,7 @@ namespace VehicleRegistrationSystem.Data
                     ProductionYear = 2022,
                     EngineCapacity = 150,
                     Weight = 300,
-                    EnginePowerKw = 15,
+                    EnginePowerKw = 35,
                     ChassisNumber = "WBAXX12345678901",
                     FirstRegistrationDate = new DateTime(2023, 3, 10),
                     FuelType = "Petrol"
@@ -137,7 +137,7 @@ namespace VehicleRegistrationSystem.Data
                     ProductionYear = 2020,
                     EngineCapacity = 1800,
                     Weight = 1400,
-                    EnginePowerKw = 45,
+                    EnginePowerKw = 65,
                     ChassisNumber = "JTDBR32E720123456",
                     FirstRegistrationDate = new DateTime(2022, 6, 1),
                     FuelType = "Diesel"
@@ -151,7 +151,7 @@ namespace VehicleRegistrationSystem.Data
                     ProductionYear = 2020,
                     EngineCapacity = 4000,
                     Weight = 4200,
-                    EnginePowerKw = 300,
+                    EnginePowerKw = 90,
                     ChassisNumber = "ACAEBF12345678902",
                     FirstRegistrationDate = new DateTime(2023, 3, 10),
                     FuelType = "Diesel"
@@ -201,7 +201,7 @@ namespace VehicleRegistrationSystem.Data
                 {
                     Id = Guid.Parse("70707070-7070-7070-7070-707070707070"),
                     InsuranceId = allianzId,
-                    MinKw = 0,
+                    MinKw = 1,
                     MaxKw = 50,
                     PricePerKw = 220
                 },
@@ -212,6 +212,22 @@ namespace VehicleRegistrationSystem.Data
                     MinKw = 51,
                     MaxKw = 100,
                     PricePerKw = 270
+                },
+                new InsurancePrice
+                {
+                    Id = Guid.Parse("156f70c9-94bf-40e6-ad5b-8efa662f3a22"),
+                    InsuranceId = generaliId,
+                    MinKw = 1,
+                    MaxKw = 50,
+                    PricePerKw = 225
+                },
+                new InsurancePrice
+                {
+                    Id = Guid.Parse("8dade321-ff73-43f0-9cf0-2c3ec1ce0700"),
+                    InsuranceId = generaliId,
+                    MinKw = 51,
+                    MaxKw = 100,
+                    PricePerKw = 265
                 }
             );
 

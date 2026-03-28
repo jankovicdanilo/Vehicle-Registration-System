@@ -33,6 +33,41 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     $" with the id {request.InsuranceId} not found");
             }
 
+            // Get all existing prices for this insurance
+            var existingPrices = await insurancePricingRepository
+                .FindAsync(x=>x.InsuranceId == request.InsuranceId);
+
+            // Check for overlapping ranges
+            var hasOverlap = existingPrices.Any(x =>
+            request.MinKw <= x.MaxKw && request.MaxKw >= x.MinKw);
+
+            if (hasOverlap)
+            {
+                return Result<bool>.Fail("INSURANCE_PRICE_OVERLAP",
+                    "This price range overlaps with an existing range");
+            }
+
+            /* Check for gaps — if there are existing prices, the new range
+             must connect to an existing one */
+            if (existingPrices.Any())
+            {
+                var connectsToExisting = existingPrices.Any(x=>
+                request.MinKw == x.MaxKw + 1 || request.MaxKw == x.MinKw - 1);
+
+                if(!connectsToExisting)
+                {
+                    return Result<bool>.Fail("INSURANCE_PRICE_GAP",
+                    "Price range must connect to an existing range without gaps");
+                }
+            }
+
+            // Validate that MinKw is less than MaxKw
+            if (request.MinKw >= request.MaxKw)
+            {
+                return Result<bool>.Fail("INSURANCE_PRICE_INVALID_RANGE",
+                    "MinKw must be less than MaxKw");
+            }
+
             return Result<bool>.Ok(true);
         }
 

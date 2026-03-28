@@ -11,15 +11,22 @@ namespace VehicleRegistrationSystem.Repositories.Implementation
     {
         public InsurancePricingRepository(VehicleRegistrationDbContext appDbContext) : base(appDbContext) { }
 
-        public async Task<List<InsurancePrice>> GetAllAsync()
+        public async Task<InsurancePrice?> GetByInsuranceIdAsync(Guid id, int kw)
         {
-            return await appDbContext.InsurancePrices.ToListAsync();
-        }
+            var exactMatch = await appDbContext.InsurancePrices
+                .Where(x => x.InsuranceId == id && x.MinKw <= kw && x.MaxKw >= kw)
+                .OrderByDescending(x => x.MinKw)
+                .FirstOrDefaultAsync();
 
-        public async Task<InsurancePrice> GetByInsuranceIdAsync(Guid id, int kw)
-        {
-            return await appDbContext.InsurancePrices.
-                Where(x => x.MinKw <= kw && x.MaxKw >= kw).FirstOrDefaultAsync(x => x.InsuranceId == id);
+            if(exactMatch != null)
+            {
+                return exactMatch;
+            }
+
+            return await appDbContext.InsurancePrices
+                .Where(x => x.InsuranceId == id)
+                .OrderByDescending(x => x.MaxKw)
+                .FirstOrDefaultAsync();
         }
     }
 }

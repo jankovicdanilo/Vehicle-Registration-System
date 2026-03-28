@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VehicleRegistrationSystem.Data;
 
@@ -11,9 +12,11 @@ using VehicleRegistrationSystem.Data;
 namespace VehicleRegistrationSystem.Migrations
 {
     [DbContext(typeof(VehicleRegistrationDbContext))]
-    partial class VehicleRegistrationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260328103511_fixed insurance pricing seeding")]
+    partial class fixedinsurancepricingseeding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -294,7 +297,7 @@ namespace VehicleRegistrationSystem.Migrations
                             Id = new Guid("30303030-3030-3030-3030-303030303030"),
                             ChassisNumber = "WBAXX12345678901",
                             EngineCapacity = 150f,
-                            EnginePowerKw = 35,
+                            EnginePowerKw = 15,
                             FirstRegistrationDate = new DateTime(2023, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FuelType = "Petrol",
                             ProductionYear = 2022,
@@ -308,7 +311,7 @@ namespace VehicleRegistrationSystem.Migrations
                             Id = new Guid("40404040-4040-4040-4040-404040404040"),
                             ChassisNumber = "JTDBR32E720123456",
                             EngineCapacity = 1800f,
-                            EnginePowerKw = 65,
+                            EnginePowerKw = 45,
                             FirstRegistrationDate = new DateTime(2022, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FuelType = "Diesel",
                             ProductionYear = 2020,
@@ -322,7 +325,7 @@ namespace VehicleRegistrationSystem.Migrations
                             Id = new Guid("50505050-5050-5050-5050-505050505050"),
                             ChassisNumber = "ACAEBF12345678902",
                             EngineCapacity = 4000f,
-                            EnginePowerKw = 90,
+                            EnginePowerKw = 300,
                             FirstRegistrationDate = new DateTime(2023, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FuelType = "Diesel",
                             ProductionYear = 2020,
