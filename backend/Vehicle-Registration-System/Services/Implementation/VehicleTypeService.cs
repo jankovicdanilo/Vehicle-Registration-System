@@ -71,20 +71,19 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<Result<bool>> ValidateVehicleTypeDeleteRequestAsync(Guid id)
         {
-            var hasBrands = await vehicleBrandRepository.ExistsAsync(x => x.VehicleTypeId == id);
-
-            if (hasBrands)
-            {
-                return Result<bool>.Fail
-                    ("TYPE_HAS_BRANDS", "Vehicle type cannot be deleted because it has associated brands.");
-            }
-
             var exists = await vehicleTypeRepository.ExistsAsync(x => x.Id == id);
+            var hasBrands = await vehicleBrandRepository.ExistsAsync(x => x.VehicleTypeId == id);
 
             if (!exists)
             {
                 return Result<bool>.Fail
                     ($"VEHICLE_TYPE_NOT_FOUND", $"Vehicle type with the id {id} doesnt exist");
+            }
+
+            if (hasBrands)
+            {
+                return Result<bool>.Fail
+                    ("TYPE_HAS_BRANDS", "Vehicle type cannot be deleted because it has associated brands.");
             }
 
             return Result<bool>.Ok(true);

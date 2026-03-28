@@ -117,7 +117,7 @@ namespace VehicleRegistrationSystem.Repositories.Implementation
                 .ThenInclude(vm => vm.VehicleBrand)
                 .Include(v => v.Vehicle)
                 .ThenInclude(v => v.VehicleModel)
-                .Include(i => i.Insurance).FirstOrDefaultAsync();
+                .Include(i => i.Insurance).FirstOrDefaultAsync(x=>x.Id==id);
         }
 
         public async Task<Registration?> UpdateAsync(Registration request)

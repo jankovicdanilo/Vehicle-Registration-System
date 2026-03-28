@@ -6,16 +6,25 @@ Designed as an enterprise-style system with clearly separated backend and fronte
 
 ---
 
+## 📋 Prerequisites
+
+* .NET 8 SDK
+* SQL Server
+* Node.js & npm
+* Angular CLI (`npm install -g @angular/cli`)
+
+---
+
 ## 🏗 Architecture
 
 The application follows a layered architecture:
 
-* Presentation Layer (Angular Frontend)
-* API Layer (ASP.NET Core Web API)
-* Service Layer (Business Logic)
-* Repository Layer (Data Access)
 * Database Layer (SQL Server)
-
+* Repository Layer (Data Access)
+* Service Layer (Business Logic)
+* API Layer (ASP.NET Core Web API)
+* Presentation Layer (Angular Frontend)
+ 
 Additional architectural patterns:
 
 * Repository Pattern with generic `RepositoryBase`
@@ -65,7 +74,7 @@ Additional architectural patterns:
 
 * Generic `RepositoryBase` implementation to reduce duplication
 * Service layer responsible for business logic and validation
-* Advanced validation rules (cross-entity checks such as vehicle–brand–type consistency)
+* Advanced validation rules (cross-entity checks such as vehicle-brand-type consistency)
 * Concurrency-safe operations using database constraints
 * Unique constraints:
 
@@ -79,7 +88,7 @@ Additional architectural patterns:
 ## 🧠 Business Logic Examples
 
 * Prevent duplicate vehicle registrations
-* Validate vehicle–brand–model relationships
+* Validate vehicle-brand-model relationships
 * Ensure insurance pricing exists before registration
 * Calculate registration price dynamically based on:
 
@@ -102,11 +111,18 @@ Additional architectural patterns:
 ### Backend
 
 1. Clone the repository
-2. Configure the connection string in `appsettings.json`
-3. Run:
+2. Copy `appsettings.example.json` to `appsettings.json` and fill in your values
+3. Set up User Secrets with your connection string, JWT key, and email password
+4. Apply database migrations:
+```
+   dotnet ef database update --context VehicleRegistrationDbContext
+   dotnet ef database update --context AuthDbContext
+```
+5. Navigate to the backend folder and run:
 
 ```
-dotnet run
+   cd backend/Vehicle-Registration-System
+   dotnet run
 ```
 
 ### Frontend
@@ -129,19 +145,12 @@ npm install
 ng serve
 ```
 
----
+## Test Data
 
-## 📈 Purpose of the Project
-
-This project demonstrates:
-
-* Full-stack development skills
-* Backend system design with clean architecture
-* Repository pattern and abstraction layers
-* Validation and business rule enforcement
-* Secure authentication with JWT
-* Database modeling and integrity constraints
-* Handling real-world backend challenges (concurrency, data consistency)
+The database seeds default users on first migration:
+- Admin: `admin@test.com` / `Admin123!`
+- Manager: `manager@test.com` / `Manager123!`  
+- Employee: `employee@test.com` / `Employee123!`
 
 ---
 

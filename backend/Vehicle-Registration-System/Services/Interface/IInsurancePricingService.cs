@@ -7,8 +7,6 @@ namespace VehicleRegistrationSystem.Services.Interface
     {
         Task<Result<bool>> ValidateCreateAsync(CreateInsurancePriceRequestDto request);
 
-        Task<Result<bool>> ValidateGetAllAsync();
-
         Task<Result<bool>> ValidateGetByIdAsync(Guid id);
 
         Task<Result<bool>> ValidateGetByInsuranceIdAsync(Guid id);

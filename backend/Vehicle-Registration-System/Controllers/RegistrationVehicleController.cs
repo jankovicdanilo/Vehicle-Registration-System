@@ -71,8 +71,8 @@ namespace VehicleRegistrationSystem.Controllers
             return Ok(result);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var result = await registrationVehicleService.DeleteRegistrationAsync(id);
 

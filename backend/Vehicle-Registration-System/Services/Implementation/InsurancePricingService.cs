@@ -54,11 +54,6 @@ namespace VehicleRegistrationSystem.Services.Implementation
             return Result<InsurancePriceDto>.Ok(response, "New insurance price has been created!");
         }
 
-        public Task<Result<bool>> ValidateGetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Result<List<InsurancePriceDto>>> GetAllAsync()
         {
             var insurancePricesDomainList = await insurancePricingRepository.GetAllAsync();

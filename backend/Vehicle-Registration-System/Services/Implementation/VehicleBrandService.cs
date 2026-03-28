@@ -73,16 +73,16 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<Result<bool>> ValidateVehicleBrandDeleteRequestAsync(Guid id)
         {
-            if(await vehicleModelRepository.ExistsAsync(x=>x.VehicleBrandId == id))
-            {
-                return Result<bool>.Fail("VEHICLE_BRAND_HAS_MODELS",
-                    " Vehicle brand has models and can't be deleted");
-            }
-
-            if(!await vehicleBrandRepository.ExistsAsync(x=>x.Id == id))
+            if (!await vehicleBrandRepository.ExistsAsync(x => x.Id == id))
             {
                 return Result<bool>.Fail("VEHICLE_BRAND_NOT_FOUND",
                     $"Vehicle brand with Id {id} was not found");
+            }
+
+            if (await vehicleModelRepository.ExistsAsync(x=>x.VehicleBrandId == id))
+            {
+                return Result<bool>.Fail("VEHICLE_BRAND_HAS_MODELS",
+                    " Vehicle brand has models and can't be deleted");
             }
 
             if(await vehicleRepository.ExistsAsync(x=>x.VehicleBrandId == id))
@@ -161,7 +161,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
         {
             if(!await vehicleBrandRepository.ExistsAsync(x=>x.VehicleTypeId ==  id))
             {
-                return Result<bool>.Fail("INCORRECT TYPE ID",$"Vehicle type with the id {id}" +
+                return Result<bool>.Fail("INCORRECT_TYPE_ID",$"Vehicle type with the id {id}" +
                     $" doesn't exist!");
             }
 
@@ -188,7 +188,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
         {
             if (!await vehicleBrandRepository.ExistsAsync(x => x.Id == id))
             {
-                return Result<bool>.Fail("INCORRECT BRAND ID", $"Vehicle brand with the  id {id}" +
+                return Result<bool>.Fail("INCORRECT_BRAND_ID", $"Vehicle brand with the  id {id}" +
                     $" doesn't exist!");
             }
 

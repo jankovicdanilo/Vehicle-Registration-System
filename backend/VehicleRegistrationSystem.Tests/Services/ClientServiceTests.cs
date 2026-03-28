@@ -48,6 +48,7 @@ namespace VehicleRegistrationSystem.Tests.Services
             result.Success.Should().BeFalse();
         }
 
+        [Fact]
         public async Task ValidateClientCreateRequestAsync_ShouldPass_WhenNationalIdDoesNotExist()
         {
             var request = new CreateClientRequestDto

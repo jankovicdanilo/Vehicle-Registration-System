@@ -22,6 +22,7 @@ namespace VehicleRegistrationSystem.Services.Implementation
             this.mapper = mapper;
             this.vehicleModelRepository = vehicleModelRepository;
             this.vehicleBrandRepository = vehicleBrandRepository;
+            this.vehicleRepository = vehicleRepository;
         }
 
         public async Task<Result<bool>> 
