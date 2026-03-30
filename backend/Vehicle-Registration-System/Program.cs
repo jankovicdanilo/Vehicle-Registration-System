@@ -182,6 +182,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+/* Development CORS policy - in production this should be
+ restricted to specific origins*/
 app.UseCors(options =>
 {
     options.AllowAnyHeader();

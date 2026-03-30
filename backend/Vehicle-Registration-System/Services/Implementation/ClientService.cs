@@ -28,33 +28,10 @@ namespace VehicleRegistrationSystem.Services.Implementation
 
         public async Task<Result<bool>> ValidateClientCreateRequestAsync(CreateClientRequestDto request)
         {
-            if (await clientRepository.ExistsAsync(x => x.NationalId == request.NationalId))
-            {
-                logger.LogWarning
-                    ("Client creation failed: NationalId {NationalId} already exists", request.NationalId);
-
-                return Result<bool>.Fail
-                    ("NATIONAL_ID_EXISTS",$"A client with this social security number already exists");
-            }
-
-            if (await clientRepository.ExistsAsync(x => x.IdCardNumber == request.IdCardNumber))
-            {
-                logger.LogWarning
-                    ("Client creation failed: IdCardNumber {IdCardNumber} already exists", request.IdCardNumber);
-
-                return Result<bool>.Fail
-                    ("ID_CARD_EXISTS","A client with this ID card number already exists");
-            }
-
-            if (await clientRepository.ExistsAsync(x => x.Email == request.Email))
-            {
-                logger.LogWarning("Client creation failed"," Email {Email} already exists", request.Email);
-
-                return Result<bool>.Fail
-                    ("EMAIL_EXISTS","A client with this email adress already exists");
-            }
-
-            return Result<bool>.Ok(true);
+            return await ValidateUniqueClientFields(
+                request.NationalId,
+                request.IdCardNumber,
+                request.Email);
         }
 
         public async Task<Result<ClientDto>> CreateClientAsync(CreateClientRequestDto request)
@@ -129,26 +106,10 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     ($"CLIENT_NOT_FOUND","Client with the Id {request.Id} was not found");
             }
 
-            if (await clientRepository.ExistsAsync(x => x.NationalId == request.NationalId && x.Id!=request.Id))
-            {
-                return Result<bool>.Fail
-                    ("NATIONAL_ID_EXISTS","A client with this social security number already exists");
-            }
-
-            if (await clientRepository.ExistsAsync
-                (x => x.IdCardNumber == request.IdCardNumber && x.Id != request.Id))
-            {
-                return Result<bool>.Fail
-                    ("ID_CARD_EXISTS","A client with this ID card number already exists");
-            }
-
-            if (await clientRepository.ExistsAsync(x => x.Email == request.Email && x.Id != request.Id))
-            {
-                return Result<bool>.Fail
-                    ("EMAIL_EXISTS", "A client with this email adress already exists");
-            }
-
-            return Result<bool>.Ok(true);
+            return await ValidateUniqueClientFields(
+                request.NationalId,
+                request.IdCardNumber,
+                request.Email);
         }
 
         public async Task<Result<ClientDto>> UpdateClientAsync(UpdateClientRequestDto request)
@@ -210,7 +171,33 @@ namespace VehicleRegistrationSystem.Services.Implementation
             return Result<ClientDto>.Ok(response);
         }
 
-        
+        private async Task<Result<bool>> ValidateUniqueClientFields(string nationalId, 
+            string idCardNumber, string email, Guid? excludeId = null)
+        {
+            if (await clientRepository.ExistsAsync(x => x.NationalId == nationalId && 
+                    (excludeId == null || x.Id != excludeId)))
+            {
+                return Result<bool>.Fail
+                    ("NATIONAL_ID_EXISTS", "A client with this social security number already exists");
+            }
+
+            if (await clientRepository.ExistsAsync
+                (x => x.IdCardNumber == idCardNumber && 
+                    (excludeId == null || x.Id !=excludeId)))
+            {
+                return Result<bool>.Fail
+                    ("ID_CARD_EXISTS", "A client with this ID card number already exists");
+            }
+
+            if (await clientRepository.ExistsAsync(x => x.Email == email && 
+            (excludeId == null || x.Id != excludeId)))
+            {
+                return Result<bool>.Fail
+                    ("EMAIL_EXISTS", "A client with this email adress already exists");
+            }
+
+            return Result<bool>.Ok(true);
+        }
     }
 }
 
