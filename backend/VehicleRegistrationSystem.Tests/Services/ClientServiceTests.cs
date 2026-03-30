@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using Azure.Core;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Linq.Expressions;
@@ -32,37 +33,121 @@ namespace VehicleRegistrationSystem.Tests.Services
         }
 
         [Fact]
-        public async Task ValidateClientCreateRequestAsync_ShouldFail_WhenNationalIdExists()
+        public async Task ValidateClientCreateUpdateRequestAsyn_ShouldFail_WhenNationalIdExists()
         {
             var request = new CreateClientRequestDto
             {
-                NationalId = "123456789"
+                NationalId = "123456789",
+                IdCardNumber = "ABC123",
+                Email = "test@test.com"
             };
 
             clientRepositoryMock
-                .Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<Client,bool>>>()))
+                .SetupSequence(x => x.ExistsAsync(It.IsAny<Expression<Func<Client,bool>>>()))
                 .ReturnsAsync(true);
 
             var result = await clientService.ValidateClientCreateRequestAsync(request);
 
             result.Success.Should().BeFalse();
+            result.ErrorCode.Should().Be("NATIONAL_ID_EXISTS");
         }
 
         [Fact]
-        public async Task ValidateClientCreateRequestAsync_ShouldPass_WhenNationalIdDoesNotExist()
+        public async Task ValidateClientCreateUpdateRequestAsyn_ShouldFail_WhenIdCardNumberExists()
         {
             var request = new CreateClientRequestDto
             {
-                NationalId = "123456789"
+                NationalId = "123456789",
+                IdCardNumber = "ABC123",
+                Email = "test@test.com"
             };
+
+            clientRepositoryMock
+                .SetupSequence(x => x.ExistsAsync(It.IsAny<Expression<Func<Client, bool>>>()))
+                .ReturnsAsync(false)
+                .ReturnsAsync (true);
+
+            var result = await clientService.ValidateClientCreateRequestAsync(request);
+
+            result.Success.Should().BeFalse();
+            result.ErrorCode.Should().Be("ID_CARD_EXISTS");
+        }
+
+        [Fact]
+        public async Task ValidateClientCreateUpdateRequestAsyn_ShouldFail_WhenEmailExists()
+        {
+            var request = new CreateClientRequestDto
+            {
+                NationalId = "123456789",
+                IdCardNumber = "ABC123",
+                Email = "test@test.com"
+            };
+
+            clientRepositoryMock
+                .SetupSequence(x=>x.ExistsAsync(It.IsAny<Expression<Func<Client, bool>>>()))
+                .ReturnsAsync(false)
+                .ReturnsAsync(false)
+                .ReturnsAsync (true);
+
+            var result = await clientService.ValidateClientCreateRequestAsync(request);
+
+            result.Success.Should().BeFalse();
+            result.ErrorCode.Should().Be("EMAIL_EXISTS");
+        }
+
+        [Fact]
+        public async Task ValidateClientCreateUpdateRequestAsync_ShouldPass_WhenAllFieldsAreUnique()
+        {
+            var request = new CreateClientRequestDto
+            {
+                NationalId = "123456789",
+                IdCardNumber = "ABC123",
+                Email = "test@test.com"
+            };
+
+            clientRepositoryMock
+                .SetupSequence(x => x.ExistsAsync(It.IsAny<Expression<Func<Client, bool>>>()))
+                .ReturnsAsync(false)
+                .ReturnsAsync(false)
+                .ReturnsAsync(false);
+
+            var result = await clientService.ValidateClientCreateRequestAsync(request);
+
+            result.Success.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task ValidateClientId_ShouldFail_WhenClientDoesNotExist()
+        {
+            Guid id = Guid.NewGuid();
 
             clientRepositoryMock
                 .Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<Client, bool>>>()))
                 .ReturnsAsync(false);
 
-            var result = await clientService.ValidateClientCreateRequestAsync(request);
+            var result = await clientService.ValidateClientId(id);
 
-            result.Success!.Should().BeTrue();
+            result.Success.Should().BeFalse();
+            result.ErrorCode.Should().Be("CLIENT_NOT_FOUND");
+        }
+
+        [Fact]
+        public async Task ValidateClientDeleteRequestAsync_ShouldFail_WhenClientDoesNotExist()
+        {
+            Guid id = Guid.NewGuid();
+
+            clientRepositoryMock
+                .Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<Client, bool>>>()))
+                .ReturnsAsync(true);
+
+            registrationRepositoryMock
+                .Setup(x=>x.ExistsAsync(It.IsAny<Expression<Func<Registration,bool>>>()))
+                .ReturnsAsync(true);
+
+            var result = await clientService.ValidateClientDeleteRequestAsync(id);
+
+            result.Success.Should().BeFalse();
+            result.ErrorCode.Should().Be("CLIENT_REGISTRATION_EXISTS");
         }
     }
 }
