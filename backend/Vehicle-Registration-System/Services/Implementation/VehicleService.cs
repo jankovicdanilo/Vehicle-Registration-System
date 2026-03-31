@@ -31,40 +31,15 @@ namespace VehicleRegistrationSystem.Services.Implementation
             this.registrationVehicleRepository = registrationVehicleRepository;
         }
 
+        
+
         public async Task<Result<bool>> 
             ValidateVehicleCreateRequestAsync(CreateVehicleRequestDto request)
         {
-            if (!await vehicleTypeRepository.ExistsAsync(t => t.Id == request.VehicleTypeId))
-                return Result<bool>.Fail("TYPE_NOT_FOUND", "Vehicle type doesn't exist");
-
-            if (!await vehicleBrandRepository.ExistsAsync(m => m.Id == request.VehicleBrandId))
-                return Result<bool>.Fail("BRAND_NOT_FOUND", "Vehicle brand doesn't exist");
-
-            if (!await vehicleModelRepository.ExistsAsync(m => m.Id == request.VehicleModelId))
-                return Result<bool>.Fail("MODEL_NOT_FOUND", "Vehicle model doesn't exist");
-
-            bool isValid = await vehicleRepository.IsVehicleModelValidAsync
-                (request.VehicleModelId, request.VehicleBrandId, request.VehicleTypeId);
-
-            if (!isValid)
-                return Result<bool>.Fail("INVALID_COMBINATION",
-                    "Model doesn't match brand and vehicle type");
-
-            if (await vehicleRepository.ExistsAsync(x => x.ChassisNumber == request.ChassisNumber))
-                return Result<bool>.Fail("CHASSIS_NUMBER_EXISTS", "Chassis number already used");
-
-            if (request.ProductionYear < 1900 || request.ProductionYear > DateTime.Now.Year)
-                return Result<bool>.Fail("INVALID_YEAR", "Invalid production year");
-
-            if (request.EnginePowerKw <= 0)
-                return Result<bool>.Fail("INVALID_ENGINE_POWER",
-                    "Engine power must be greater than zero");
-
-            if (request.ProductionYear > request.FirstRegistrationDate.Year)
-                return Result<bool>.Fail("PRODUCTION_DATE_AFTER_FIRST_REGISTRATION",
-                    "The car's production year must be before or equal to its first registration date.");
-
-            return Result<bool>.Ok(true);
+            return await ValidateUniqueVehicleFields(
+                request.VehicleTypeId, request.VehicleBrandId, request.VehicleModelId,
+                request.ChassisNumber, request.ProductionYear, request.EnginePowerKw,
+                request.FirstRegistrationDate, request.EngineCapacity);
         }
 
         public async Task<Result<VehicleDto>> CreateVehicleAsync(CreateVehicleRequestDto request)
@@ -134,40 +109,10 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     $"Vehicle with the Id {request?.Id} was not found");
             }
 
-            if (!await vehicleTypeRepository.ExistsAsync(t => t.Id == request.VehicleTypeId))
-                return Result<bool>.Fail("TYPE_NOT_FOUND", "Vehicle type doesn't exist");
-
-            if (!await vehicleBrandRepository.ExistsAsync(m => m.Id == request.VehicleBrandId))
-                return Result<bool>.Fail("BRAND_NOT_FOUND","Vehicle brand doesn't exist");
-
-            if (!await vehicleModelRepository.ExistsAsync(m => m.Id == request.VehicleModelId))
-                return Result<bool>.Fail("MODEL_NOT_FOUND", "Vehicle model doesn't exist");
-
-            var isValid = await vehicleRepository.IsVehicleModelValidAsync
-                (request.VehicleModelId, request.VehicleBrandId, request.VehicleTypeId);
-
-            if (!isValid)
-                return Result<bool>.Fail("INVALID_COMBINATION",
-                    "Model doesn't match brand and vehicle type");
-
-
-
-            if (await vehicleRepository.ExistsAsync(x => x.ChassisNumber == request.ChassisNumber &&
-            x.Id != request.Id))
-                return Result<bool>.Fail("CHASSIS_NUMBER_EXISTS","Chassis number already used");
-
-            if (request.ProductionYear < 1900 || request.ProductionYear > DateTime.Now.Year)
-                return Result<bool>.Fail("INVALID_YEAR", "Invalid production year");
-
-            if (request.EnginePowerKw <= 0)
-                return Result<bool>.Fail("INVALID_ENGINE_POWER",
-                    "Engine power must be greater than zero");
-
-            if (request.ProductionYear > request.FirstRegistrationDate.Year)
-                return Result<bool>.Fail("PRODUCTION_DATE_AFTER_FIRST_REGISTRATION",
-                    "The car's production year must be before or equal to its first registration date.");
-
-            return Result<bool>.Ok(true);
+            return await ValidateUniqueVehicleFields(
+                request.VehicleTypeId, request.VehicleBrandId, request.VehicleModelId,
+                request.ChassisNumber, request.ProductionYear, request.EnginePowerKw,
+                request.FirstRegistrationDate, request.EngineCapacity);
         }
 
         public async Task<Result<VehicleDto>> UpdateVehicleAsync(UpdateVehicleDto request)
@@ -224,6 +169,64 @@ namespace VehicleRegistrationSystem.Services.Implementation
             var response = await vehicleRepository.GetVehicleByIdAsync(id);
 
             return Result<VehicleDto>.Ok(response);
+        }
+
+        private async Task<Result<bool>> ValidateUniqueVehicleFields
+                (Guid vehicleTypeId, Guid vehicleBrandId,
+                 Guid vehicleModelId, string chassisNumber,
+                 int productionYear, int enginePowerKw,
+                 DateTime firstRegistrationDate, float engineCapacity)
+        {
+            if (!await vehicleTypeRepository.
+                ExistsAsync(t => t.Id == vehicleTypeId))
+                return Result<bool>.Fail
+                    ("TYPE_NOT_FOUND", "Vehicle type doesn't exist");
+
+            if (!await vehicleBrandRepository.ExistsAsync
+                (m => m.Id == vehicleBrandId))
+                return Result<bool>.Fail
+                    ("BRAND_NOT_FOUND", "Vehicle brand doesn't exist");
+
+            if (!await vehicleModelRepository.ExistsAsync
+                (m => m.Id == vehicleModelId))
+                return Result<bool>.Fail
+                    ("MODEL_NOT_FOUND", "Vehicle model doesn't exist");
+
+            bool isValid = await vehicleRepository.IsVehicleModelValidAsync
+               (vehicleModelId, vehicleBrandId,
+               vehicleTypeId);
+
+            if (!isValid)
+                return Result<bool>.Fail("INVALID_COMBINATION",
+                    "Model doesn't match brand and vehicle type");
+
+            if (await vehicleRepository.ExistsAsync
+                (x => x.ChassisNumber == chassisNumber))
+                return Result<bool>.Fail
+                    ("CHASSIS_NUMBER_EXISTS", "Chassis number already used");
+
+            if (productionYear < 1900 ||
+                productionYear > DateTime.Now.Year)
+                return Result<bool>.Fail
+                    ("INVALID_YEAR", "Invalid production year");
+
+            if (enginePowerKw <= 0)
+                return Result<bool>.Fail("INVALID_ENGINE_POWER",
+                    "Engine power must be greater than zero");
+
+            if (productionYear > firstRegistrationDate.Year)
+                return Result<bool>.Fail
+                    ("PRODUCTION_DATE_AFTER_FIRST_REGISTRATION",
+                    "The car's production year must be before or " +
+                    "equal to its first registration date.");
+
+            if (engineCapacity <= 0)
+            {
+                return Result<bool>.Fail("INVALID_ENGINE_CAPACITY",
+                    "Engine power must be greater than zero");
+            }
+
+            return Result<bool>.Ok(true);
         }
     }
 }
