@@ -18,10 +18,13 @@ namespace VehicleRegistrationSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List([FromQuery] string? searchQuery, [FromQuery] int pageSize = 10,
+        public async Task<IActionResult> List(
+            [FromQuery] string? searchQuery, 
+            [FromQuery] int pageSize = 10,
             [FromQuery] int pageNumber = 1)
         {
-            var result = await vehicleService.GetAllAsync(searchQuery, pageSize, pageNumber);
+            var result = await vehicleService.GetAllAsync
+                (searchQuery, pageSize, pageNumber);
             
             return Ok(result);
         }
@@ -40,7 +43,8 @@ namespace VehicleRegistrationSystem.Controllers
                 });
             }
 
-            return CreatedAtAction(nameof(GetVehicleById), new { id = result.Data.Id }, result);
+            return CreatedAtAction(nameof(GetVehicleById), 
+                new { id = result.Data.Id }, result);
         }
 
         [HttpGet("{id:guid}")]

@@ -23,7 +23,8 @@ namespace VehicleRegistrationSystem.Services.Implementation
             this.registrationVehicleRepository = registrationVehicleRepository;
         }
 
-        public async Task<Result<bool>> ValidateClientCreateRequestAsync(CreateClientRequestDto request)
+        public async Task<Result<bool>> ValidateClientCreateRequestAsync
+            (CreateClientRequestDto request)
         {
             return await ValidateUniqueClientFields(
                 request.NationalId,
@@ -31,7 +32,8 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 request.Email);
         }
 
-        public async Task<Result<ClientDto>> CreateClientAsync(CreateClientRequestDto request)
+        public async Task<Result<ClientDto>> CreateClientAsync
+            (CreateClientRequestDto request)
         {
             logger.LogInformation("Starting client creation for email {Email}", request.Email);
 
@@ -93,14 +95,15 @@ namespace VehicleRegistrationSystem.Services.Implementation
             return Result<ClientDto>.Ok(response, "Client successfully deleted!");
         }
 
-        public async Task<Result<bool>> ValidateClientUpdateRequestAsync(UpdateClientRequestDto request)
+        public async Task<Result<bool>> ValidateClientUpdateRequestAsync
+            (UpdateClientRequestDto request)
         {
             var exists = await clientRepository.ExistsAsync(x => x.Id == request.Id);
 
             if (!exists)
             {
                 return Result<bool>.Fail
-                    ($"CLIENT_NOT_FOUND","Client with the Id {request.Id} was not found");
+                    ("CLIENT_NOT_FOUND",$"Client with the Id {request.Id} was not found");
             }
 
             return await ValidateUniqueClientFields(
@@ -109,13 +112,15 @@ namespace VehicleRegistrationSystem.Services.Implementation
                 request.Email);
         }
 
-        public async Task<Result<ClientDto>> UpdateClientAsync(UpdateClientRequestDto request)
+        public async Task<Result<ClientDto>> UpdateClientAsync
+            (UpdateClientRequestDto request)
         {
             var validationResult = await ValidateClientUpdateRequestAsync(request);
 
             if (!validationResult.Success)
             {
-                return Result<ClientDto>.Fail(validationResult.ErrorCode,validationResult.Message);
+                return Result<ClientDto>.Fail
+                    (validationResult.ErrorCode,validationResult.Message);
             }
 
             var clientDomain = mapper.Map<Client>(request);
@@ -130,7 +135,8 @@ namespace VehicleRegistrationSystem.Services.Implementation
         public async Task<Result<PagedResult<ClientListItemDto>>> GetClientsAsync
             (string? searchQuery = null, int pageNumber = 1, int pageSize = 10)
         {
-            var (clients, totalCount) = await clientRepository.GetAllAsync(searchQuery, pageNumber, pageSize);
+            var (clients, totalCount) = await clientRepository.
+                GetAllAsync(searchQuery, pageNumber, pageSize);
 
             var response = new PagedResult<ClientListItemDto>
             {
@@ -139,14 +145,16 @@ namespace VehicleRegistrationSystem.Services.Implementation
             };
 
 
-            return Result<PagedResult<ClientListItemDto>>.Ok(response, "Clients loaded successfully");
+            return Result<PagedResult<ClientListItemDto>>.Ok(response, 
+                "Clients loaded successfully");
         }
 
         public async Task<Result<bool>> ValidateClientId(Guid id)
         {
             if (!await clientRepository.ExistsAsync(x => x.Id == id))
             {
-                return Result<bool>.Fail("CLIENT_NOT_FOUND", $"Client with the Id {id} was not found");
+                return Result<bool>.Fail("CLIENT_NOT_FOUND", $"Client with the Id " +
+                    $"{id} was not found");
             }
 
             return Result<bool>.Ok(true);
@@ -175,7 +183,8 @@ namespace VehicleRegistrationSystem.Services.Implementation
                     (excludeId == null || x.Id != excludeId)))
             {
                 return Result<bool>.Fail
-                    ("NATIONAL_ID_EXISTS", "A client with this social security number already exists");
+                    ("NATIONAL_ID_EXISTS", "A client with this social " +
+                    "security number already exists");
             }
 
             if (await clientRepository.ExistsAsync
